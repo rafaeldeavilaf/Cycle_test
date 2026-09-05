@@ -4,14 +4,40 @@ Juegos de estudio para los Cycle Tests de Samuel (Year 6, colegio británico IB)
 Cada test es un juego de 5 niveles; cada nivel es un día de estudio de ~30 minutos.
 
 - **Juego actual:** Maths — Counting and Sequences (Cycle Test #1)
-- **Stack:** HTML plano. Sin build para el navegador, sin dependencias, sin backend.
-- **Costo de infraestructura:** USD 0/mes.
+- **Link de Samuel:** <https://rafaeldeavilaf.github.io/Cycle_test/>
+- **Repositorio:** <https://github.com/rafaeldeavilaf/Cycle_test>
+- **Stack:** HTML plano. Sin dependencias, sin backend. Infraestructura: USD 0/mes.
 
 ---
 
-## ⚡ Lo único que hay que subir a GitHub
+## Publicar cambios
 
-Dos archivos. **Solo dos.** Están en la raíz de esta carpeta:
+Esta carpeta **es** el repositorio: está clonada y enlazada con GitHub.
+
+### Doble clic en `publicar.bat`
+
+Sube todo lo que haya cambiado y actualiza el sitio. Eso es todo.
+
+La primera vez Git te pedirá iniciar sesión en GitHub: se abre una ventana del
+navegador, aceptas, y no vuelve a preguntar. Si no tienes Git instalado, el script
+te lo dice y te da el link (<https://git-scm.com/download/win>).
+
+### Alternativa sin terminal: GitHub Desktop
+
+<https://desktop.github.com> → **File → Add local repository** → elige esta carpeta →
+escribes un resumen → **Commit to main** → **Push origin**.
+
+### Comprobar
+
+El sitio tarda 1-2 minutos. Si lo ves igual, es la caché: `Ctrl + F5`.
+Debe verse fondo azul oscuro, tipografía de píxeles y la tarjeta
+**COUNTING AND SEQUENCES**.
+
+---
+
+## Qué se publica
+
+Solo dos archivos importan para el navegador:
 
 ```
 index.html                            ← el menú
@@ -19,49 +45,14 @@ y6-maths-counting-sequences.html      ← el juego completo
 ```
 
 Cada uno lleva dentro el CSS, el motor y las 240 preguntas. **No dependen de ninguna
-carpeta.** Si alguna vez se pierde una carpeta al subir, el juego sigue funcionando.
+carpeta.**
 
-> **Por qué esto importa:** en el primer intento, el arrastrar-y-soltar de GitHub descartó
+> **Por qué:** en el primer despliegue, el arrastrar-y-soltar de GitHub descartó
 > silenciosamente las carpetas `assets/` y `subjects/`. La página cargó sin estilos y el
-> juego no existía. Con archivos autocontenidos ese fallo es imposible.
+> juego no existía. Un archivo autocontenido no puede subirse a medias.
 
-Las carpetas `assets/`, `subjects/` y `tools/` son el **código fuente**. Puedes subirlas
-si quieres tenerlo todo versionado, pero el navegador no las necesita.
-
----
-
-## Actualizar el repo que ya existe (`Cycle_test`)
-
-1. Entra a <https://github.com/rafaeldeavilaf/Cycle_test>.
-2. Click en **Add file → Upload files**.
-3. Arrastra **estos dos archivos**: `index.html` y `y6-maths-counting-sequences.html`.
-4. Abajo, **Commit changes**. El `index.html` viejo se reemplaza solo.
-5. Espera 1-2 minutos y recarga <https://rafaeldeavilaf.github.io/Cycle_test/>.
-
-Si sigue viéndose sin estilos, es la caché del navegador: `Ctrl + F5`.
-
-### Comprobar que quedó bien
-
-En la página debe verse fondo azul oscuro, tipografía de píxeles y una tarjeta
-**COUNTING AND SEQUENCES**. Al hacer clic, el mapa con **LEVEL 1** desbloqueado y los
-otros cuatro con candado.
-
----
-
-## Publicar desde cero (si algún día empiezas otro repo)
-
-1. <https://github.com/new> → nombre `samuel-quest` → **Public** → **Create repository**.
-2. **uploading an existing file** → arrastra los dos `.html` → **Commit changes**.
-3. **Settings → Pages** → Source: *Deploy from a branch* → Branch: **main** / **/ (root)** → **Save**.
-4. En 1-2 minutos: `https://<tu-usuario>.github.io/samuel-quest/`.
-
-Ese link no cambia nunca, aunque añadas materias.
-
----
-
-## Probar en local
-
-Doble clic en `index.html`. Funciona sin servidor: todo va dentro del archivo.
+Las carpetas `assets/`, `subjects/` y `tools/` son el **código fuente**: van al repo para
+tenerlo versionado, pero el navegador no las necesita.
 
 ---
 
@@ -69,8 +60,8 @@ Doble clic en `index.html`. Funciona sin servidor: todo va dentro del archivo.
 
 1. Abre una conversación nueva de Claude.
 2. Pega el contenido de [`PROMPT.md`](PROMPT.md) y adjunta el material de estudio.
-3. Claude devuelve **un `.html` nuevo** más un `index.html` actualizado.
-4. Sube esos dos archivos al repo igual que arriba.
+3. Claude escribe los archivos en esta misma carpeta y ejecuta `tools/build.py`.
+4. Doble clic en `publicar.bat`.
 
 **Nunca se editan** `assets/engine.css` ni `assets/engine.js` al añadir una materia.
 Ahí vive el diseño compartido. Ver [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) y
@@ -91,11 +82,13 @@ Ahí vive el diseño compartido. Ver [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) y
 
 ---
 
-## Para mantenimiento (opcional)
-
-Estructura del código fuente:
+## Estructura
 
 ```
+index.html                           PUBLICABLE — menú autocontenido      GENERADO
+y6-maths-counting-sequences.html     PUBLICABLE — juego autocontenido     GENERADO
+publicar.bat                         doble clic para publicar
+
 assets/engine.css                    design system      (NO EDITAR por materia)
 assets/engine.js                     motor del juego    (NO EDITAR por materia)
 subjects/<slug>/data.js              contenido de una materia
@@ -104,7 +97,7 @@ tools/gen_y6_maths_counting.py       genera data.js con aritmética verificada
 tools/build.py                       inlina todo en los .html de la raíz
 ```
 
-Regenerar el contenido de Maths y reconstruir los archivos publicables:
+Regenerar contenido y reconstruir los publicables:
 
 ```bash
 python3 tools/gen_y6_maths_counting.py subjects/y6-maths-counting-sequences
@@ -117,3 +110,9 @@ python3 tools/build.py
 
 El generador usa `fractions.Fraction`, así que decimales y fracciones son exactos, y falla
 con `assert` si alguna pregunta queda con opciones duplicadas o mal formadas.
+
+---
+
+## Probar en local
+
+Doble clic en `index.html`. Funciona sin servidor: todo va dentro del archivo.
