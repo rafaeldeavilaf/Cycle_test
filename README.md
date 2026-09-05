@@ -4,64 +4,64 @@ Juegos de estudio para los Cycle Tests de Samuel (Year 6, colegio británico IB)
 Cada test es un juego de 5 niveles; cada nivel es un día de estudio de ~30 minutos.
 
 - **Juego actual:** Maths — Counting and Sequences (Cycle Test #1)
-- **Stack:** HTML + CSS + JS plano. Sin build, sin dependencias, sin backend.
+- **Stack:** HTML plano. Sin build para el navegador, sin dependencias, sin backend.
 - **Costo de infraestructura:** USD 0/mes.
 
 ---
 
-## Publicar en GitHub Pages (una sola vez, ~5 minutos)
+## ⚡ Lo único que hay que subir a GitHub
 
-### Opción A — desde la web de GitHub (sin instalar nada)
-
-1. Entra a <https://github.com/new>.
-   - Repository name: `samuel-quest`
-   - Visibilidad: **Public** (Pages gratis requiere público en cuentas Free)
-   - No marques "Add a README"
-   - **Create repository**
-2. En la pantalla siguiente, click en **uploading an existing file**.
-3. Arrastra **el contenido** de la carpeta `samuel-quest` (no la carpeta en sí):
-   `index.html`, `subjects.js`, la carpeta `assets/`, la carpeta `subjects/`,
-   y los `.md`. GitHub conserva la estructura de carpetas.
-4. Abajo, **Commit changes**.
-5. Ve a **Settings → Pages**:
-   - Source: **Deploy from a branch**
-   - Branch: **main** / carpeta **/ (root)** → **Save**
-6. Espera 1-2 minutos y recarga. Arriba aparecerá el link:
+Dos archivos. **Solo dos.** Están en la raíz de esta carpeta:
 
 ```
-https://<tu-usuario>.github.io/samuel-quest/
+index.html                            ← el menú
+y6-maths-counting-sequences.html      ← el juego completo
 ```
 
-Ese es el link que le pasas a Samuel. No cambia nunca, aunque añadas materias.
+Cada uno lleva dentro el CSS, el motor y las 240 preguntas. **No dependen de ninguna
+carpeta.** Si alguna vez se pierde una carpeta al subir, el juego sigue funcionando.
 
-### Opción B — desde la terminal
+> **Por qué esto importa:** en el primer intento, el arrastrar-y-soltar de GitHub descartó
+> silenciosamente las carpetas `assets/` y `subjects/`. La página cargó sin estilos y el
+> juego no existía. Con archivos autocontenidos ese fallo es imposible.
 
-```bash
-cd samuel-quest
-git init
-git add .
-git commit -m "Samuel Quest: Maths Cycle Test #1"
-git branch -M main
-git remote add origin https://github.com/<tu-usuario>/samuel-quest.git
-git push -u origin main
-```
+Las carpetas `assets/`, `subjects/` y `tools/` son el **código fuente**. Puedes subirlas
+si quieres tenerlo todo versionado, pero el navegador no las necesita.
 
-Luego **Settings → Pages → main / (root) → Save**.
+---
+
+## Actualizar el repo que ya existe (`Cycle_test`)
+
+1. Entra a <https://github.com/rafaeldeavilaf/Cycle_test>.
+2. Click en **Add file → Upload files**.
+3. Arrastra **estos dos archivos**: `index.html` y `y6-maths-counting-sequences.html`.
+4. Abajo, **Commit changes**. El `index.html` viejo se reemplaza solo.
+5. Espera 1-2 minutos y recarga <https://rafaeldeavilaf.github.io/Cycle_test/>.
+
+Si sigue viéndose sin estilos, es la caché del navegador: `Ctrl + F5`.
+
+### Comprobar que quedó bien
+
+En la página debe verse fondo azul oscuro, tipografía de píxeles y una tarjeta
+**COUNTING AND SEQUENCES**. Al hacer clic, el mapa con **LEVEL 1** desbloqueado y los
+otros cuatro con candado.
+
+---
+
+## Publicar desde cero (si algún día empiezas otro repo)
+
+1. <https://github.com/new> → nombre `samuel-quest` → **Public** → **Create repository**.
+2. **uploading an existing file** → arrastra los dos `.html` → **Commit changes**.
+3. **Settings → Pages** → Source: *Deploy from a branch* → Branch: **main** / **/ (root)** → **Save**.
+4. En 1-2 minutos: `https://<tu-usuario>.github.io/samuel-quest/`.
+
+Ese link no cambia nunca, aunque añadas materias.
 
 ---
 
 ## Probar en local
 
-Abrir `index.html` con doble clic funciona: el contenido se carga como `.js`, no por
-`fetch`, así que no hay bloqueo de CORS.
-
-Si prefieres un servidor:
-
-```bash
-cd samuel-quest
-python3 -m http.server 8000
-# http://localhost:8000
-```
+Doble clic en `index.html`. Funciona sin servidor: todo va dentro del archivo.
 
 ---
 
@@ -69,14 +69,12 @@ python3 -m http.server 8000
 
 1. Abre una conversación nueva de Claude.
 2. Pega el contenido de [`PROMPT.md`](PROMPT.md) y adjunta el material de estudio.
-3. Claude devuelve 4 cosas: `tools/gen_<slug>.py`, `subjects/<slug>/data.js`,
-   `subjects/<slug>/index.html` y una línea nueva para `subjects.js`.
-4. Súbelas al repo (arrastrar en la web de GitHub, o `git push`).
-5. Listo. El mismo link muestra el juego nuevo en el hub.
+3. Claude devuelve **un `.html` nuevo** más un `index.html` actualizado.
+4. Sube esos dos archivos al repo igual que arriba.
 
-**Nunca se editan** `assets/engine.css` ni `assets/engine.js`. Ahí vive el diseño
-compartido; si se tocan, cada materia empieza a verse distinta.
-Ver [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) y [`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md).
+**Nunca se editan** `assets/engine.css` ni `assets/engine.js` al añadir una materia.
+Ahí vive el diseño compartido. Ver [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) y
+[`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md).
 
 ---
 
@@ -93,13 +91,29 @@ Ver [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) y [`PROJECT_INSTRUCTIONS.md`](PROJECT
 
 ---
 
-## Regenerar el contenido de Maths
+## Para mantenimiento (opcional)
+
+Estructura del código fuente:
+
+```
+assets/engine.css                    design system      (NO EDITAR por materia)
+assets/engine.js                     motor del juego    (NO EDITAR por materia)
+subjects/<slug>/data.js              contenido de una materia
+subjects.js                          registro de materias
+tools/gen_y6_maths_counting.py       genera data.js con aritmética verificada
+tools/build.py                       inlina todo en los .html de la raíz
+```
+
+Regenerar el contenido de Maths y reconstruir los archivos publicables:
 
 ```bash
 python3 tools/gen_y6_maths_counting.py subjects/y6-maths-counting-sequences
-# OK -> subjects/y6-maths-counting-sequences/data.js
-# levels=5 families=80 variants=240
+# OK -> ... levels=5 families=80 variants=240
+
+python3 tools/build.py
+# index.html                          16.2 KB
+# y6-maths-counting-sequences.html   145.7 KB
 ```
 
-El script usa `fractions.Fraction`, así que decimales y fracciones son exactos, y falla
+El generador usa `fractions.Fraction`, así que decimales y fracciones son exactos, y falla
 con `assert` si alguna pregunta queda con opciones duplicadas o mal formadas.

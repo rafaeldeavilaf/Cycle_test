@@ -17,18 +17,25 @@ nivel de juego nuevo dentro del repo existente, **sin tocar el motor ni el dise�
 
 ```
 samuel-quest/
-├── index.html                      hub: lista de juegos (NO se edita, lee subjects.js)
+├── index.html                      GENERADO por tools/build.py — no se edita a mano
+├── <slug>.html                     GENERADO — el juego autocontenido de cada materia
 ├── subjects.js                     registro de materias  <-- añadir 1 objeto
 ├── assets/
 │   ├── engine.css                  design system pixel gaming  <-- NO EDITAR
 │   └── engine.js                   motor del juego             <-- NO EDITAR
 ├── subjects/<slug>/
-│   ├── index.html                  loader de 12 líneas         <-- copiar de otra materia
-│   └── data.js                     contenido                   <-- LO ÚNICO QUE GENERAS
-├── tools/gen_<slug>.py             script generador de data.js
+│   └── data.js                     contenido                   <-- LO ÚNICO QUE ESCRIBES
+├── tools/
+│   ├── gen_<slug>.py               script generador de data.js
+│   └── build.py                    inlina motor+datos en los .html de la raíz
 ├── DESIGN_SYSTEM.md                reglas visuales inviolables
 └── PROJECT_INSTRUCTIONS.md         memoria del proyecto
 ```
+
+**Regla de publicación:** lo que se sube a GitHub son **solo los `.html` de la raíz**, y
+cada uno lleva el CSS, el motor y las preguntas dentro. Nada de rutas relativas a
+carpetas: el arrastrar-y-soltar de GitHub las descarta en silencio y la página queda sin
+estilos. Nunca entregues un `index.html` que apunte a `assets/…`.
 
 Lee `DESIGN_SYSTEM.md` y `PROJECT_INSTRUCTIONS.md` antes de escribir nada.
 Si no tienes el repo a la vista, pídeme el zip antes de empezar.
@@ -42,9 +49,9 @@ Exactamente cuatro cosas:
    descriptivas), el script igual se usa para garantizar que **no haya opciones duplicadas**
    y que cada familia tenga sus variantes.
 2. `subjects/<slug>/data.js` — salida del script.
-3. `subjects/<slug>/index.html` — copia literal del loader de otra materia, cambiando
-   `<title>`, la meta description y el atributo `data-accent`.
-4. Una línea nueva al inicio del array en `subjects.js`.
+3. Una línea nueva al inicio del array en `subjects.js`.
+4. La salida de `python3 tools/build.py`, que produce `<slug>.html` e `index.html`
+   autocontenidos en la raíz. **Esos dos son los archivos que subo a GitHub.**
 
 **No generes CSS ni JS nuevos.** Si crees que hace falta una capacidad que el motor no
 tiene, dímelo antes de escribirla.
@@ -123,7 +130,9 @@ Ejecuta y muéstrame el resultado de:
 
 ### 7. Entrega
 
-Dame el zip del repo actualizado y la lista exacta de archivos nuevos o modificados.
+Dame el zip del repo actualizado y, por separado y bien señalados, **los dos `.html` de la
+raíz que debo subir a GitHub** (`index.html` y `<slug>.html`). Confirma explícitamente que
+ninguno de los dos referencia archivos externos salvo la hoja de fuentes de Google.
 
 ---
 

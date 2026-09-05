@@ -38,21 +38,26 @@ con dos variables de color para una materia nueva.
 
 ```
 samuel-quest/
-├── index.html            hub; lee subjects.js, no se edita
+│  ── PUBLICABLE (lo único que va a GitHub) ──
+├── index.html            hub autocontenido            GENERADO
+├── <slug>.html           un juego completo por materia GENERADO
+│
+│  ── FUENTE (para mantenimiento) ──
 ├── subjects.js           registro de materias (añadir 1 objeto por materia)
 ├── assets/
-│   ├── engine.css        design system                (NO EDITAR)
-│   └── engine.js         motor                        (NO EDITAR)
-├── subjects/
-│   └── y6-maths-counting-sequences/
-│       ├── index.html    loader de 12 líneas
-│       └── data.js       contenido (autogenerado)
+│   ├── engine.css        design system                (NO EDITAR por materia)
+│   └── engine.js         motor                        (NO EDITAR por materia)
+├── subjects/<slug>/data.js   contenido (autogenerado)
 ├── tools/
-│   └── gen_y6_maths_counting.py   generador con validación
+│   ├── gen_<slug>.py     generador de data.js con validación
+│   └── build.py          inlina motor+datos en los .html de la raíz
 ├── PROMPT.md             prompt maestro para materias nuevas
 ├── DESIGN_SYSTEM.md      reglas visuales inviolables
 └── PROJECT_INSTRUCTIONS.md
 ```
+
+**Los archivos de la raíz no referencian nada externo** salvo la hoja de fuentes de Google.
+Llevan el CSS, el motor y las 240 preguntas dentro.
 
 ---
 
@@ -88,11 +93,15 @@ el terreno. No se introducen temas que el material no menciona.
 
 1. Llega el material de estudio (PDF, foto o texto).
 2. Abro una conversación nueva, pego `PROMPT.md` y adjunto el material.
-3. Claude genera `tools/gen_<slug>.py`, `subjects/<slug>/data.js`,
-   `subjects/<slug>/index.html` y la línea de `subjects.js`.
-4. Reviso la salida del script y del test.
-5. `git add . && git commit -m "add <materia>" && git push`.
+3. Claude genera `tools/gen_<slug>.py`, `subjects/<slug>/data.js`, la línea de
+   `subjects.js`, y ejecuta `tools/build.py`.
+4. Reviso la salida del generador y del test.
+5. Subo a GitHub **solo los `.html` de la raíz**: el `<slug>.html` nuevo y el `index.html`
+   actualizado. Arrastrar y soltar en *Add file → Upload files*.
 6. GitHub Pages publica en 1-2 minutos. Samuel usa el mismo link de siempre.
+
+Repo actual: <https://github.com/rafaeldeavilaf/Cycle_test>
+Link de Samuel: <https://rafaeldeavilaf.github.io/Cycle_test/>
 
 ---
 
@@ -134,8 +143,15 @@ marcada le enseña a Samuel algo falso. Es el riesgo más caro del proyecto.
 
 ## Decisiones tomadas (no volver a discutir)
 
-- **Motor + JSON** frente a un HTML por materia. Razón: costo marginal por materia y
-  consistencia visual.
+- **Motor + JSON en la fuente, HTML autocontenido en la publicación.** El motor sigue
+  siendo uno solo (`assets/`), pero `tools/build.py` lo inlina en cada juego antes de
+  publicar. Razón: en el primer despliegue el arrastrar-y-soltar de GitHub descartó las
+  carpetas `assets/` y `subjects/` sin avisar; la página cargó sin estilos y el juego no
+  existía. Un archivo único no puede subirse a medias. Costo: el motor se duplica en cada
+  juego (~25 KB), irrelevante. Contrapartida real: un arreglo en el motor obliga a
+  reconstruir y volver a subir todos los juegos — un comando y un arrastre.
+- **Nunca entregar un HTML publicable que apunte a `assets/…`.** Es el modo de fallo
+  conocido del proyecto.
 - **localStorage** frente a backend. Razón: burn rate cero y cero datos de menor en la nube.
 - **`data.js` en vez de `data.json`.** Razón: un `.js` funciona también abriendo el archivo
   con doble clic (`file://`); un `fetch` de JSON lo bloquearía CORS. Cero costo, más robusto.

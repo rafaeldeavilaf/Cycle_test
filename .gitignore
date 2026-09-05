@@ -1,0 +1,17 @@
+# Windows / macOS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Editores
+.vscode/
+.idea/
+
+# Temporales
+*.tmp
+*.bak
+.write_test

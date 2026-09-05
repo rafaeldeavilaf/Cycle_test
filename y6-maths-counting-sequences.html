@@ -1,0 +1,5608 @@
+<!DOCTYPE html>
+<html lang="en" data-accent="maths">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samuel Quest — Counting and Sequences</title>
+<meta name="description" content="Counting on and back with whole numbers, decimals, fractions and negatives, plus position-to-term rules.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>%F0%9F%8E%AE</text></svg>">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap">
+<style>
+/* ============================================================
+   SAMUEL QUEST — ENGINE.CSS
+   Shared pixel-gaming design system.
+   DO NOT fork this file per subject. Subjects only override
+   --accent / --accent-2 via the [data-accent] attribute.
+   ============================================================ */
+
+
+
+/* ---------- 1. TOKENS ---------- */
+:root {
+  /* Base world palette — identical in every subject */
+  --bg-0:      #0b0f2a;   /* deepest background          */
+  --bg-1:      #131a3f;   /* panel background            */
+  --bg-2:      #1c2555;   /* raised surface              */
+  --bg-3:      #2a3573;   /* hover surface               */
+  --ink:       #eaf0ff;   /* primary text                */
+  --ink-dim:   #97a3d4;   /* secondary text              */
+  --line:      #4658b8;   /* pixel border                */
+
+  /* Semantic — identical in every subject */
+  --good:      #3ce88a;
+  --good-dark: #12683f;
+  --bad:       #ff4d6d;
+  --bad-dark:  #7a1930;
+  --warn:      #ffd93d;
+  --xp:        #7ee8fa;
+
+  /* Subject accent — the ONLY thing a subject may change */
+  --accent:    #7ee8fa;
+  --accent-2:  #c77dff;
+
+  /* Pixel geometry */
+  --px:        4px;       /* one "pixel" unit            */
+  --radius:    0px;       /* never round corners         */
+  --font-ui:   'Press Start 2P', 'Courier New', monospace;
+  --font-read: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Per-subject accents. Add a new line when a new subject is added. */
+[data-accent="maths"]     { --accent:#7ee8fa; --accent-2:#c77dff; }
+[data-accent="science"]   { --accent:#3ce88a; --accent-2:#ffd93d; }
+[data-accent="english"]   { --accent:#ff9e64; --accent-2:#ff4d6d; }
+[data-accent="humanities"]{ --accent:#ffd93d; --accent-2:#ff9e64; }
+[data-accent="spanish"]   { --accent:#ff6ec7; --accent-2:#7ee8fa; }
+[data-accent="computing"] { --accent:#a0ff5c; --accent-2:#7ee8fa; }
+
+/* ---------- 2. RESET / SHELL ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--bg-0);
+  background-image:
+    radial-gradient(circle at 20% 0%,  rgba(126,232,250,.10), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(199,125,255,.10), transparent 45%),
+    linear-gradient(180deg, #0b0f2a 0%, #070a1c 100%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-read);
+  font-size: 17px;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 0 0 64px;
+  overflow-x: hidden;
+}
+
+/* CRT scanlines — decorative, never blocks clicks */
+body::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,.13) 0px,
+    rgba(0,0,0,.13) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  opacity: .55;
+}
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 18px; }
+
+/* ---------- 3. PIXEL PRIMITIVES ---------- */
+
+/* Chunky stepped border. Used on every box in the game. */
+.pixel-box {
+  background: var(--bg-1);
+  border: var(--px) solid var(--line);
+  box-shadow:
+     0 0 0 var(--px) var(--bg-0),
+     0 var(--px) 0 var(--px) rgba(0,0,0,.55);
+  position: relative;
+}
+
+.pixel-box--raised { background: var(--bg-2); }
+
+h1, h2, h3, .ui, .btn, .tag, .hud, .tile {
+  font-family: var(--font-ui);
+  letter-spacing: .5px;
+  line-height: 1.5;
+}
+
+h1 { font-size: 20px; }
+h2 { font-size: 15px; }
+h3 { font-size: 12px; }
+
+.text-accent { color: var(--accent); }
+.text-dim    { color: var(--ink-dim); }
+
+/* ---------- 4. BUTTONS ---------- */
+.btn {
+  display: inline-block;
+  font-size: 11px;
+  padding: 14px 18px;
+  background: var(--bg-2);
+  color: var(--ink);
+  border: var(--px) solid var(--line);
+  box-shadow: 0 var(--px) 0 0 #0a0e24, inset 0 var(--px) 0 0 rgba(255,255,255,.08);
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: transform .06s steps(2), background .12s;
+  user-select: none;
+}
+.btn:hover   { background: var(--bg-3); }
+.btn:active  { transform: translateY(var(--px)); box-shadow: 0 0 0 0 #0a0e24; }
+.btn:focus-visible { outline: var(--px) solid var(--warn); outline-offset: var(--px); }
+.btn[disabled] { opacity: .4; cursor: not-allowed; }
+
+.btn--primary {
+  background: var(--accent);
+  color: #071024;
+  border-color: #fff;
+  font-weight: 700;
+}
+.btn--primary:hover { background: #fff; }
+
+.btn--ghost { background: transparent; }
+
+/* ---------- 5. HUD ---------- */
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  margin: 18px 0;
+  font-size: 10px;
+}
+.hud__group { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.hud__stat  { display: flex; gap: 7px; align-items: center; color: var(--ink-dim); }
+.hud__stat b { color: var(--ink); font-weight: 400; }
+
+.bar {
+  height: 16px;
+  background: #0a0e24;
+  border: var(--px) solid var(--line);
+  overflow: hidden;
+  flex: 1;
+  min-width: 140px;
+}
+.bar__fill {
+  height: 100%;
+  width: 0%;
+  background: repeating-linear-gradient(90deg,
+     var(--accent) 0 8px, color-mix(in srgb, var(--accent) 70%, #000) 8px 12px);
+  transition: width .35s steps(10);
+}
+
+/* ---------- 6. AVATAR ---------- */
+.avatar {
+  width: 64px; height: 64px;
+  image-rendering: pixelated;
+  flex: none;
+  filter: drop-shadow(0 4px 0 rgba(0,0,0,.6));
+}
+.avatar--sm { width: 40px; height: 40px; }
+.avatar--lg { width: 96px; height: 96px; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.avatar--bob { animation: bob 1.4s steps(4) infinite; }
+
+/* ---------- 7. LEVEL MAP ---------- */
+.levels { display: grid; gap: 16px; margin-top: 22px; }
+
+.level-card {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  cursor: pointer;
+  transition: transform .08s steps(2);
+}
+.level-card:hover:not(.is-locked) { transform: translate(0, -3px); }
+.level-card.is-locked { opacity: .45; cursor: not-allowed; }
+.level-card.is-done   { border-color: var(--good); }
+
+.level-card__num {
+  font-family: var(--font-ui);
+  font-size: 22px;
+  width: 64px; height: 64px;
+  display: grid; place-items: center;
+  background: var(--bg-0);
+  border: var(--px) solid var(--accent);
+  color: var(--accent);
+}
+.level-card.is-done .level-card__num { border-color: var(--good); color: var(--good); }
+.level-card__name { font-family: var(--font-ui); font-size: 12px; margin-bottom: 8px; }
+.level-card__sub  { color: var(--ink-dim); font-size: 14px; }
+.stars { font-family: var(--font-ui); font-size: 16px; color: var(--warn); white-space: nowrap; }
+.stars .off { color: #333c72; }
+
+/* ---------- 8. QUESTION SCREEN ---------- */
+.stage { margin-top: 20px; padding: 22px; }
+
+.q-tag {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  padding: 6px 9px;
+  background: var(--bg-0);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.q-stem { font-size: 19px; font-weight: 700; line-height: 1.55; margin-bottom: 8px; }
+.q-sub  { color: var(--ink-dim); font-size: 15px; margin-bottom: 18px; }
+
+/* Sequence tiles */
+.seq {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin: 18px 0 22px;
+}
+.tile {
+  min-width: 62px;
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 13px;
+  background: var(--bg-0);
+  border: var(--px) solid var(--line);
+  color: var(--ink);
+}
+.tile--blank { border-color: var(--warn); color: var(--warn); background: #1a1533; }
+.tile--ghost { opacity: .45; }
+
+/* Options */
+.options { display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 620px) { .options { grid-template-columns: 1fr; } }
+
+.opt {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 14px;
+  background: var(--bg-2);
+  border: var(--px) solid var(--line);
+  box-shadow: 0 var(--px) 0 0 #0a0e24;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: left;
+  color: var(--ink);
+  font-family: var(--font-read);
+  transition: background .12s, transform .06s steps(2);
+}
+.opt:hover:not(:disabled) { background: var(--bg-3); }
+.opt:active:not(:disabled){ transform: translateY(var(--px)); box-shadow: none; }
+.opt:focus-visible { outline: var(--px) solid var(--warn); outline-offset: var(--px); }
+.opt__key {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  width: 30px; height: 30px;
+  flex: none;
+  display: grid; place-items: center;
+  background: var(--bg-0);
+  border: 2px solid var(--line);
+  color: var(--accent);
+}
+.opt.is-right { background: var(--good-dark); border-color: var(--good); }
+.opt.is-right .opt__key { border-color: var(--good); color: var(--good); }
+.opt.is-wrong { background: var(--bad-dark); border-color: var(--bad); }
+.opt.is-wrong .opt__key { border-color: var(--bad); color: var(--bad); }
+.opt:disabled { cursor: default; }
+
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)}
+  40%{transform:translateX(7px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
+}
+.shake { animation: shake .3s steps(3); }
+
+@keyframes pop { 0%{transform:scale(.9)} 60%{transform:scale(1.04)} 100%{transform:scale(1)} }
+.pop { animation: pop .22s steps(3); }
+
+/* Feedback panel */
+.feedback { margin-top: 18px; padding: 16px; display: none; }
+.feedback.is-on { display: block; }
+.feedback__title { font-family: var(--font-ui); font-size: 12px; margin-bottom: 10px; }
+.feedback--good { border-color: var(--good); }
+.feedback--good .feedback__title { color: var(--good); }
+.feedback--bad  { border-color: var(--bad); }
+.feedback--bad  .feedback__title { color: var(--bad); }
+.feedback__body { font-size: 16px; }
+.feedback__body code {
+  font-family: var(--font-ui); font-size: 12px;
+  background: var(--bg-0); padding: 2px 5px; border: 2px solid var(--line);
+}
+
+/* Hint */
+.hint {
+  margin-top: 14px; padding: 12px 14px;
+  border-left: var(--px) solid var(--warn);
+  background: rgba(255,217,61,.08);
+  font-size: 15px;
+  display: none;
+}
+.hint.is-on { display: block; }
+
+/* Briefing (mini-lesson) */
+.brief { padding: 22px; margin-top: 20px; }
+.brief h2 { color: var(--accent); margin-bottom: 16px; }
+.brief p  { margin-bottom: 14px; font-size: 17px; }
+.brief ul { margin: 0 0 14px 20px; }
+.brief li { margin-bottom: 8px; }
+.brief .example {
+  background: var(--bg-0);
+  border: var(--px) solid var(--line);
+  padding: 14px; margin: 14px 0;
+  font-family: var(--font-ui); font-size: 12px; line-height: 1.9;
+  overflow-x: auto;
+}
+
+/* Combo popup */
+.combo {
+  position: fixed; right: 20px; top: 20px; z-index: 50;
+  font-family: var(--font-ui); font-size: 14px;
+  color: var(--warn); text-shadow: 0 3px 0 #000;
+  opacity: 0; pointer-events: none;
+}
+@keyframes floatUp { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-40px)} }
+.combo.is-on { animation: floatUp .8s steps(8) forwards; }
+
+/* Victory screen */
+.victory { text-align: center; padding: 34px 22px; }
+.victory h2 { color: var(--warn); font-size: 18px; margin-bottom: 18px; }
+.victory .stars { font-size: 34px; margin: 18px 0; }
+.victory__stats { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 22px 0; font-family: var(--font-ui); font-size: 11px; }
+.victory__stats div span { display: block; color: var(--ink-dim); font-size: 9px; margin-bottom: 8px; }
+
+/* Row helpers */
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.row--end { justify-content: flex-end; }
+.mt   { margin-top: 18px; }
+.mt-lg{ margin-top: 30px; }
+
+.screen { display: none; }
+.screen.is-on { display: block; }
+
+/* Site header */
+.site-head { padding: 26px 0 6px; display: flex; gap: 18px; align-items: center; }
+.site-head h1 { line-height: 1.4; }
+.site-head p { color: var(--ink-dim); font-size: 14px; margin-top: 8px; }
+
+footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top: 40px; }
+
+@media (max-width: 620px) {
+  body { font-size: 16px; }
+  h1 { font-size: 15px; }
+  .stage { padding: 16px; }
+  .level-card { grid-template-columns: 52px 1fr; }
+  .level-card__num { width: 52px; height: 52px; font-size: 18px; }
+  .stars { grid-column: 1 / -1; }
+}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* AUTO-GENERATED by tools/gen_y6_maths_counting.py - do not hand-edit */
+window.QUIZ_DATA = {
+ "meta": {
+  "slug": "y6-maths-counting-sequences",
+  "year": "Year 6",
+  "subject": "Maths",
+  "topic": "Counting and Sequences",
+  "test": "Cycle Test #1",
+  "accent": "maths"
+ },
+ "levels": [
+  {
+   "id": 1,
+   "name": "WHOLE NUMBER WAY",
+   "subtitle": "Counting on and back with whole numbers",
+   "briefing": [
+    "<p>Welcome to the Quest, Samuel. Before anything else you need the basic move: <b>the step</b>.</p>",
+    "<p>A sequence is just numbers that follow a rule. To find the rule, look at the jump between two numbers next to each other.</p>",
+    "<div class='example'>4, 11, 18, 25<br>11 - 4 = 7<br>18 - 11 = 7<br>Rule: count on in steps of 7</div>",
+    "<ul><li><b>Count on</b> = numbers get bigger. Add the step.</li><li><b>Count back</b> = numbers get smaller. Subtract the step.</li><li>Always check <i>two</i> jumps, not one, so you don't guess.</li></ul>",
+    "<p>If numbers are missing in the middle, count how many jumps are hidden and divide the difference by that number.</p>",
+    "<p class='text-dim'>Mission: 16 challenges. Get one wrong and it comes back later with different numbers.</p>"
+   ],
+   "questions": [
+    {
+     "id": "L1F1",
+     "skill": "count back",
+     "variants": [
+      {
+       "stem": "Count back in steps of 5. What number comes next?",
+       "sub": null,
+       "seq": [
+        "10",
+        "5",
+        "0",
+        "?"
+       ],
+       "options": [
+        "10",
+        "-5",
+        "0",
+        "-10"
+       ],
+       "answer": 1,
+       "hint": "Each jump goes down by 5. Take 5 off the last number you can see.",
+       "explain": "The last visible number is <code>0</code>. Counting back 5 gives <code>0 - 5 = -5</code>."
+      },
+      {
+       "stem": "Count back in steps of 4. What number comes next?",
+       "sub": null,
+       "seq": [
+        "20",
+        "16",
+        "12",
+        "?"
+       ],
+       "options": [
+        "12",
+        "20",
+        "4",
+        "8"
+       ],
+       "answer": 3,
+       "hint": "Each jump goes down by 4. Take 4 off the last number you can see.",
+       "explain": "The last visible number is <code>12</code>. Counting back 4 gives <code>12 - 4 = 8</code>."
+      },
+      {
+       "stem": "Count back in steps of 9. What number comes next?",
+       "sub": null,
+       "seq": [
+        "45",
+        "36",
+        "27",
+        "?"
+       ],
+       "options": [
+        "27",
+        "18",
+        "9",
+        "45"
+       ],
+       "answer": 1,
+       "hint": "Each jump goes down by 9. Take 9 off the last number you can see.",
+       "explain": "The last visible number is <code>27</code>. Counting back 9 gives <code>27 - 9 = 18</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F2",
+     "skill": "count on",
+     "variants": [
+      {
+       "stem": "Count on in steps of 7. What number comes next?",
+       "sub": null,
+       "seq": [
+        "7",
+        "14",
+        "21",
+        "?"
+       ],
+       "options": [
+        "28",
+        "35",
+        "21",
+        "29"
+       ],
+       "answer": 0,
+       "hint": "Add 7 to the last number in the sequence.",
+       "explain": "<code>21 + 7 = 28</code>."
+      },
+      {
+       "stem": "Count on in steps of 25. What number comes next?",
+       "sub": null,
+       "seq": [
+        "25",
+        "50",
+        "75",
+        "?"
+       ],
+       "options": [
+        "101",
+        "75",
+        "100",
+        "125"
+       ],
+       "answer": 2,
+       "hint": "Add 25 to the last number in the sequence.",
+       "explain": "<code>75 + 25 = 100</code>."
+      },
+      {
+       "stem": "Count on in steps of 11. What number comes next?",
+       "sub": null,
+       "seq": [
+        "11",
+        "22",
+        "33",
+        "?"
+       ],
+       "options": [
+        "44",
+        "45",
+        "55",
+        "33"
+       ],
+       "answer": 0,
+       "hint": "Add 11 to the last number in the sequence.",
+       "explain": "<code>33 + 11 = 44</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F3",
+     "skill": "find the step",
+     "variants": [
+      {
+       "stem": "What is the step size in this sequence?",
+       "sub": null,
+       "seq": [
+        "3",
+        "9",
+        "15",
+        "21"
+       ],
+       "options": [
+        "5",
+        "12",
+        "7",
+        "6"
+       ],
+       "answer": 3,
+       "hint": "Subtract one term from the term straight after it.",
+       "explain": "<code>9 - 3 = 6</code>. The sequence counts on in steps of 6."
+      },
+      {
+       "stem": "What is the step size in this sequence?",
+       "sub": null,
+       "seq": [
+        "4",
+        "11",
+        "18",
+        "25"
+       ],
+       "options": [
+        "8",
+        "7",
+        "6",
+        "14"
+       ],
+       "answer": 1,
+       "hint": "Subtract one term from the term straight after it.",
+       "explain": "<code>11 - 4 = 7</code>. The sequence counts on in steps of 7."
+      },
+      {
+       "stem": "What is the step size in this sequence?",
+       "sub": null,
+       "seq": [
+        "9",
+        "17",
+        "25",
+        "33"
+       ],
+       "options": [
+        "7",
+        "9",
+        "8",
+        "16"
+       ],
+       "answer": 2,
+       "hint": "Subtract one term from the term straight after it.",
+       "explain": "<code>17 - 9 = 8</code>. The sequence counts on in steps of 8."
+      }
+     ]
+    },
+    {
+     "id": "L1F4",
+     "skill": "missing term",
+     "variants": [
+      {
+       "stem": "Which number belongs in the gap?",
+       "sub": null,
+       "seq": [
+        "12",
+        "?",
+        "24",
+        "30"
+       ],
+       "options": [
+        "20",
+        "12",
+        "24",
+        "18"
+       ],
+       "answer": 3,
+       "hint": "Work out the step first, then add it to the number before the gap.",
+       "explain": "The step is 6. So the missing term is <code>12 + (6) = 18</code>."
+      },
+      {
+       "stem": "Which number belongs in the gap?",
+       "sub": null,
+       "seq": [
+        "30",
+        "23",
+        "?",
+        "9"
+       ],
+       "options": [
+        "23",
+        "9",
+        "16",
+        "18"
+       ],
+       "answer": 2,
+       "hint": "Work out the step first, then add it to the number before the gap.",
+       "explain": "The step is -7. So the missing term is <code>23 + (-7) = 16</code>."
+      },
+      {
+       "stem": "Which number belongs in the gap?",
+       "sub": null,
+       "seq": [
+        "14",
+        "?",
+        "32",
+        "41"
+       ],
+       "options": [
+        "25",
+        "14",
+        "32",
+        "23"
+       ],
+       "answer": 3,
+       "hint": "Work out the step first, then add it to the number before the gap.",
+       "explain": "The step is 9. So the missing term is <code>14 + (9) = 23</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F5",
+     "skill": "missing first term",
+     "variants": [
+      {
+       "stem": "The first number is missing. What is it?",
+       "sub": null,
+       "seq": [
+        "?",
+        "14",
+        "21",
+        "28"
+       ],
+       "options": [
+        "7",
+        "14",
+        "0",
+        "21"
+       ],
+       "answer": 0,
+       "hint": "Go backwards one step from the second number.",
+       "explain": "The step is 7, so the first term is <code>14 - 7 = 7</code>."
+      },
+      {
+       "stem": "The first number is missing. What is it?",
+       "sub": null,
+       "seq": [
+        "?",
+        "36",
+        "48",
+        "60"
+       ],
+       "options": [
+        "48",
+        "12",
+        "24",
+        "36"
+       ],
+       "answer": 2,
+       "hint": "Go backwards one step from the second number.",
+       "explain": "The step is 12, so the first term is <code>36 - 12 = 24</code>."
+      },
+      {
+       "stem": "The first number is missing. What is it?",
+       "sub": null,
+       "seq": [
+        "?",
+        "22",
+        "33",
+        "44"
+       ],
+       "options": [
+        "33",
+        "0",
+        "11",
+        "22"
+       ],
+       "answer": 2,
+       "hint": "Go backwards one step from the second number.",
+       "explain": "The step is 11, so the first term is <code>22 - 11 = 11</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F6",
+     "skill": "spot the error",
+     "variants": [
+      {
+       "stem": "This should count on in steps of 6, but one number is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "6",
+        "12",
+        "18",
+        "25",
+        "30"
+       ],
+       "options": [
+        "12",
+        "25",
+        "18",
+        "24"
+       ],
+       "answer": 1,
+       "hint": "Check every jump. Which gap is not exactly 6?",
+       "explain": "Counting on in 6s the term should be <code>24</code>, not <code>25</code>."
+      },
+      {
+       "stem": "This should count on in steps of 8, but one number is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "8",
+        "16",
+        "26",
+        "32",
+        "40"
+       ],
+       "options": [
+        "26",
+        "16",
+        "24",
+        "8"
+       ],
+       "answer": 0,
+       "hint": "Check every jump. Which gap is not exactly 8?",
+       "explain": "Counting on in 8s the term should be <code>24</code>, not <code>26</code>."
+      },
+      {
+       "stem": "This should count on in steps of 9, but one number is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "9",
+        "18",
+        "27",
+        "36",
+        "46"
+       ],
+       "options": [
+        "36",
+        "45",
+        "27",
+        "46"
+       ],
+       "answer": 3,
+       "hint": "Check every jump. Which gap is not exactly 9?",
+       "explain": "Counting on in 9s the term should be <code>45</code>, not <code>46</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F7",
+     "skill": "two steps ahead",
+     "variants": [
+      {
+       "stem": "What number comes <b>two steps</b> after the last one shown?",
+       "sub": null,
+       "seq": [
+        "9",
+        "18",
+        "27",
+        "?",
+        "?"
+       ],
+       "options": [
+        "45",
+        "36",
+        "27",
+        "54"
+       ],
+       "answer": 0,
+       "hint": "Take two jumps, not one.",
+       "explain": "Last shown is <code>27</code>. Two jumps of 9: <code>36</code> then <code>45</code>."
+      },
+      {
+       "stem": "What number comes <b>two steps</b> after the last one shown?",
+       "sub": null,
+       "seq": [
+        "13",
+        "19",
+        "25",
+        "?",
+        "?"
+       ],
+       "options": [
+        "37",
+        "31",
+        "25",
+        "43"
+       ],
+       "answer": 0,
+       "hint": "Take two jumps, not one.",
+       "explain": "Last shown is <code>25</code>. Two jumps of 6: <code>31</code> then <code>37</code>."
+      },
+      {
+       "stem": "What number comes <b>two steps</b> after the last one shown?",
+       "sub": null,
+       "seq": [
+        "40",
+        "32",
+        "24",
+        "?",
+        "?"
+       ],
+       "options": [
+        "0",
+        "8",
+        "16",
+        "24"
+       ],
+       "answer": 1,
+       "hint": "Take two jumps, not one.",
+       "explain": "Last shown is <code>24</code>. Two jumps of -8: <code>16</code> then <code>8</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F8",
+     "skill": "identify the rule",
+     "variants": [
+      {
+       "stem": "Which sequence counts <b>back</b> in steps of 8?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "80, 73, 66, 59",
+        "80, 71, 62, 53",
+        "80, 72, 64, 56",
+        "80, 88, 96, 104"
+       ],
+       "answer": 2,
+       "hint": "Back means the numbers get smaller. Check the size of the jump too.",
+       "explain": "<code>80, 72, 64, 56</code> goes down by exactly 8 each time."
+      },
+      {
+       "stem": "Which sequence counts <b>back</b> in steps of 6?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "54, 60, 66, 72",
+        "54, 47, 40, 33",
+        "54, 48, 42, 36",
+        "54, 49, 44, 39"
+       ],
+       "answer": 2,
+       "hint": "Back means the numbers get smaller. Check the size of the jump too.",
+       "explain": "<code>54, 48, 42, 36</code> goes down by exactly 6 each time."
+      },
+      {
+       "stem": "Which sequence counts <b>back</b> in steps of 9?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "90, 80, 70, 60",
+        "90, 82, 74, 66",
+        "90, 81, 72, 63",
+        "90, 99, 108, 117"
+       ],
+       "answer": 2,
+       "hint": "Back means the numbers get smaller. Check the size of the jump too.",
+       "explain": "<code>90, 81, 72, 63</code> goes down by exactly 9 each time."
+      }
+     ]
+    },
+    {
+     "id": "L1F9",
+     "skill": "crossing zero",
+     "variants": [
+      {
+       "stem": "Keep counting back in 3s. What comes after zero?",
+       "sub": null,
+       "seq": [
+        "6",
+        "3",
+        "0",
+        "?"
+       ],
+       "options": [
+        "-6",
+        "-3",
+        "3",
+        "0"
+       ],
+       "answer": 1,
+       "hint": "Below zero the numbers are negative and keep getting further from zero.",
+       "explain": "After 0 you keep subtracting 3: <code>0 - 3 = -3</code>."
+      },
+      {
+       "stem": "Keep counting back in 5s. What comes after zero?",
+       "sub": null,
+       "seq": [
+        "10",
+        "5",
+        "0",
+        "?"
+       ],
+       "options": [
+        "-10",
+        "-5",
+        "5",
+        "0"
+       ],
+       "answer": 1,
+       "hint": "Below zero the numbers are negative and keep getting further from zero.",
+       "explain": "After 0 you keep subtracting 5: <code>0 - 5 = -5</code>."
+      },
+      {
+       "stem": "Keep counting back in 4s. What comes after zero?",
+       "sub": null,
+       "seq": [
+        "8",
+        "4",
+        "0",
+        "?"
+       ],
+       "options": [
+        "-8",
+        "4",
+        "0",
+        "-4"
+       ],
+       "answer": 3,
+       "hint": "Below zero the numbers are negative and keep getting further from zero.",
+       "explain": "After 0 you keep subtracting 4: <code>0 - 4 = -4</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F10",
+     "skill": "word problem",
+     "variants": [
+      {
+       "stem": "A lift starts on floor 30 and goes down 4 floors at a time. Which floor is it on after 3 moves?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "14",
+        "22",
+        "42",
+        "18"
+       ],
+       "answer": 3,
+       "hint": "3 moves of 4 floors is 3 x 4 floors in total.",
+       "explain": "<code>3 x 4 = 12</code>, and <code>30 - 12 = 18</code>."
+      },
+      {
+       "stem": "A lift starts on floor 24 and goes down 3 floors at a time. Which floor is it on after 4 moves?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "36",
+        "9",
+        "15",
+        "12"
+       ],
+       "answer": 3,
+       "hint": "4 moves of 3 floors is 4 x 3 floors in total.",
+       "explain": "<code>4 x 3 = 12</code>, and <code>24 - 12 = 12</code>."
+      },
+      {
+       "stem": "A lift starts on floor 45 and goes down 5 floors at a time. Which floor is it on after 3 moves?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "30",
+        "35",
+        "25",
+        "60"
+       ],
+       "answer": 0,
+       "hint": "3 moves of 5 floors is 3 x 5 floors in total.",
+       "explain": "<code>3 x 5 = 15</code>, and <code>45 - 15 = 30</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F11",
+     "skill": "count the steps",
+     "variants": [
+      {
+       "stem": "A sequence counts on in steps of 6. How many steps are there from 12 to 42?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6",
+        "30",
+        "4",
+        "5"
+       ],
+       "answer": 3,
+       "hint": "Find the difference first, then divide by the step size.",
+       "explain": "<code>42 - 12 = 30</code> and <code>30 / 6 = 5</code> steps."
+      },
+      {
+       "stem": "A sequence counts on in steps of 7. How many steps are there from 7 to 49?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "5",
+        "6",
+        "7",
+        "42"
+       ],
+       "answer": 1,
+       "hint": "Find the difference first, then divide by the step size.",
+       "explain": "<code>49 - 7 = 42</code> and <code>42 / 7 = 6</code> steps."
+      },
+      {
+       "stem": "A sequence counts on in steps of 4. How many steps are there from 20 to 48?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "8",
+        "28",
+        "6",
+        "7"
+       ],
+       "answer": 3,
+       "hint": "Find the difference first, then divide by the step size.",
+       "explain": "<code>48 - 20 = 28</code> and <code>28 / 4 = 7</code> steps."
+      }
+     ]
+    },
+    {
+     "id": "L1F12",
+     "skill": "nth number",
+     "variants": [
+      {
+       "stem": "This sequence counts on in 6s. What is the 8th number?",
+       "sub": null,
+       "seq": [
+        "6",
+        "12",
+        "18",
+        "24",
+        "..."
+       ],
+       "options": [
+        "60",
+        "54",
+        "48",
+        "42"
+       ],
+       "answer": 2,
+       "hint": "The 1st number is 6. To reach the 8th you take 7 more jumps.",
+       "explain": "<code>6 + 7 x 6 = 48</code>."
+      },
+      {
+       "stem": "This sequence counts on in 4s. What is the 9th number?",
+       "sub": null,
+       "seq": [
+        "4",
+        "8",
+        "12",
+        "16",
+        "..."
+       ],
+       "options": [
+        "36",
+        "40",
+        "44",
+        "32"
+       ],
+       "answer": 0,
+       "hint": "The 1st number is 4. To reach the 9th you take 8 more jumps.",
+       "explain": "<code>4 + 8 x 4 = 36</code>."
+      },
+      {
+       "stem": "This sequence counts on in 5s. What is the 7th number?",
+       "sub": null,
+       "seq": [
+        "5",
+        "10",
+        "15",
+        "20",
+        "..."
+       ],
+       "options": [
+        "35",
+        "30",
+        "40",
+        "45"
+       ],
+       "answer": 0,
+       "hint": "The 1st number is 5. To reach the 7th you take 6 more jumps.",
+       "explain": "<code>5 + 6 x 5 = 35</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F13",
+     "skill": "step from a gap",
+     "variants": [
+      {
+       "stem": "Two numbers are missing. What is the step size?",
+       "sub": null,
+       "seq": [
+        "5",
+        "?",
+        "?",
+        "20"
+       ],
+       "options": [
+        "5",
+        "6",
+        "15",
+        "4"
+       ],
+       "answer": 0,
+       "hint": "The two shown numbers are 3 jumps apart. Divide the difference by 3.",
+       "explain": "<code>20 - 5 = 15</code>, and <code>15 / 3 = 5</code>."
+      },
+      {
+       "stem": "Two numbers are missing. What is the step size?",
+       "sub": null,
+       "seq": [
+        "6",
+        "?",
+        "?",
+        "27"
+       ],
+       "options": [
+        "7",
+        "8",
+        "6",
+        "21"
+       ],
+       "answer": 0,
+       "hint": "The two shown numbers are 3 jumps apart. Divide the difference by 3.",
+       "explain": "<code>27 - 6 = 21</code>, and <code>21 / 3 = 7</code>."
+      },
+      {
+       "stem": "Two numbers are missing. What is the step size?",
+       "sub": null,
+       "seq": [
+        "10",
+        "?",
+        "?",
+        "37"
+       ],
+       "options": [
+        "27",
+        "10",
+        "8",
+        "9"
+       ],
+       "answer": 3,
+       "hint": "The two shown numbers are 3 jumps apart. Divide the difference by 3.",
+       "explain": "<code>37 - 10 = 27</code>, and <code>27 / 3 = 9</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F14",
+     "skill": "large steps",
+     "variants": [
+      {
+       "stem": "Count back in steps of 12. What comes next?",
+       "sub": null,
+       "seq": [
+        "100",
+        "88",
+        "76",
+        "?"
+       ],
+       "options": [
+        "64",
+        "76",
+        "74",
+        "52"
+       ],
+       "answer": 0,
+       "hint": "Subtract 12 from the last number shown.",
+       "explain": "<code>76 - 12 = 64</code>."
+      },
+      {
+       "stem": "Count back in steps of 25. What comes next?",
+       "sub": null,
+       "seq": [
+        "200",
+        "175",
+        "150",
+        "?"
+       ],
+       "options": [
+        "125",
+        "100",
+        "150",
+        "135"
+       ],
+       "answer": 0,
+       "hint": "Subtract 25 from the last number shown.",
+       "explain": "<code>150 - 25 = 125</code>."
+      },
+      {
+       "stem": "Count back in steps of 15. What comes next?",
+       "sub": null,
+       "seq": [
+        "150",
+        "135",
+        "120",
+        "?"
+       ],
+       "options": [
+        "90",
+        "115",
+        "105",
+        "120"
+       ],
+       "answer": 2,
+       "hint": "Subtract 15 from the last number shown.",
+       "explain": "<code>120 - 15 = 105</code>."
+      }
+     ]
+    },
+    {
+     "id": "L1F15",
+     "skill": "rule in words",
+     "variants": [
+      {
+       "stem": "Which sentence describes this sequence?",
+       "sub": null,
+       "seq": [
+        "11",
+        "22",
+        "33",
+        "44"
+       ],
+       "options": [
+        "Count on in steps of 11.",
+        "Count on in steps of 12.",
+        "Multiply by 11 each time.",
+        "Count back in steps of 11."
+       ],
+       "answer": 0,
+       "hint": "Check the direction first, then the size of the jump.",
+       "explain": "Each jump is 11, so the rule is: count on in steps of 11."
+      },
+      {
+       "stem": "Which sentence describes this sequence?",
+       "sub": null,
+       "seq": [
+        "60",
+        "48",
+        "36",
+        "24"
+       ],
+       "options": [
+        "Count back in steps of 13.",
+        "Count back in steps of 12.",
+        "Multiply by 12 each time.",
+        "Count on in steps of 12."
+       ],
+       "answer": 1,
+       "hint": "Check the direction first, then the size of the jump.",
+       "explain": "Each jump is -12, so the rule is: count back in steps of 12."
+      },
+      {
+       "stem": "Which sentence describes this sequence?",
+       "sub": null,
+       "seq": [
+        "7",
+        "20",
+        "33",
+        "46"
+       ],
+       "options": [
+        "Count back in steps of 13.",
+        "Multiply by 13 each time.",
+        "Count on in steps of 14.",
+        "Count on in steps of 13."
+       ],
+       "answer": 3,
+       "hint": "Check the direction first, then the size of the jump.",
+       "explain": "Each jump is 13, so the rule is: count on in steps of 13."
+      }
+     ]
+    },
+    {
+     "id": "L1F16",
+     "skill": "fill two gaps",
+     "variants": [
+      {
+       "stem": "Which pair fills the two gaps?",
+       "sub": null,
+       "seq": [
+        "18",
+        "27",
+        "36",
+        "?",
+        "?"
+       ],
+       "options": [
+        "54, 45",
+        "45, 54",
+        "36, 54",
+        "54, 63"
+       ],
+       "answer": 1,
+       "hint": "Work out one gap, then use the same step again.",
+       "explain": "The step is 9: <code>36 -> 45 -> 54</code>."
+      },
+      {
+       "stem": "Which pair fills the two gaps?",
+       "sub": null,
+       "seq": [
+        "33",
+        "22",
+        "11",
+        "?",
+        "?"
+       ],
+       "options": [
+        "-11, -22",
+        "-11, 0",
+        "11, -11",
+        "0, -11"
+       ],
+       "answer": 3,
+       "hint": "Work out one gap, then use the same step again.",
+       "explain": "The step is -11: <code>11 -> 0 -> -11</code>."
+      },
+      {
+       "stem": "Which pair fills the two gaps?",
+       "sub": null,
+       "seq": [
+        "16",
+        "24",
+        "32",
+        "?",
+        "?"
+       ],
+       "options": [
+        "48, 56",
+        "32, 48",
+        "40, 48",
+        "48, 40"
+       ],
+       "answer": 2,
+       "hint": "Work out one gap, then use the same step again.",
+       "explain": "The step is 8: <code>32 -> 40 -> 48</code>."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "name": "DECIMAL DEPTHS",
+   "subtitle": "Counting on and back in decimal steps",
+   "briefing": [
+    "<p>Level 2. The numbers now have a decimal point, but the rule has not changed: <b>find the step, then repeat it</b>.</p>",
+    "<div class='example'>2.1, 2.4, 2.7, ?<br>2.4 - 2.1 = 0.3<br>2.7 + 0.3 = 3.0</div>",
+    "<ul><li>Line up the decimal points before you add or subtract.</li><li>When the tenths reach 10, exchange them for one whole: 2.7 + 0.3 = 3.0, not 2.10.</li><li>0.25 steps are quarters &mdash; four of them make one whole.</li></ul>",
+    "<p><b>Danger zone:</b> crossing a whole number and crossing zero. Slow down at those two points.</p>"
+   ],
+   "questions": [
+    {
+     "id": "L2F1",
+     "skill": "decimal count on",
+     "variants": [
+      {
+       "stem": "Count on in steps of 0.3. What comes next?",
+       "sub": null,
+       "seq": [
+        "2.1",
+        "2.4",
+        "2.7",
+        "?"
+       ],
+       "options": [
+        "2.7",
+        "4",
+        "3.3",
+        "3"
+       ],
+       "answer": 3,
+       "hint": "Add the tenths. If the tenths pass 10, carry one whole.",
+       "explain": "<code>2.7 + 0.3 = 3</code>."
+      },
+      {
+       "stem": "Count on in steps of 0.2. What comes next?",
+       "sub": null,
+       "seq": [
+        "4.5",
+        "4.7",
+        "4.9",
+        "?"
+       ],
+       "options": [
+        "5.3",
+        "4.9",
+        "5.1",
+        "6.1"
+       ],
+       "answer": 2,
+       "hint": "Add the tenths. If the tenths pass 10, carry one whole.",
+       "explain": "<code>4.9 + 0.2 = 5.1</code>."
+      },
+      {
+       "stem": "Count on in steps of 0.4. What comes next?",
+       "sub": null,
+       "seq": [
+        "1.2",
+        "1.6",
+        "2",
+        "?"
+       ],
+       "options": [
+        "2.4",
+        "3.4",
+        "2.8",
+        "2"
+       ],
+       "answer": 0,
+       "hint": "Add the tenths. If the tenths pass 10, carry one whole.",
+       "explain": "<code>2 + 0.4 = 2.4</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F2",
+     "skill": "decimal count back",
+     "variants": [
+      {
+       "stem": "Count back in steps of 0.3. What comes next?",
+       "sub": null,
+       "seq": [
+        "5.2",
+        "4.9",
+        "4.6",
+        "?"
+       ],
+       "options": [
+        "4.3",
+        "4.2",
+        "4.6",
+        "4"
+       ],
+       "answer": 0,
+       "hint": "Subtract carefully. Line up the decimal points in your head.",
+       "explain": "<code>4.6 - 0.3 = 4.3</code>."
+      },
+      {
+       "stem": "Count back in steps of 0.25. What comes next?",
+       "sub": null,
+       "seq": [
+        "8",
+        "7.75",
+        "7.5",
+        "?"
+       ],
+       "options": [
+        "7.25",
+        "7.15",
+        "7.5",
+        "7"
+       ],
+       "answer": 0,
+       "hint": "Subtract carefully. Line up the decimal points in your head.",
+       "explain": "<code>7.5 - 0.25 = 7.25</code>."
+      },
+      {
+       "stem": "Count back in steps of 0.7. What comes next?",
+       "sub": null,
+       "seq": [
+        "4.1",
+        "3.4",
+        "2.7",
+        "?"
+       ],
+       "options": [
+        "1.3",
+        "2.7",
+        "2",
+        "1.9"
+       ],
+       "answer": 2,
+       "hint": "Subtract carefully. Line up the decimal points in your head.",
+       "explain": "<code>2.7 - 0.7 = 2</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F3",
+     "skill": "crossing a whole",
+     "variants": [
+      {
+       "stem": "Careful &mdash; this one crosses a whole number. Count on in 0.06.",
+       "sub": null,
+       "seq": [
+        "0.88",
+        "0.94",
+        "1",
+        "1.06",
+        "?"
+       ],
+       "options": [
+        "1.12",
+        "1.06",
+        "1.22",
+        "1.18"
+       ],
+       "answer": 0,
+       "hint": "When the tenths or hundredths reach 10, exchange them for the next column up.",
+       "explain": "<code>1.06 + 0.06 = 1.12</code>. Crossing a whole is just normal addition."
+      },
+      {
+       "stem": "Careful &mdash; this one crosses a whole number. Count on in 0.3.",
+       "sub": null,
+       "seq": [
+        "9.6",
+        "9.9",
+        "10.2",
+        "?"
+       ],
+       "options": [
+        "10.2",
+        "10.8",
+        "10.5",
+        "10.6"
+       ],
+       "answer": 2,
+       "hint": "When the tenths or hundredths reach 10, exchange them for the next column up.",
+       "explain": "<code>10.2 + 0.3 = 10.5</code>. Crossing a whole is just normal addition."
+      },
+      {
+       "stem": "Careful &mdash; this one crosses a whole number. Count on in 0.05.",
+       "sub": null,
+       "seq": [
+        "1.85",
+        "1.9",
+        "1.95",
+        "2",
+        "?"
+       ],
+       "options": [
+        "2.15",
+        "2.1",
+        "2",
+        "2.05"
+       ],
+       "answer": 3,
+       "hint": "When the tenths or hundredths reach 10, exchange them for the next column up.",
+       "explain": "<code>2 + 0.05 = 2.05</code>. Crossing a whole is just normal addition."
+      }
+     ]
+    },
+    {
+     "id": "L2F4",
+     "skill": "find decimal step",
+     "variants": [
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "1.3",
+        "1.7",
+        "2.1",
+        "2.5"
+       ],
+       "options": [
+        "0.5",
+        "0.4",
+        "0.8",
+        "-0.4"
+       ],
+       "answer": 1,
+       "hint": "Subtract the first number from the second one.",
+       "explain": "<code>1.7 - 1.3 = 0.4</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "0.25",
+        "0.4",
+        "0.55",
+        "0.7"
+       ],
+       "options": [
+        "0.15",
+        "0.3",
+        "-0.15",
+        "0.25"
+       ],
+       "answer": 0,
+       "hint": "Subtract the first number from the second one.",
+       "explain": "<code>0.4 - 0.25 = 0.15</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "6",
+        "5.55",
+        "5.1",
+        "4.65"
+       ],
+       "options": [
+        "-0.45",
+        "-0.35",
+        "0.45",
+        "-0.9"
+       ],
+       "answer": 0,
+       "hint": "Subtract the first number from the second one.",
+       "explain": "<code>5.55 - 6 = -0.45</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F5",
+     "skill": "missing decimal",
+     "variants": [
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "3.4",
+        "4",
+        "?",
+        "5.2"
+       ],
+       "options": [
+        "4",
+        "5.2",
+        "4.6",
+        "4.61"
+       ],
+       "answer": 2,
+       "hint": "Find the step from two numbers you can see, then apply it once.",
+       "explain": "The step is <code>0.6</code>, so the gap is <code>4 + (0.6) = 4.6</code>."
+      },
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "0.9",
+        "?",
+        "0.6",
+        "0.45"
+       ],
+       "options": [
+        "0.76",
+        "0.75",
+        "0.6",
+        "0.9"
+       ],
+       "answer": 1,
+       "hint": "Find the step from two numbers you can see, then apply it once.",
+       "explain": "The step is <code>-0.15</code>, so the gap is <code>0.9 + (-0.15) = 0.75</code>."
+      },
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "0.72",
+        "0.81",
+        "?",
+        "0.99"
+       ],
+       "options": [
+        "0.99",
+        "0.91",
+        "0.9",
+        "0.81"
+       ],
+       "answer": 2,
+       "hint": "Find the step from two numbers you can see, then apply it once.",
+       "explain": "The step is <code>0.09</code>, so the gap is <code>0.81 + (0.09) = 0.9</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F6",
+     "skill": "decimal error",
+     "variants": [
+      {
+       "stem": "One number breaks the pattern of 0.3. Which is it?",
+       "sub": null,
+       "seq": [
+        "0.2",
+        "0.5",
+        "0.8",
+        "1.2",
+        "1.4"
+       ],
+       "options": [
+        "0.5",
+        "0.8",
+        "1.2",
+        "1.1"
+       ],
+       "answer": 2,
+       "hint": "Check each jump in turn. One of them is the wrong size.",
+       "explain": "It should be <code>1.1</code> to keep the step of 0.3."
+      },
+      {
+       "stem": "One number breaks the pattern of 0.25. Which is it?",
+       "sub": null,
+       "seq": [
+        "1.5",
+        "1.75",
+        "2.05",
+        "2.25",
+        "2.5"
+       ],
+       "options": [
+        "2.05",
+        "1.5",
+        "1.75",
+        "2"
+       ],
+       "answer": 0,
+       "hint": "Check each jump in turn. One of them is the wrong size.",
+       "explain": "It should be <code>2</code> to keep the step of 0.25."
+      },
+      {
+       "stem": "One number breaks the pattern of -0.4. Which is it?",
+       "sub": null,
+       "seq": [
+        "4",
+        "3.6",
+        "3.2",
+        "2.9",
+        "2.4"
+       ],
+       "options": [
+        "3.2",
+        "2.8",
+        "3.6",
+        "2.9"
+       ],
+       "answer": 3,
+       "hint": "Check each jump in turn. One of them is the wrong size.",
+       "explain": "It should be <code>2.8</code> to keep the step of -0.4."
+      }
+     ]
+    },
+    {
+     "id": "L2F7",
+     "skill": "negative decimals",
+     "variants": [
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "0.6",
+        "0.3",
+        "0",
+        "?"
+       ],
+       "options": [
+        "-0.6",
+        "0.3",
+        "0",
+        "-0.3"
+       ],
+       "answer": 3,
+       "hint": "Once you pass zero the numbers become negative decimals.",
+       "explain": "<code>0 - 0.3 = -0.3</code>."
+      },
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "1",
+        "0.6",
+        "0.2",
+        "?"
+       ],
+       "options": [
+        "-0.2",
+        "-0.6",
+        "0",
+        "0.2"
+       ],
+       "answer": 0,
+       "hint": "Once you pass zero the numbers become negative decimals.",
+       "explain": "<code>0.2 - 0.4 = -0.2</code>."
+      },
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "0.75",
+        "0.5",
+        "0.25",
+        "0",
+        "?"
+       ],
+       "options": [
+        "0.25",
+        "0",
+        "-0.5",
+        "-0.25"
+       ],
+       "answer": 3,
+       "hint": "Once you pass zero the numbers become negative decimals.",
+       "explain": "<code>0 - 0.25 = -0.25</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F8",
+     "skill": "nth decimal",
+     "variants": [
+      {
+       "stem": "What is the 8th number in this sequence?",
+       "sub": null,
+       "seq": [
+        "0.5",
+        "1",
+        "1.5",
+        "2",
+        "..."
+       ],
+       "options": [
+        "5",
+        "3.5",
+        "4",
+        "4.5"
+       ],
+       "answer": 2,
+       "hint": "You need 7 jumps from the first number, not 8.",
+       "explain": "<code>0.5 + 7 x 0.5 = 4</code>."
+      },
+      {
+       "stem": "What is the 7th number in this sequence?",
+       "sub": null,
+       "seq": [
+        "0.2",
+        "0.5",
+        "0.8",
+        "1.1",
+        "..."
+       ],
+       "options": [
+        "1.7",
+        "2.3",
+        "2.6",
+        "2"
+       ],
+       "answer": 3,
+       "hint": "You need 6 jumps from the first number, not 7.",
+       "explain": "<code>0.2 + 6 x 0.3 = 2</code>."
+      },
+      {
+       "stem": "What is the 9th number in this sequence?",
+       "sub": null,
+       "seq": [
+        "1.1",
+        "1.3",
+        "1.5",
+        "1.7",
+        "..."
+       ],
+       "options": [
+        "2.5",
+        "3.1",
+        "2.9",
+        "2.7"
+       ],
+       "answer": 3,
+       "hint": "You need 8 jumps from the first number, not 9.",
+       "explain": "<code>1.1 + 8 x 0.2 = 2.7</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F9",
+     "skill": "decimal word problem",
+     "variants": [
+      {
+       "stem": "Samuel has &pound;12.5 and spends &pound;1.75 each week. How much after 3 weeks?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "£9",
+        "£5.5",
+        "£7.25",
+        "£10.75"
+       ],
+       "answer": 2,
+       "hint": "That is 3 equal steps of 1.75.",
+       "explain": "<code>3 x 1.75 = 5.25</code>, so the answer is <code>7.25</code>."
+      },
+      {
+       "stem": "Samuel has &pound;2 and saves &pound;0.45 each week. How much after 4 weeks?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "£4.25",
+        "£3.8",
+        "£2.45",
+        "£3.35"
+       ],
+       "answer": 1,
+       "hint": "That is 4 equal steps of 0.45.",
+       "explain": "<code>4 x 0.45 = 1.8</code>, so the answer is <code>3.8</code>."
+      },
+      {
+       "stem": "Samuel has &pound;30 and spends &pound;2.5 each week. How much after 5 weeks?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "£27.5",
+        "£17.5",
+        "£20",
+        "£15"
+       ],
+       "answer": 1,
+       "hint": "That is 5 equal steps of 2.5.",
+       "explain": "<code>5 x 2.5 = 12.5</code>, so the answer is <code>17.5</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F10",
+     "skill": "fill two gaps",
+     "variants": [
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "1.4",
+        "1.7",
+        "2",
+        "?",
+        "?"
+       ],
+       "options": [
+        "2.3, 2.6",
+        "2.6, 2.3",
+        "2.6, 2.9",
+        "2.3, 2.9"
+       ],
+       "answer": 0,
+       "hint": "Same step twice in a row.",
+       "explain": "Step is 0.3: <code>2 -> 2.3 -> 2.6</code>."
+      },
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "5",
+        "4.85",
+        "4.7",
+        "?",
+        "?"
+       ],
+       "options": [
+        "4.55, 4.25",
+        "4.55, 4.4",
+        "4.4, 4.55",
+        "4.4, 4.25"
+       ],
+       "answer": 1,
+       "hint": "Same step twice in a row.",
+       "explain": "Step is -0.15: <code>4.7 -> 4.55 -> 4.4</code>."
+      },
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "0.23",
+        "0.34",
+        "0.45",
+        "?",
+        "?"
+       ],
+       "options": [
+        "0.67, 0.78",
+        "0.56, 0.67",
+        "0.67, 0.56",
+        "0.56, 0.78"
+       ],
+       "answer": 1,
+       "hint": "Same step twice in a row.",
+       "explain": "Step is 0.11: <code>0.45 -> 0.56 -> 0.67</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F11",
+     "skill": "match the step",
+     "variants": [
+      {
+       "stem": "Which sequence has a step of exactly 0.25?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1, 0.75, 0.5, 0.25",
+        "1, 1.5, 2, 2.5",
+        "1, 1.3, 1.6, 1.9",
+        "1, 1.25, 1.5, 1.75"
+       ],
+       "answer": 3,
+       "hint": "Test the first jump of each option.",
+       "explain": "In <code>1, 1.25, 1.5, 1.75</code> every jump is 0.25."
+      },
+      {
+       "stem": "Which sequence has a step of exactly 0.6?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "2, 3.2, 4.4, 5.6",
+        "2, 2.65, 3.3, 3.95",
+        "2, 1.4, 0.8, 0.2",
+        "2, 2.6, 3.2, 3.8"
+       ],
+       "answer": 3,
+       "hint": "Test the first jump of each option.",
+       "explain": "In <code>2, 2.6, 3.2, 3.8</code> every jump is 0.6."
+      },
+      {
+       "stem": "Which sequence has a step of exactly -0.15?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "3, 2.9, 2.8, 2.7",
+        "3, 2.85, 2.7, 2.55",
+        "3, 3.15, 3.3, 3.45",
+        "3, 2.7, 2.4, 2.1"
+       ],
+       "answer": 1,
+       "hint": "Test the first jump of each option.",
+       "explain": "In <code>3, 2.85, 2.7, 2.55</code> every jump is -0.15."
+      }
+     ]
+    },
+    {
+     "id": "L2F12",
+     "skill": "find the start",
+     "variants": [
+      {
+       "stem": "The first two numbers are missing. What was the first number?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "4.6",
+        "5"
+       ],
+       "options": [
+        "3",
+        "3.4",
+        "3.8",
+        "4.2"
+       ],
+       "answer": 2,
+       "hint": "Go backwards two jumps from the number you can see.",
+       "explain": "<code>4.6 - 2 x (0.4) = 3.8</code>."
+      },
+      {
+       "stem": "The first two numbers are missing. What was the first number?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "2",
+        "1.7"
+       ],
+       "options": [
+        "2.9",
+        "2.6",
+        "2.3",
+        "3.2"
+       ],
+       "answer": 1,
+       "hint": "Go backwards two jumps from the number you can see.",
+       "explain": "<code>2 - 2 x (-0.3) = 2.6</code>."
+      },
+      {
+       "stem": "The first two numbers are missing. What was the first number?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "1.25",
+        "1.4"
+       ],
+       "options": [
+        "0.65",
+        "0.8",
+        "1.1",
+        "0.95"
+       ],
+       "answer": 3,
+       "hint": "Go backwards two jumps from the number you can see.",
+       "explain": "<code>1.25 - 2 x (0.15) = 0.95</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F13",
+     "skill": "count decimal steps",
+     "variants": [
+      {
+       "stem": "A sequence steps by 0.5. How many steps from 1.5 to 4.5?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "7",
+        "6",
+        "12",
+        "5"
+       ],
+       "answer": 1,
+       "hint": "Difference divided by step size.",
+       "explain": "<code>4.5 - 1.5 = 3</code>, and <code>3 / 0.5 = 6</code>."
+      },
+      {
+       "stem": "A sequence steps by 0.25. How many steps from 2 to 4?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "16",
+        "7",
+        "8",
+        "9"
+       ],
+       "answer": 2,
+       "hint": "Difference divided by step size.",
+       "explain": "<code>4 - 2 = 2</code>, and <code>2 / 0.25 = 8</code>."
+      },
+      {
+       "stem": "A sequence steps by -0.4. How many steps from 10 to 8?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6",
+        "10",
+        "4",
+        "5"
+       ],
+       "answer": 3,
+       "hint": "Difference divided by step size.",
+       "explain": "<code>8 - 10 = -2</code>, and <code>-2 / 0.4 = 5</code>."
+      }
+     ]
+    },
+    {
+     "id": "L2F14",
+     "skill": "measures",
+     "variants": [
+      {
+       "stem": "A plant is 1.25 m tall and changes by 0.15 m each month. How tall after 4 months?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1.4 m",
+        "1.85 m",
+        "1.7 m",
+        "2 m"
+       ],
+       "answer": 1,
+       "hint": "4 equal changes of 0.15.",
+       "explain": "<code>4 x 0.15 = 0.6</code>, so <code>1.25 + 0.6 = 1.85</code> m."
+      },
+      {
+       "stem": "A plant is 3 m tall and changes by -0.35 m each month. How tall after 4 months?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1.95 m",
+        "1.25 m",
+        "1.6 m",
+        "2.65 m"
+       ],
+       "answer": 2,
+       "hint": "4 equal changes of -0.35.",
+       "explain": "<code>4 x -0.35 = -1.4</code>, so <code>3 + -1.4 = 1.6</code> m."
+      },
+      {
+       "stem": "A plant is 4.8 m tall and changes by 0.6 m each month. How tall after 3 months?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6.6 m",
+        "6 m",
+        "7.2 m",
+        "5.4 m"
+       ],
+       "answer": 0,
+       "hint": "3 equal changes of 0.6.",
+       "explain": "<code>3 x 0.6 = 1.8</code>, so <code>4.8 + 1.8 = 6.6</code> m."
+      }
+     ]
+    },
+    {
+     "id": "L2F15",
+     "skill": "true statement",
+     "variants": [
+      {
+       "stem": "Which statement is true about this sequence?",
+       "sub": null,
+       "seq": [
+        "0.3",
+        "0.6",
+        "0.9",
+        "1.2"
+       ],
+       "options": [
+        "It doubles each time.",
+        "It counts on in steps of 0.3.",
+        "It counts back in steps of 0.3.",
+        "It counts on in steps of 0.6."
+       ],
+       "answer": 1,
+       "hint": "Doubling and adding are different. Check by subtracting.",
+       "explain": "Every jump is exactly <code>0.3</code>, so it counts on in 0.3."
+      },
+      {
+       "stem": "Which statement is true about this sequence?",
+       "sub": null,
+       "seq": [
+        "0.7",
+        "0.9",
+        "1.1",
+        "1.3"
+       ],
+       "options": [
+        "It counts on in steps of 0.4.",
+        "It counts back in steps of 0.2.",
+        "It counts on in steps of 0.2.",
+        "It doubles each time."
+       ],
+       "answer": 2,
+       "hint": "Doubling and adding are different. Check by subtracting.",
+       "explain": "Every jump is exactly <code>0.2</code>, so it counts on in 0.2."
+      },
+      {
+       "stem": "Which statement is true about this sequence?",
+       "sub": null,
+       "seq": [
+        "1.05",
+        "1.1",
+        "1.15",
+        "1.2"
+       ],
+       "options": [
+        "It counts on in steps of 0.1.",
+        "It counts on in steps of 0.05.",
+        "It doubles each time.",
+        "It counts back in steps of 0.05."
+       ],
+       "answer": 1,
+       "hint": "Doubling and adding are different. Check by subtracting.",
+       "explain": "Every jump is exactly <code>0.05</code>, so it counts on in 0.05."
+      }
+     ]
+    },
+    {
+     "id": "L2F16",
+     "skill": "three steps on",
+     "variants": [
+      {
+       "stem": "What number is <b>3 steps</b> after the first one?",
+       "sub": null,
+       "seq": [
+        "1.9",
+        "?",
+        "?",
+        "?"
+       ],
+       "options": [
+        "3.5",
+        "2.7",
+        "3.1",
+        "2.3"
+       ],
+       "answer": 2,
+       "hint": "Three jumps, so multiply the step by 3 and add it on.",
+       "explain": "<code>3 x 0.4 = 1.2</code>, and <code>1.9 + 1.2 = 3.1</code>."
+      },
+      {
+       "stem": "What number is <b>3 steps</b> after the first one?",
+       "sub": null,
+       "seq": [
+        "0.52",
+        "?",
+        "?",
+        "?"
+       ],
+       "options": [
+        "0.78",
+        "0.65",
+        "1.04",
+        "0.91"
+       ],
+       "answer": 3,
+       "hint": "Three jumps, so multiply the step by 3 and add it on.",
+       "explain": "<code>3 x 0.13 = 0.39</code>, and <code>0.52 + 0.39 = 0.91</code>."
+      },
+      {
+       "stem": "What number is <b>3 steps</b> after the first one?",
+       "sub": null,
+       "seq": [
+        "9",
+        "?",
+        "?",
+        "?"
+       ],
+       "options": [
+        "7.2",
+        "7.65",
+        "8.55",
+        "8.1"
+       ],
+       "answer": 1,
+       "hint": "Three jumps, so multiply the step by 3 and add it on.",
+       "explain": "<code>3 x -0.45 = -1.35</code>, and <code>9 + -1.35 = 7.65</code>."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "name": "FRACTION FOREST",
+   "subtitle": "Counting on and back in fraction steps",
+   "briefing": [
+    "<p>Level 3. Same rule, new number type. A fraction step works exactly like a decimal step.</p>",
+    "<div class='example'>3, 2 2/3, 2 1/3, ?<br>Each jump takes away 1/3<br>2 1/3 - 1/3 = 2</div>",
+    "<ul><li>The bottom number (denominator) tells you how many pieces make one whole.</li><li>To cross a whole going down, break one whole into that many pieces: 2 = 1 3/3.</li><li>Write answers as mixed numbers: <b>2 1/3</b>, not 7/3.</li><li>Careful: <b>1/3 is bigger than 1/4</b>. A bigger bottom number means smaller pieces.</li></ul>"
+   ],
+   "questions": [
+    {
+     "id": "L3F1",
+     "skill": "count back in fractions",
+     "variants": [
+      {
+       "stem": "Count back in steps of 1/3. What comes next?",
+       "sub": null,
+       "seq": [
+        "3",
+        "2 2/3",
+        "2 1/3",
+        "?"
+       ],
+       "options": [
+        "2",
+        "1 2/3",
+        "2 1/3",
+        "1 1/3"
+       ],
+       "answer": 0,
+       "hint": "Each jump takes away 1/3. When you run out of 3ths, break down a whole.",
+       "explain": "<code>2 1/3 - 1/3 = 2</code>."
+      },
+      {
+       "stem": "Count back in steps of 1/4. What comes next?",
+       "sub": null,
+       "seq": [
+        "4",
+        "3 3/4",
+        "3 1/2",
+        "?"
+       ],
+       "options": [
+        "3 1/2",
+        "3 1/4",
+        "3",
+        "2 3/4"
+       ],
+       "answer": 1,
+       "hint": "Each jump takes away 1/4. When you run out of 4ths, break down a whole.",
+       "explain": "<code>3 1/2 - 1/4 = 3 1/4</code>."
+      },
+      {
+       "stem": "Count back in steps of 1/5. What comes next?",
+       "sub": null,
+       "seq": [
+        "5",
+        "4 4/5",
+        "4 3/5",
+        "?"
+       ],
+       "options": [
+        "4 1/5",
+        "4 2/5",
+        "4 3/5",
+        "4"
+       ],
+       "answer": 1,
+       "hint": "Each jump takes away 1/5. When you run out of 5ths, break down a whole.",
+       "explain": "<code>4 3/5 - 1/5 = 4 2/5</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F2",
+     "skill": "count on in fractions",
+     "variants": [
+      {
+       "stem": "Count on in steps of 1/2. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/2",
+        "1",
+        "1 1/2",
+        "?"
+       ],
+       "options": [
+        "2 1/2",
+        "3",
+        "1 1/2",
+        "2"
+       ],
+       "answer": 3,
+       "hint": "Add 1/2 each time. 2 of them make one whole.",
+       "explain": "<code>1 1/2 + 1/2 = 2</code>."
+      },
+      {
+       "stem": "Count on in steps of 1/4. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/4",
+        "1/2",
+        "3/4",
+        "1",
+        "?"
+       ],
+       "options": [
+        "1 3/4",
+        "1 1/2",
+        "1",
+        "1 1/4"
+       ],
+       "answer": 3,
+       "hint": "Add 1/4 each time. 4 of them make one whole.",
+       "explain": "<code>1 + 1/4 = 1 1/4</code>."
+      },
+      {
+       "stem": "Count on in steps of 1/5. What comes next?",
+       "sub": null,
+       "seq": [
+        "2/5",
+        "3/5",
+        "4/5",
+        "1",
+        "?"
+       ],
+       "options": [
+        "1",
+        "1 3/5",
+        "1 2/5",
+        "1 1/5"
+       ],
+       "answer": 3,
+       "hint": "Add 1/5 each time. 5 of them make one whole.",
+       "explain": "<code>1 + 1/5 = 1 1/5</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F3",
+     "skill": "find fraction step",
+     "variants": [
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "1/3",
+        "2/3",
+        "1",
+        "1 1/3"
+       ],
+       "options": [
+        "1",
+        "2/3",
+        "1/4",
+        "1/3"
+       ],
+       "answer": 3,
+       "hint": "Subtract the first term from the second one.",
+       "explain": "<code>2/3 - 1/3 = 1/3</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "1/4",
+        "1",
+        "1 3/4",
+        "2 1/2"
+       ],
+       "options": [
+        "1/5",
+        "3/4",
+        "2 1/4",
+        "1 1/2"
+       ],
+       "answer": 1,
+       "hint": "Subtract the first term from the second one.",
+       "explain": "<code>1 - 1/4 = 3/4</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "2/5",
+        "4/5",
+        "1 1/5",
+        "1 3/5"
+       ],
+       "options": [
+        "1 1/5",
+        "1/6",
+        "2/5",
+        "4/5"
+       ],
+       "answer": 2,
+       "hint": "Subtract the first term from the second one.",
+       "explain": "<code>4/5 - 2/5 = 2/5</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F4",
+     "skill": "fractions past a whole",
+     "variants": [
+      {
+       "stem": "This one crosses a whole number. What comes next?",
+       "sub": null,
+       "seq": [
+        "2/3",
+        "1",
+        "?"
+       ],
+       "options": [
+        "2/3",
+        "1 1/3",
+        "1 2/3",
+        "1"
+       ],
+       "answer": 1,
+       "hint": "When you collect 3 lots of 1/3, that is one whole.",
+       "explain": "<code>1 + 1/3 = 1 1/3</code>. Remember to write it as a mixed number."
+      },
+      {
+       "stem": "This one crosses a whole number. What comes next?",
+       "sub": null,
+       "seq": [
+        "3/4",
+        "1",
+        "?"
+       ],
+       "options": [
+        "1 1/2",
+        "1",
+        "1/2",
+        "1 1/4"
+       ],
+       "answer": 3,
+       "hint": "When you collect 4 lots of 1/4, that is one whole.",
+       "explain": "<code>1 + 1/4 = 1 1/4</code>. Remember to write it as a mixed number."
+      },
+      {
+       "stem": "This one crosses a whole number. What comes next?",
+       "sub": null,
+       "seq": [
+        "4/5",
+        "1 1/5",
+        "?"
+       ],
+       "options": [
+        "2",
+        "4/5",
+        "1 3/5",
+        "1 1/5"
+       ],
+       "answer": 2,
+       "hint": "When you collect 5 lots of 1/5, that is one whole.",
+       "explain": "<code>1 1/5 + 2/5 = 1 3/5</code>. Remember to write it as a mixed number."
+      }
+     ]
+    },
+    {
+     "id": "L3F5",
+     "skill": "missing fraction",
+     "variants": [
+      {
+       "stem": "Which fraction fills the gap?",
+       "sub": null,
+       "seq": [
+        "1/2",
+        "1",
+        "?",
+        "2"
+       ],
+       "options": [
+        "2 1/2",
+        "1",
+        "2",
+        "1 1/2"
+       ],
+       "answer": 3,
+       "hint": "Work out the step from two terms you can see.",
+       "explain": "Step is 1/2, so the gap is <code>1 + 1/2 = 1 1/2</code>."
+      },
+      {
+       "stem": "Which fraction fills the gap?",
+       "sub": null,
+       "seq": [
+        "1/3",
+        "?",
+        "1 2/3",
+        "2 1/3"
+       ],
+       "options": [
+        "1/3",
+        "1 1/3",
+        "1",
+        "1 2/3"
+       ],
+       "answer": 2,
+       "hint": "Work out the step from two terms you can see.",
+       "explain": "Step is 2/3, so the gap is <code>1/3 + 2/3 = 1</code>."
+      },
+      {
+       "stem": "Which fraction fills the gap?",
+       "sub": null,
+       "seq": [
+        "3/4",
+        "1",
+        "?",
+        "1 1/2"
+       ],
+       "options": [
+        "1 1/4",
+        "1 3/4",
+        "1",
+        "1 1/2"
+       ],
+       "answer": 0,
+       "hint": "Work out the step from two terms you can see.",
+       "explain": "Step is 1/4, so the gap is <code>1 + 1/4 = 1 1/4</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F6",
+     "skill": "negative fractions",
+     "variants": [
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "2/3",
+        "1/3",
+        "0",
+        "?"
+       ],
+       "options": [
+        "0",
+        "-2/3",
+        "-1/3",
+        "1/3"
+       ],
+       "answer": 2,
+       "hint": "Past zero the fractions become negative.",
+       "explain": "<code>0 - 1/3 = -1/3</code>."
+      },
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/2",
+        "0",
+        "?"
+       ],
+       "options": [
+        "-1",
+        "1/2",
+        "0",
+        "-1/2"
+       ],
+       "answer": 3,
+       "hint": "Past zero the fractions become negative.",
+       "explain": "<code>0 - 1/2 = -1/2</code>."
+      },
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "3/4",
+        "1/2",
+        "1/4",
+        "0",
+        "?"
+       ],
+       "options": [
+        "0",
+        "-1/4",
+        "-1/2",
+        "1/4"
+       ],
+       "answer": 1,
+       "hint": "Past zero the fractions become negative.",
+       "explain": "<code>0 - 1/4 = -1/4</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F7",
+     "skill": "nth fraction",
+     "variants": [
+      {
+       "stem": "What is the 9th term?",
+       "sub": null,
+       "seq": [
+        "1/4",
+        "1/2",
+        "3/4",
+        "1",
+        "..."
+       ],
+       "options": [
+        "2 1/2",
+        "2",
+        "2 3/4",
+        "2 1/4"
+       ],
+       "answer": 3,
+       "hint": "8 jumps from the first term.",
+       "explain": "<code>1/4 + 8 x 1/4 = 2 1/4</code>."
+      },
+      {
+       "stem": "What is the 7th term?",
+       "sub": null,
+       "seq": [
+        "1/3",
+        "2/3",
+        "1",
+        "1 1/3",
+        "..."
+       ],
+       "options": [
+        "2 2/3",
+        "3",
+        "2 1/3",
+        "2"
+       ],
+       "answer": 2,
+       "hint": "6 jumps from the first term.",
+       "explain": "<code>1/3 + 6 x 1/3 = 2 1/3</code>."
+      },
+      {
+       "stem": "What is the 6th term?",
+       "sub": null,
+       "seq": [
+        "1/5",
+        "3/5",
+        "1",
+        "1 2/5",
+        "..."
+       ],
+       "options": [
+        "2 1/5",
+        "1 4/5",
+        "2 3/5",
+        "3"
+       ],
+       "answer": 0,
+       "hint": "5 jumps from the first term.",
+       "explain": "<code>1/5 + 5 x 2/5 = 2 1/5</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F8",
+     "skill": "equivalent steps",
+     "variants": [
+      {
+       "stem": "The step is written as 2/4. Which is the same size?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "2/8",
+        "4/4",
+        "1/2",
+        "4/2"
+       ],
+       "answer": 2,
+       "hint": "Simplify the fraction by dividing top and bottom by the same number.",
+       "explain": "<code>2/4 = 1/2</code> once you simplify."
+      },
+      {
+       "stem": "The step is written as 2/6. Which is the same size?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1/3",
+        "2/12",
+        "6/2",
+        "4/6"
+       ],
+       "answer": 0,
+       "hint": "Simplify the fraction by dividing top and bottom by the same number.",
+       "explain": "<code>2/6 = 1/3</code> once you simplify."
+      },
+      {
+       "stem": "The step is written as 5/10. Which is the same size?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "10/10",
+        "5/20",
+        "10/5",
+        "1/2"
+       ],
+       "answer": 3,
+       "hint": "Simplify the fraction by dividing top and bottom by the same number.",
+       "explain": "<code>5/10 = 1/2</code> once you simplify."
+      }
+     ]
+    },
+    {
+     "id": "L3F9",
+     "skill": "fraction error",
+     "variants": [
+      {
+       "stem": "One term breaks the pattern of 1/3. Which one?",
+       "sub": null,
+       "seq": [
+        "1/3",
+        "2/3",
+        "1",
+        "1 2/3",
+        "1 2/3"
+       ],
+       "options": [
+        "1 1/3",
+        "2/3",
+        "1",
+        "1 2/3"
+       ],
+       "answer": 3,
+       "hint": "Check each jump in turn.",
+       "explain": "It should be <code>1 1/3</code> to keep steps of 1/3."
+      },
+      {
+       "stem": "One term breaks the pattern of 1/4. Which one?",
+       "sub": null,
+       "seq": [
+        "1/4",
+        "1/2",
+        "1",
+        "1",
+        "1 1/4"
+       ],
+       "options": [
+        "1",
+        "3/4",
+        "1/4",
+        "1/2"
+       ],
+       "answer": 0,
+       "hint": "Check each jump in turn.",
+       "explain": "It should be <code>3/4</code> to keep steps of 1/4."
+      },
+      {
+       "stem": "One term breaks the pattern of 1/5. Which one?",
+       "sub": null,
+       "seq": [
+        "2/5",
+        "3/5",
+        "4/5",
+        "1 1/5",
+        "1 1/5"
+       ],
+       "options": [
+        "1",
+        "4/5",
+        "1 1/5",
+        "3/5"
+       ],
+       "answer": 2,
+       "hint": "Check each jump in turn.",
+       "explain": "It should be <code>1</code> to keep steps of 1/5."
+      }
+     ]
+    },
+    {
+     "id": "L3F10",
+     "skill": "four fraction jumps",
+     "variants": [
+      {
+       "stem": "Start at 3 and count back in 1/3 four times. Where do you land?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1 1/3",
+        "1 2/3",
+        "2",
+        "2 2/3"
+       ],
+       "answer": 1,
+       "hint": "Four jumps of 1/3 is 4/3 altogether.",
+       "explain": "<code>4 x 1/3 = 1 1/3</code>, and <code>3 - 1 1/3 = 1 2/3</code>."
+      },
+      {
+       "stem": "Start at 4 and count back in 1/4 four times. Where do you land?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "2 3/4",
+        "3",
+        "3 3/4",
+        "3 1/4"
+       ],
+       "answer": 1,
+       "hint": "Four jumps of 1/4 is 4/4 altogether.",
+       "explain": "<code>4 x 1/4 = 1</code>, and <code>4 - 1 = 3</code>."
+      },
+      {
+       "stem": "Start at 5 and count back in 2/5 four times. Where do you land?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "3",
+        "3 4/5",
+        "4 3/5",
+        "3 2/5"
+       ],
+       "answer": 3,
+       "hint": "Four jumps of 2/5 is 8/5 altogether.",
+       "explain": "<code>4 x 2/5 = 1 3/5</code>, and <code>5 - 1 3/5 = 3 2/5</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F11",
+     "skill": "fraction word problem",
+     "variants": [
+      {
+       "stem": "There are 2 whole pizzas, each cut into 4 equal slices. 3 slices are eaten. How much pizza is left?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1",
+        "1 1/4",
+        "1 1/2",
+        "-1"
+       ],
+       "answer": 1,
+       "hint": "Each slice is 1/4 of a pizza.",
+       "explain": "<code>3 slices = 3/4</code>, so <code>2 - 3/4 = 1 1/4</code>."
+      },
+      {
+       "stem": "There are 3 whole pizzas, each cut into 3 equal slices. 2 slices are eaten. How much pizza is left?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "2 1/3",
+        "1",
+        "2",
+        "2 2/3"
+       ],
+       "answer": 0,
+       "hint": "Each slice is 1/3 of a pizza.",
+       "explain": "<code>2 slices = 2/3</code>, so <code>3 - 2/3 = 2 1/3</code>."
+      },
+      {
+       "stem": "There are 2 whole pizzas, each cut into 8 equal slices. 5 slices are eaten. How much pizza is left?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1 1/4",
+        "1 3/8",
+        "1 1/2",
+        "-3"
+       ],
+       "answer": 1,
+       "hint": "Each slice is 1/8 of a pizza.",
+       "explain": "<code>5 slices = 5/8</code>, so <code>2 - 5/8 = 1 3/8</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F12",
+     "skill": "count fraction steps",
+     "variants": [
+      {
+       "stem": "How many steps of 1/3 does it take to get from 0 to 2?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6",
+        "5",
+        "7",
+        "3"
+       ],
+       "answer": 0,
+       "hint": "Ask: how many 3ths are in 2?",
+       "explain": "<code>2 = 6/3</code>, so it takes 6 steps."
+      },
+      {
+       "stem": "How many steps of 1/4 does it take to get from 0 to 1 3/4?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6",
+        "4",
+        "7",
+        "8"
+       ],
+       "answer": 2,
+       "hint": "Ask: how many 4ths are in 1 3/4?",
+       "explain": "<code>1 3/4 = 7/4</code>, so it takes 7 steps."
+      },
+      {
+       "stem": "How many steps of 1/5 does it take to get from 0 to 1 3/5?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "7",
+        "5",
+        "9",
+        "8"
+       ],
+       "answer": 3,
+       "hint": "Ask: how many 5ths are in 1 3/5?",
+       "explain": "<code>1 3/5 = 8/5</code>, so it takes 8 steps."
+      }
+     ]
+    },
+    {
+     "id": "L3F13",
+     "skill": "fill two gaps",
+     "variants": [
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "1/2",
+        "1",
+        "1 1/2",
+        "?",
+        "?"
+       ],
+       "options": [
+        "2 1/2, 2",
+        "2, 3",
+        "2, 2 1/2",
+        "2 1/2, 3"
+       ],
+       "answer": 2,
+       "hint": "Apply the same step twice.",
+       "explain": "Step is 1/2: <code>1 1/2 -> 2 -> 2 1/2</code>."
+      },
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "1/3",
+        "2/3",
+        "1",
+        "?",
+        "?"
+       ],
+       "options": [
+        "1 2/3, 1 1/3",
+        "1 1/3, 1 2/3",
+        "1 2/3, 2",
+        "1 1/3, 2"
+       ],
+       "answer": 1,
+       "hint": "Apply the same step twice.",
+       "explain": "Step is 1/3: <code>1 -> 1 1/3 -> 1 2/3</code>."
+      },
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "1/4",
+        "1",
+        "1 3/4",
+        "?",
+        "?"
+       ],
+       "options": [
+        "3 1/4, 4",
+        "2 1/2, 4",
+        "2 1/2, 3 1/4",
+        "3 1/4, 2 1/2"
+       ],
+       "answer": 2,
+       "hint": "Apply the same step twice.",
+       "explain": "Step is 3/4: <code>1 3/4 -> 2 1/2 -> 3 1/4</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F14",
+     "skill": "fraction to decimal",
+     "variants": [
+      {
+       "stem": "A sequence counts on in steps of 1/2. What is the same step as a decimal?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "0.5",
+        "2.0",
+        "1.0",
+        "0.6"
+       ],
+       "answer": 0,
+       "hint": "Divide 1 by 2.",
+       "explain": "<code>1 / 2 = 0.5</code>."
+      },
+      {
+       "stem": "A sequence counts on in steps of 1/4. What is the same step as a decimal?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "0.25",
+        "0.35",
+        "4.0",
+        "0.5"
+       ],
+       "answer": 0,
+       "hint": "Divide 1 by 4.",
+       "explain": "<code>1 / 4 = 0.25</code>."
+      },
+      {
+       "stem": "A sequence counts on in steps of 1/5. What is the same step as a decimal?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "0.4",
+        "0.2",
+        "0.3",
+        "5.0"
+       ],
+       "answer": 1,
+       "hint": "Divide 1 by 5.",
+       "explain": "<code>1 / 5 = 0.2</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F15",
+     "skill": "find the start",
+     "variants": [
+      {
+       "stem": "The first two terms are missing. What was the first term?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "2",
+        "2 1/3"
+       ],
+       "options": [
+        "2/3",
+        "1 1/3",
+        "1",
+        "1 2/3"
+       ],
+       "answer": 1,
+       "hint": "Go back two jumps from the term you can see.",
+       "explain": "<code>2 - 2 x 1/3 = 1 1/3</code>."
+      },
+      {
+       "stem": "The first two terms are missing. What was the first term?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "3",
+        "3 1/4"
+       ],
+       "options": [
+        "2 1/4",
+        "2 1/2",
+        "2 3/4",
+        "2"
+       ],
+       "answer": 1,
+       "hint": "Go back two jumps from the term you can see.",
+       "explain": "<code>3 - 2 x 1/4 = 2 1/2</code>."
+      },
+      {
+       "stem": "The first two terms are missing. What was the first term?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "2 1/2",
+        "3"
+       ],
+       "options": [
+        "2",
+        "1",
+        "1/2",
+        "1 1/2"
+       ],
+       "answer": 3,
+       "hint": "Go back two jumps from the term you can see.",
+       "explain": "<code>2 1/2 - 2 x 1/2 = 1 1/2</code>."
+      }
+     ]
+    },
+    {
+     "id": "L3F16",
+     "skill": "compare steps",
+     "variants": [
+      {
+       "stem": "Sequence A counts on in 1/3. Sequence B counts on in 1/4. Which grows faster?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "A",
+        "They grow at the same rate",
+        "B",
+        "It depends where they start"
+       ],
+       "answer": 0,
+       "hint": "The bigger the bottom number, the smaller the fraction.",
+       "explain": "<code>1/3 > 1/4</code>, so A takes bigger jumps."
+      },
+      {
+       "stem": "Sequence A counts on in 1/5. Sequence B counts on in 1/2. Which grows faster?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "B",
+        "It depends where they start",
+        "They grow at the same rate",
+        "A"
+       ],
+       "answer": 0,
+       "hint": "The bigger the bottom number, the smaller the fraction.",
+       "explain": "<code>1/5 < 1/2</code>, so B takes bigger jumps."
+      },
+      {
+       "stem": "Sequence A counts on in 1/8. Sequence B counts on in 1/3. Which grows faster?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "They grow at the same rate",
+        "B",
+        "A",
+        "It depends where they start"
+       ],
+       "answer": 1,
+       "hint": "The bigger the bottom number, the smaller the fraction.",
+       "explain": "<code>1/8 < 1/3</code>, so B takes bigger jumps."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "name": "NEGATIVE CAVERNS",
+   "subtitle": "Counting through zero into negative numbers",
+   "briefing": [
+    "<p>Level 4. Below zero the number line keeps going. The step does not change when you cross zero &mdash; only your care level does.</p>",
+    "<div class='example'>6, 3, 0, -3, -6, -9<br>Same step of 3 all the way through</div>",
+    "<ul><li><b>-9 is smaller than -3.</b> Further left = smaller.</li><li>To find the distance from -6 to 4: go up to zero (6), then carry on (4). Total 10.</li><li>Adding moves you <b>right</b>, subtracting moves you <b>left</b>. Always.</li><li>The classic trap: bouncing back up after zero. Don't. Keep going.</li></ul>"
+   ],
+   "questions": [
+    {
+     "id": "L4F1",
+     "skill": "temperature",
+     "variants": [
+      {
+       "stem": "The temperature is 5&deg;C and falls 3&deg;C every hour. What is it after 3 hours?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "4°C",
+        "-4°C",
+        "-7°C",
+        "-1°C"
+       ],
+       "answer": 1,
+       "hint": "3 falls of 3 is 9 in total.",
+       "explain": "<code>5 - 9 = -4</code>&deg;C."
+      },
+      {
+       "stem": "The temperature is 8&deg;C and falls 5&deg;C every hour. What is it after 3 hours?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-12°C",
+        "-7°C",
+        "7°C",
+        "-2°C"
+       ],
+       "answer": 1,
+       "hint": "3 falls of 5 is 15 in total.",
+       "explain": "<code>8 - 15 = -7</code>&deg;C."
+      },
+      {
+       "stem": "The temperature is 2&deg;C and falls 4&deg;C every hour. What is it after 2 hours?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-2°C",
+        "-6°C",
+        "-10°C",
+        "6°C"
+       ],
+       "answer": 1,
+       "hint": "2 falls of 4 is 8 in total.",
+       "explain": "<code>2 - 8 = -6</code>&deg;C."
+      }
+     ]
+    },
+    {
+     "id": "L4F2",
+     "skill": "into the negatives",
+     "variants": [
+      {
+       "stem": "Count back in 6s. What comes next?",
+       "sub": null,
+       "seq": [
+        "4",
+        "-2",
+        "-8",
+        "?"
+       ],
+       "options": [
+        "-20",
+        "-8",
+        "14",
+        "-14"
+       ],
+       "answer": 3,
+       "hint": "Keep going in the same direction. Negative numbers get further from zero as you subtract.",
+       "explain": "<code>-8 - 6 = -14</code>."
+      },
+      {
+       "stem": "Count back in 7s. What comes next?",
+       "sub": null,
+       "seq": [
+        "9",
+        "2",
+        "-5",
+        "?"
+       ],
+       "options": [
+        "-12",
+        "12",
+        "-19",
+        "-5"
+       ],
+       "answer": 0,
+       "hint": "Keep going in the same direction. Negative numbers get further from zero as you subtract.",
+       "explain": "<code>-5 - 7 = -12</code>."
+      },
+      {
+       "stem": "Count back in 8s. What comes next?",
+       "sub": null,
+       "seq": [
+        "3",
+        "-5",
+        "-13",
+        "?"
+       ],
+       "options": [
+        "-29",
+        "-21",
+        "-13",
+        "21"
+       ],
+       "answer": 1,
+       "hint": "Keep going in the same direction. Negative numbers get further from zero as you subtract.",
+       "explain": "<code>-13 - 8 = -21</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F3",
+     "skill": "up from negatives",
+     "variants": [
+      {
+       "stem": "Count on in 5s. What comes next?",
+       "sub": null,
+       "seq": [
+        "-14",
+        "-9",
+        "-4",
+        "?"
+       ],
+       "options": [
+        "6",
+        "-4",
+        "1",
+        "-9"
+       ],
+       "answer": 2,
+       "hint": "Adding makes negative numbers move towards zero, then past it.",
+       "explain": "<code>-4 + 5 = 1</code>."
+      },
+      {
+       "stem": "Count on in 6s. What comes next?",
+       "sub": null,
+       "seq": [
+        "-18",
+        "-12",
+        "-6",
+        "?"
+       ],
+       "options": [
+        "-6",
+        "0",
+        "6",
+        "-12"
+       ],
+       "answer": 1,
+       "hint": "Adding makes negative numbers move towards zero, then past it.",
+       "explain": "<code>-6 + 6 = 0</code>."
+      },
+      {
+       "stem": "Count on in 7s. What comes next?",
+       "sub": null,
+       "seq": [
+        "-21",
+        "-14",
+        "-7",
+        "?"
+       ],
+       "options": [
+        "-14",
+        "0",
+        "7",
+        "-7"
+       ],
+       "answer": 1,
+       "hint": "Adding makes negative numbers move towards zero, then past it.",
+       "explain": "<code>-7 + 7 = 0</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F4",
+     "skill": "distance across zero",
+     "variants": [
+      {
+       "stem": "How far is it from -6 to 9 on a number line?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "16",
+        "14",
+        "15",
+        "3"
+       ],
+       "answer": 2,
+       "hint": "Count up to zero first, then carry on.",
+       "explain": "From -6 up to 0 is 6. From 0 up to 9 is 9. Total <code>6 + 9 = 15</code>."
+      },
+      {
+       "stem": "How far is it from -12 to 4 on a number line?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "15",
+        "16",
+        "-8",
+        "17"
+       ],
+       "answer": 1,
+       "hint": "Count up to zero first, then carry on.",
+       "explain": "From -12 up to 0 is 12. From 0 up to 4 is 4. Total <code>12 + 4 = 16</code>."
+      },
+      {
+       "stem": "How far is it from -7 to 15 on a number line?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "8",
+        "22",
+        "21",
+        "23"
+       ],
+       "answer": 1,
+       "hint": "Count up to zero first, then carry on.",
+       "explain": "From -7 up to 0 is 7. From 0 up to 15 is 15. Total <code>7 + 15 = 22</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F5",
+     "skill": "compare negatives",
+     "variants": [
+      {
+       "stem": "Which number is smaller: -8 or -3?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "You cannot compare negatives",
+        "-3",
+        "-8",
+        "They are equal"
+       ],
+       "answer": 2,
+       "hint": "On a number line, further left = smaller.",
+       "explain": "<code>-8</code> is further left on the number line, so it is smaller."
+      },
+      {
+       "stem": "Which number is smaller: -15 or -20?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-15",
+        "-20",
+        "You cannot compare negatives",
+        "They are equal"
+       ],
+       "answer": 1,
+       "hint": "On a number line, further left = smaller.",
+       "explain": "<code>-20</code> is further left on the number line, so it is smaller."
+      },
+      {
+       "stem": "Which number is smaller: -1 or -9?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-1",
+        "You cannot compare negatives",
+        "They are equal",
+        "-9"
+       ],
+       "answer": 3,
+       "hint": "On a number line, further left = smaller.",
+       "explain": "<code>-9</code> is further left on the number line, so it is smaller."
+      }
+     ]
+    },
+    {
+     "id": "L4F6",
+     "skill": "negative decimals",
+     "variants": [
+      {
+       "stem": "Count back in 0.3. What comes next?",
+       "sub": null,
+       "seq": [
+        "-1.2",
+        "-1.5",
+        "-1.8",
+        "?"
+       ],
+       "options": [
+        "-2.1",
+        "-1.8",
+        "-2.4",
+        "2.1"
+       ],
+       "answer": 0,
+       "hint": "You are already below zero, so subtracting takes you further down.",
+       "explain": "<code>-1.8 - 0.3 = -2.1</code>."
+      },
+      {
+       "stem": "Count back in 0.25. What comes next?",
+       "sub": null,
+       "seq": [
+        "-0.25",
+        "-0.5",
+        "-0.75",
+        "?"
+       ],
+       "options": [
+        "-1",
+        "1",
+        "-0.75",
+        "-1.25"
+       ],
+       "answer": 0,
+       "hint": "You are already below zero, so subtracting takes you further down.",
+       "explain": "<code>-0.75 - 0.25 = -1</code>."
+      },
+      {
+       "stem": "Count back in 0.4. What comes next?",
+       "sub": null,
+       "seq": [
+        "-2",
+        "-2.4",
+        "-2.8",
+        "?"
+       ],
+       "options": [
+        "-2.8",
+        "-3.6",
+        "-3.2",
+        "3.2"
+       ],
+       "answer": 2,
+       "hint": "You are already below zero, so subtracting takes you further down.",
+       "explain": "<code>-2.8 - 0.4 = -3.2</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F7",
+     "skill": "gap across zero",
+     "variants": [
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "7",
+        "2",
+        "?",
+        "-8",
+        "-13"
+       ],
+       "options": [
+        "-8",
+        "7",
+        "-3",
+        "3"
+       ],
+       "answer": 2,
+       "hint": "The step never changes, even when you cross zero.",
+       "explain": "Step is -5: <code>2 + (-5) = -3</code>."
+      },
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "11",
+        "5",
+        "-1",
+        "?",
+        "-13"
+       ],
+       "options": [
+        "-7",
+        "-13",
+        "7",
+        "5"
+       ],
+       "answer": 0,
+       "hint": "The step never changes, even when you cross zero.",
+       "explain": "Step is -6: <code>-1 + (-6) = -7</code>."
+      },
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "6",
+        "2",
+        "?",
+        "-6",
+        "-10"
+       ],
+       "options": [
+        "-2",
+        "6",
+        "-6",
+        "2"
+       ],
+       "answer": 0,
+       "hint": "The step never changes, even when you cross zero.",
+       "explain": "Step is -4: <code>2 + (-4) = -2</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F8",
+     "skill": "depth problem",
+     "variants": [
+      {
+       "stem": "A submarine is at -30 m and rises 12 m each minute. Where is it after 3 minutes?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6 m",
+        "-6 m",
+        "18 m",
+        "-66 m"
+       ],
+       "answer": 0,
+       "hint": "Rising means adding.",
+       "explain": "<code>3 x 12 = 36</code>, so <code>-30 + 36 = 6</code> m."
+      },
+      {
+       "stem": "A submarine is at -45 m and rises 15 m each minute. Where is it after 2 minutes?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-75 m",
+        "-15 m",
+        "-30 m",
+        "0 m"
+       ],
+       "answer": 1,
+       "hint": "Rising means adding.",
+       "explain": "<code>2 x 15 = 30</code>, so <code>-45 + 30 = -15</code> m."
+      },
+      {
+       "stem": "A submarine is at -24 m and rises 8 m each minute. Where is it after 4 minutes?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "8 m",
+        "0 m",
+        "16 m",
+        "-56 m"
+       ],
+       "answer": 0,
+       "hint": "Rising means adding.",
+       "explain": "<code>4 x 8 = 32</code>, so <code>-24 + 32 = 8</code> m."
+      }
+     ]
+    },
+    {
+     "id": "L4F9",
+     "skill": "step with negatives",
+     "variants": [
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "-20",
+        "-14",
+        "-8",
+        "-2"
+       ],
+       "options": [
+        "7",
+        "6",
+        "-6",
+        "12"
+       ],
+       "answer": 1,
+       "hint": "Second term minus first term. Keep the sign.",
+       "explain": "<code>-14 - (-20) = 6</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "-9",
+        "-13",
+        "-17",
+        "-21"
+       ],
+       "options": [
+        "-3",
+        "4",
+        "-8",
+        "-4"
+       ],
+       "answer": 3,
+       "hint": "Second term minus first term. Keep the sign.",
+       "explain": "<code>-13 - (-9) = -4</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "-15",
+        "-10",
+        "-5",
+        "0"
+       ],
+       "options": [
+        "5",
+        "-5",
+        "10",
+        "6"
+       ],
+       "answer": 0,
+       "hint": "Second term minus first term. Keep the sign.",
+       "explain": "<code>-10 - (-15) = 5</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F10",
+     "skill": "ordering",
+     "variants": [
+      {
+       "stem": "Put these in order, smallest first: -3, -11, -7",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "3, 7, 11",
+        "-3, -11, -7",
+        "-11, -7, -3",
+        "-3, -7, -11"
+       ],
+       "answer": 2,
+       "hint": "The one furthest from zero on the negative side is the smallest.",
+       "explain": "Smallest first: <code>-11, -7, -3</code>."
+      },
+      {
+       "stem": "Put these in order, smallest first: -2, -9, -5",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-2, -9, -5",
+        "2, 5, 9",
+        "-9, -5, -2",
+        "-2, -5, -9"
+       ],
+       "answer": 2,
+       "hint": "The one furthest from zero on the negative side is the smallest.",
+       "explain": "Smallest first: <code>-9, -5, -2</code>."
+      },
+      {
+       "stem": "Put these in order, smallest first: -14, -6, -20",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-14, -6, -20",
+        "6, 14, 20",
+        "-20, -14, -6",
+        "-6, -14, -20"
+       ],
+       "answer": 2,
+       "hint": "The one furthest from zero on the negative side is the smallest.",
+       "explain": "Smallest first: <code>-20, -14, -6</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F11",
+     "skill": "steps to a negative",
+     "variants": [
+      {
+       "stem": "Counting back in 4s from 12, how many steps to reach -8?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "8",
+        "4",
+        "6",
+        "5"
+       ],
+       "answer": 3,
+       "hint": "Find the total distance, then divide by the step.",
+       "explain": "<code>12 - (-8) = 20</code>, and <code>20 / 4 = 5</code>."
+      },
+      {
+       "stem": "Counting back in 3s from 10, how many steps to reach -8?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6",
+        "5",
+        "7",
+        "8"
+       ],
+       "answer": 0,
+       "hint": "Find the total distance, then divide by the step.",
+       "explain": "<code>10 - (-8) = 18</code>, and <code>18 / 3 = 6</code>."
+      },
+      {
+       "stem": "Counting back in 6s from 18, how many steps to reach -6?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6",
+        "3",
+        "4",
+        "5"
+       ],
+       "answer": 2,
+       "hint": "Find the total distance, then divide by the step.",
+       "explain": "<code>18 - (-6) = 24</code>, and <code>24 / 6 = 4</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F12",
+     "skill": "negative fractions",
+     "variants": [
+      {
+       "stem": "Count back in 1/2. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/2",
+        "0",
+        "-1/2",
+        "?"
+       ],
+       "options": [
+        "-1",
+        "-1/2",
+        "1",
+        "-1 1/2"
+       ],
+       "answer": 0,
+       "hint": "Below zero the fractions keep the same step size.",
+       "explain": "<code>-1/2 - 1/2 = -1</code>."
+      },
+      {
+       "stem": "Count back in 1/3. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/3",
+        "0",
+        "-1/3",
+        "?"
+       ],
+       "options": [
+        "2/3",
+        "-1",
+        "-2/3",
+        "-1/3"
+       ],
+       "answer": 2,
+       "hint": "Below zero the fractions keep the same step size.",
+       "explain": "<code>-1/3 - 1/3 = -2/3</code>."
+      },
+      {
+       "stem": "Count back in 1/4. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/4",
+        "0",
+        "-1/4",
+        "?"
+       ],
+       "options": [
+        "1/2",
+        "-1/4",
+        "-3/4",
+        "-1/2"
+       ],
+       "answer": 3,
+       "hint": "Below zero the fractions keep the same step size.",
+       "explain": "<code>-1/4 - 1/4 = -1/2</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F13",
+     "skill": "temperature rise",
+     "variants": [
+      {
+       "stem": "At night the temperature is -4&deg;C. By midday it is 7&deg;C. How much did it rise?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "3°C",
+        "10°C",
+        "11°C",
+        "12°C"
+       ],
+       "answer": 2,
+       "hint": "Count up to zero, then keep counting.",
+       "explain": "From -4 to 0 is 4, then 0 to 7 is 7: <code>4 + 7 = 11</code>&deg;C."
+      },
+      {
+       "stem": "At night the temperature is -9&deg;C. By midday it is 3&deg;C. How much did it rise?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "13°C",
+        "-6°C",
+        "11°C",
+        "12°C"
+       ],
+       "answer": 3,
+       "hint": "Count up to zero, then keep counting.",
+       "explain": "From -9 to 0 is 9, then 0 to 3 is 3: <code>9 + 3 = 12</code>&deg;C."
+      },
+      {
+       "stem": "At night the temperature is -2&deg;C. By midday it is 12&deg;C. How much did it rise?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "14°C",
+        "10°C",
+        "13°C",
+        "15°C"
+       ],
+       "answer": 0,
+       "hint": "Count up to zero, then keep counting.",
+       "explain": "From -2 to 0 is 2, then 0 to 12 is 12: <code>2 + 12 = 14</code>&deg;C."
+      }
+     ]
+    },
+    {
+     "id": "L4F14",
+     "skill": "error across zero",
+     "variants": [
+      {
+       "stem": "One term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "9",
+        "5",
+        "1",
+        "3",
+        "-7"
+       ],
+       "options": [
+        "3",
+        "1",
+        "5",
+        "-3"
+       ],
+       "answer": 0,
+       "hint": "A common mistake is bouncing back up instead of going through zero.",
+       "explain": "The sequence should keep dropping by 4, so it should be <code>-3</code>."
+      },
+      {
+       "stem": "One term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "6",
+        "1",
+        "-4",
+        "9",
+        "-14"
+       ],
+       "options": [
+        "-9",
+        "9",
+        "-4",
+        "1"
+       ],
+       "answer": 1,
+       "hint": "A common mistake is bouncing back up instead of going through zero.",
+       "explain": "The sequence should keep dropping by 5, so it should be <code>-9</code>."
+      },
+      {
+       "stem": "One term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "12",
+        "5",
+        "-2",
+        "9",
+        "-16"
+       ],
+       "options": [
+        "5",
+        "-2",
+        "9",
+        "-9"
+       ],
+       "answer": 2,
+       "hint": "A common mistake is bouncing back up instead of going through zero.",
+       "explain": "The sequence should keep dropping by 7, so it should be <code>-9</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F15",
+     "skill": "negative nth term",
+     "variants": [
+      {
+       "stem": "What is the 8th term?",
+       "sub": null,
+       "seq": [
+        "2",
+        "1.7",
+        "1.4",
+        "1.1",
+        "..."
+       ],
+       "options": [
+        "0.2",
+        "-0.4",
+        "-0.7",
+        "-0.1"
+       ],
+       "answer": 3,
+       "hint": "7 jumps from the start.",
+       "explain": "<code>2 + 7 x (-0.3) = -0.1</code>."
+      },
+      {
+       "stem": "What is the 7th term?",
+       "sub": null,
+       "seq": [
+        "1",
+        "0.75",
+        "0.5",
+        "0.25",
+        "..."
+       ],
+       "options": [
+        "-1",
+        "-0.75",
+        "-0.25",
+        "-0.5"
+       ],
+       "answer": 3,
+       "hint": "6 jumps from the start.",
+       "explain": "<code>1 + 6 x (-0.25) = -0.5</code>."
+      },
+      {
+       "stem": "What is the 9th term?",
+       "sub": null,
+       "seq": [
+        "3",
+        "2.6",
+        "2.2",
+        "1.8",
+        "..."
+       ],
+       "options": [
+        "-0.2",
+        "-0.6",
+        "-1",
+        "0.2"
+       ],
+       "answer": 0,
+       "hint": "8 jumps from the start.",
+       "explain": "<code>3 + 8 x (-0.4) = -0.2</code>."
+      }
+     ]
+    },
+    {
+     "id": "L4F16",
+     "skill": "crossing zero",
+     "variants": [
+      {
+       "stem": "Which sequence counts back in 4s and ends up below zero?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6, 2, -2, -6",
+        "46, 42, 38, 34",
+        "6, 10, 14, 18",
+        "6, 5, 4, 3"
+       ],
+       "answer": 0,
+       "hint": "Check the direction and whether the last term is negative.",
+       "explain": "<code>6, 2, -2, -6</code> drops by 4 each time and finishes below zero."
+      },
+      {
+       "stem": "Which sequence counts back in 5s and ends up below zero?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "8, 13, 18, 23",
+        "8, 7, 6, 5",
+        "8, 3, -2, -7",
+        "48, 43, 38, 33"
+       ],
+       "answer": 2,
+       "hint": "Check the direction and whether the last term is negative.",
+       "explain": "<code>8, 3, -2, -7</code> drops by 5 each time and finishes below zero."
+      },
+      {
+       "stem": "Which sequence counts back in 3s and ends up below zero?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "45, 42, 39, 36",
+        "5, 8, 11, 14",
+        "5, 2, -1, -4",
+        "5, 4, 3, 2"
+       ],
+       "answer": 2,
+       "hint": "Check the direction and whether the last term is negative.",
+       "explain": "<code>5, 2, -1, -4</code> drops by 3 each time and finishes below zero."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "name": "RULE MASTER TOWER",
+   "subtitle": "Position-to-term rules (find any term instantly)",
+   "briefing": [
+    "<p>Final level. A <b>position-to-term rule</b> lets you jump straight to any term without listing them all.</p>",
+    "<div class='example'>8, 16, 24, 32<br>Position:  1   2   3   4<br>Term:      8  16  24  32<br>Rule: multiply the position by 8<br>10th term: 10 x 8 = 80<br>Value 96 is at position: 96 / 8 = 12</div>",
+    "<p>Some rules have <b>two steps</b>:</p>",
+    "<div class='example'>5, 8, 11, 14<br>Gap is 3, so start with 'x 3'<br>1 x 3 = 3, but the term is 5, so also '+ 2'<br>Rule: multiply the position by 3, then add 2</div>",
+    "<ul><li>To go <b>forwards</b> (position &rarr; term): multiply, then add or subtract.</li><li>To go <b>backwards</b> (term &rarr; position): undo the add/subtract first, then divide.</li><li>The gap between terms is always the number you multiply by.</li></ul>"
+   ],
+   "questions": [
+    {
+     "id": "L5F1",
+     "skill": "find the rule",
+     "variants": [
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": "Positions are 1st, 2nd, 3rd, 4th.",
+       "seq": [
+        "8",
+        "16",
+        "24",
+        "32"
+       ],
+       "options": [
+        "Multiply the position by 8, then add 1",
+        "Multiply the position by 8",
+        "Add 8 to the position",
+        "Multiply the position by 9"
+       ],
+       "answer": 1,
+       "hint": "Ask: what do I do to the position (1, 2, 3, 4) to get the term?",
+       "explain": "Position 1 gives 8, position 2 gives 16. Every term is the position times 8. Rule: <b>multiply the position by 8</b>."
+      },
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": "Positions are 1st, 2nd, 3rd, 4th.",
+       "seq": [
+        "6",
+        "12",
+        "18",
+        "24"
+       ],
+       "options": [
+        "Multiply the position by 6",
+        "Multiply the position by 7",
+        "Multiply the position by 6, then add 1",
+        "Add 6 to the position"
+       ],
+       "answer": 0,
+       "hint": "Ask: what do I do to the position (1, 2, 3, 4) to get the term?",
+       "explain": "Position 1 gives 6, position 2 gives 12. Every term is the position times 6. Rule: <b>multiply the position by 6</b>."
+      },
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": "Positions are 1st, 2nd, 3rd, 4th.",
+       "seq": [
+        "9",
+        "18",
+        "27",
+        "36"
+       ],
+       "options": [
+        "Multiply the position by 9",
+        "Add 9 to the position",
+        "Multiply the position by 9, then add 1",
+        "Multiply the position by 10"
+       ],
+       "answer": 0,
+       "hint": "Ask: what do I do to the position (1, 2, 3, 4) to get the term?",
+       "explain": "Position 1 gives 9, position 2 gives 18. Every term is the position times 9. Rule: <b>multiply the position by 9</b>."
+      }
+     ]
+    },
+    {
+     "id": "L5F2",
+     "skill": "value at position",
+     "variants": [
+      {
+       "stem": "What is the value of the term in the 10th position?",
+       "sub": null,
+       "seq": [
+        "8",
+        "16",
+        "24",
+        "32"
+       ],
+       "options": [
+        "72",
+        "88",
+        "18",
+        "80"
+       ],
+       "answer": 3,
+       "hint": "The rule is multiply the position by 8.",
+       "explain": "<code>10 x 8 = 80</code>."
+      },
+      {
+       "stem": "What is the value of the term in the 12th position?",
+       "sub": null,
+       "seq": [
+        "7",
+        "14",
+        "21",
+        "28"
+       ],
+       "options": [
+        "77",
+        "19",
+        "91",
+        "84"
+       ],
+       "answer": 3,
+       "hint": "The rule is multiply the position by 7.",
+       "explain": "<code>12 x 7 = 84</code>."
+      },
+      {
+       "stem": "What is the value of the term in the 11th position?",
+       "sub": null,
+       "seq": [
+        "9",
+        "18",
+        "27",
+        "36"
+       ],
+       "options": [
+        "99",
+        "20",
+        "108",
+        "90"
+       ],
+       "answer": 0,
+       "hint": "The rule is multiply the position by 9.",
+       "explain": "<code>11 x 9 = 99</code>."
+      }
+     ]
+    },
+    {
+     "id": "L5F3",
+     "skill": "position of a value",
+     "variants": [
+      {
+       "stem": "What is the position of the term with a value of 96?",
+       "sub": null,
+       "seq": [
+        "8",
+        "16",
+        "24",
+        "32"
+       ],
+       "options": [
+        "11th",
+        "12th",
+        "96th",
+        "13th"
+       ],
+       "answer": 1,
+       "hint": "Do the opposite of the rule: divide instead of multiply.",
+       "explain": "<code>96 / 8 = 12</code>, so it is the 12th term."
+      },
+      {
+       "stem": "What is the position of the term with a value of 90?",
+       "sub": null,
+       "seq": [
+        "6",
+        "12",
+        "18",
+        "24"
+       ],
+       "options": [
+        "15th",
+        "16th",
+        "90th",
+        "14th"
+       ],
+       "answer": 0,
+       "hint": "Do the opposite of the rule: divide instead of multiply.",
+       "explain": "<code>90 / 6 = 15</code>, so it is the 15th term."
+      },
+      {
+       "stem": "What is the position of the term with a value of 126?",
+       "sub": null,
+       "seq": [
+        "9",
+        "18",
+        "27",
+        "36"
+       ],
+       "options": [
+        "126th",
+        "14th",
+        "15th",
+        "13th"
+       ],
+       "answer": 1,
+       "hint": "Do the opposite of the rule: divide instead of multiply.",
+       "explain": "<code>126 / 9 = 14</code>, so it is the 14th term."
+      }
+     ]
+    },
+    {
+     "id": "L5F4",
+     "skill": "two-step rule",
+     "variants": [
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "5",
+        "8",
+        "11",
+        "14"
+       ],
+       "options": [
+        "Multiply the position by 3, then add 2",
+        "Multiply the position by 3",
+        "Multiply the position by 3, then subtract 2",
+        "Multiply the position by 4, then add 2"
+       ],
+       "answer": 0,
+       "hint": "The terms go up in 3s, so start with 'multiply by 3'. Then check what to add or subtract.",
+       "explain": "Position 1 x 3 = 3, but the term is 5. So you also add 2."
+      },
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "5",
+        "9",
+        "13",
+        "17"
+       ],
+       "options": [
+        "Multiply the position by 4",
+        "Multiply the position by 4, then subtract 1",
+        "Multiply the position by 4, then add 1",
+        "Multiply the position by 5, then add 1"
+       ],
+       "answer": 2,
+       "hint": "The terms go up in 4s, so start with 'multiply by 4'. Then check what to add or subtract.",
+       "explain": "Position 1 x 4 = 4, but the term is 5. So you also add 1."
+      },
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "4",
+        "9",
+        "14",
+        "19"
+       ],
+       "options": [
+        "Multiply the position by 5, then subtract 1",
+        "Multiply the position by 5, then add 1",
+        "Multiply the position by 5",
+        "Multiply the position by 6, then subtract 1"
+       ],
+       "answer": 0,
+       "hint": "The terms go up in 5s, so start with 'multiply by 5'. Then check what to add or subtract.",
+       "explain": "Position 1 x 5 = 5, but the term is 4. So you also subtract 1."
+      }
+     ]
+    },
+    {
+     "id": "L5F5",
+     "skill": "two-step value",
+     "variants": [
+      {
+       "stem": "The rule is: multiply the position by 3, then add 2. What is the 10th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "30",
+        "35",
+        "32",
+        "15"
+       ],
+       "answer": 2,
+       "hint": "Multiply first, then add or subtract. Order matters.",
+       "explain": "<code>10 x 3 = 30</code>, then <code>30 + 2 = 32</code>."
+      },
+      {
+       "stem": "The rule is: multiply the position by 4, then add 1. What is the 12th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "48",
+        "49",
+        "53",
+        "17"
+       ],
+       "answer": 1,
+       "hint": "Multiply first, then add or subtract. Order matters.",
+       "explain": "<code>12 x 4 = 48</code>, then <code>48 + 1 = 49</code>."
+      },
+      {
+       "stem": "The rule is: multiply the position by 6, then subtract 2. What is the 9th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "54",
+        "58",
+        "13",
+        "52"
+       ],
+       "answer": 3,
+       "hint": "Multiply first, then add or subtract. Order matters.",
+       "explain": "<code>9 x 6 = 54</code>, then <code>54 - 2 = 52</code>."
+      }
+     ]
+    },
+    {
+     "id": "L5F6",
+     "skill": "two-step position",
+     "variants": [
+      {
+       "stem": "The rule is: multiply the position by 3, then add 2. Which position has the value 62?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "19th",
+        "20th",
+        "21th",
+        "22th"
+       ],
+       "answer": 1,
+       "hint": "Undo the rule backwards: first undo the add/subtract, then undo the multiply.",
+       "explain": "<code>62 - 2 = 60</code>, then <code>60 / 3 = 20</code>."
+      },
+      {
+       "stem": "The rule is: multiply the position by 5, then add 1. Which position has the value 71?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "16th",
+        "14th",
+        "13th",
+        "15th"
+       ],
+       "answer": 1,
+       "hint": "Undo the rule backwards: first undo the add/subtract, then undo the multiply.",
+       "explain": "<code>71 - 1 = 70</code>, then <code>70 / 5 = 14</code>."
+      },
+      {
+       "stem": "The rule is: multiply the position by 4, then subtract 3. Which position has the value 61?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "17th",
+        "16th",
+        "15th",
+        "18th"
+       ],
+       "answer": 1,
+       "hint": "Undo the rule backwards: first undo the add/subtract, then undo the multiply.",
+       "explain": "<code>61 + 3 = 64</code>, then <code>64 / 4 = 16</code>."
+      }
+     ]
+    },
+    {
+     "id": "L5F7",
+     "skill": "is it a term",
+     "variants": [
+      {
+       "stem": "The rule is: multiply the position by 8. Is 96 a term in this sequence?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "No",
+        "Only if the sequence is long enough",
+        "Yes",
+        "There is not enough information"
+       ],
+       "answer": 2,
+       "hint": "Divide 96 by 8. If you get a whole number, it is a term.",
+       "explain": "<code>96 / 8 = 12</code> exactly, so yes &mdash; it is the 12th term."
+      },
+      {
+       "stem": "The rule is: multiply the position by 7. Is 50 a term in this sequence?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "There is not enough information",
+        "Only if the sequence is long enough",
+        "Yes",
+        "No"
+       ],
+       "answer": 3,
+       "hint": "Divide 50 by 7. If you get a whole number, it is a term.",
+       "explain": "<code>50 / 7 = 7.14</code>, not a whole number, so no."
+      },
+      {
+       "stem": "The rule is: multiply the position by 6. Is 84 a term in this sequence?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "There is not enough information",
+        "No",
+        "Yes",
+        "Only if the sequence is long enough"
+       ],
+       "answer": 2,
+       "hint": "Divide 84 by 6. If you get a whole number, it is a term.",
+       "explain": "<code>84 / 6 = 14</code> exactly, so yes &mdash; it is the 14th term."
+      }
+     ]
+    },
+    {
+     "id": "L5F8",
+     "skill": "far position",
+     "variants": [
+      {
+       "stem": "Using the rule multiply the position by 8, what is the 100th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "808",
+        "800",
+        "108",
+        "792"
+       ],
+       "answer": 1,
+       "hint": "The rule works for any position, however large. No need to list them.",
+       "explain": "<code>100 x 8 = 800</code>."
+      },
+      {
+       "stem": "Using the rule multiply the position by 3, then add 1, what is the 50th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "150",
+        "151",
+        "154",
+        "148"
+       ],
+       "answer": 1,
+       "hint": "The rule works for any position, however large. No need to list them.",
+       "explain": "<code>50 x 3 = 150</code>, then + 1 gives <code>151</code>."
+      },
+      {
+       "stem": "Using the rule multiply the position by 5, then subtract 2, what is the 40th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "203",
+        "198",
+        "193",
+        "200"
+       ],
+       "answer": 1,
+       "hint": "The rule works for any position, however large. No need to list them.",
+       "explain": "<code>40 x 5 = 200</code>, then - 2 gives <code>198</code>."
+      }
+     ]
+    },
+    {
+     "id": "L5F9",
+     "skill": "match rule",
+     "variants": [
+      {
+       "stem": "Which sequence follows the rule: multiply the position by 4, then add 1?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "3, 7, 11, 15",
+        "6, 11, 16, 21",
+        "5, 9, 13, 17",
+        "4, 8, 12, 16"
+       ],
+       "answer": 2,
+       "hint": "Test position 1 and position 2 on each option.",
+       "explain": "Position 1: <code>1 x 4 + 1 = 5</code>. Only <code>5, 9, 13, 17</code> starts there."
+      },
+      {
+       "stem": "Which sequence follows the rule: multiply the position by 3, then add 5?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "9, 13, 17, 21",
+        "8, 11, 14, 17",
+        "-2, 1, 4, 7",
+        "3, 6, 9, 12"
+       ],
+       "answer": 1,
+       "hint": "Test position 1 and position 2 on each option.",
+       "explain": "Position 1: <code>1 x 3 + 5 = 8</code>. Only <code>8, 11, 14, 17</code> starts there."
+      },
+      {
+       "stem": "Which sequence follows the rule: multiply the position by 6, then subtract 1?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6, 12, 18, 24",
+        "7, 13, 19, 25",
+        "6, 13, 20, 27",
+        "5, 11, 17, 23"
+       ],
+       "answer": 3,
+       "hint": "Test position 1 and position 2 on each option.",
+       "explain": "Position 1: <code>1 x 6 - 1 = 5</code>. Only <code>5, 11, 17, 23</code> starts there."
+      }
+     ]
+    },
+    {
+     "id": "L5F10",
+     "skill": "rule types",
+     "variants": [
+      {
+       "stem": "A sequence has the rule: multiply the position by 7. Which statement is also true?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "Each term is 8 more than the one before it.",
+        "Each term is 7 more than the one before it.",
+        "Each term is 7 times the one before it.",
+        "Each term is 7 less than the one before it."
+       ],
+       "answer": 1,
+       "hint": "Work out the first two terms and compare them.",
+       "explain": "Terms are 7, 14, 21, 28. The gap between them is 7 every time."
+      },
+      {
+       "stem": "A sequence has the rule: multiply the position by 9. Which statement is also true?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "Each term is 10 more than the one before it.",
+        "Each term is 9 times the one before it.",
+        "Each term is 9 more than the one before it.",
+        "Each term is 9 less than the one before it."
+       ],
+       "answer": 2,
+       "hint": "Work out the first two terms and compare them.",
+       "explain": "Terms are 9, 18, 27, 36. The gap between them is 9 every time."
+      },
+      {
+       "stem": "A sequence has the rule: multiply the position by 4. Which statement is also true?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "Each term is 4 less than the one before it.",
+        "Each term is 4 more than the one before it.",
+        "Each term is 4 times the one before it.",
+        "Each term is 5 more than the one before it."
+       ],
+       "answer": 1,
+       "hint": "Work out the first two terms and compare them.",
+       "explain": "Terms are 4, 8, 12, 16. The gap between them is 4 every time."
+      }
+     ]
+    },
+    {
+     "id": "L5F11",
+     "skill": "build the rule",
+     "variants": [
+      {
+       "stem": "These are the first four terms. What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "7",
+        "17",
+        "27",
+        "37"
+       ],
+       "options": [
+        "Multiply the position by 10",
+        "Multiply the position by 11, then subtract 4",
+        "Multiply the position by 11, then add 10",
+        "Multiply the position by 10, then subtract 3"
+       ],
+       "answer": 3,
+       "hint": "Check the gap between terms first &mdash; that gives you the multiplier.",
+       "explain": "The terms go up in 10s so the rule starts 'multiply by 10'. Position 1 x 10 = 10, and the first term is 7, so you subtract 3."
+      },
+      {
+       "stem": "These are the first four terms. What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "7",
+        "9",
+        "11",
+        "13"
+       ],
+       "options": [
+        "Multiply the position by 5, then add 2",
+        "Multiply the position by 2, then add 5",
+        "Multiply the position by 3, then add 4",
+        "Multiply the position by 2"
+       ],
+       "answer": 1,
+       "hint": "Check the gap between terms first &mdash; that gives you the multiplier.",
+       "explain": "The terms go up in 2s so the rule starts 'multiply by 2'. Position 1 x 2 = 2, and the first term is 7, so you add 5."
+      },
+      {
+       "stem": "These are the first four terms. What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "9",
+        "16",
+        "23",
+        "30"
+       ],
+       "options": [
+        "Multiply the position by 7, then add 2",
+        "Multiply the position by 8, then add 1",
+        "Multiply the position by 2, then add 7",
+        "Multiply the position by 7"
+       ],
+       "answer": 0,
+       "hint": "Check the gap between terms first &mdash; that gives you the multiplier.",
+       "explain": "The terms go up in 7s so the rule starts 'multiply by 7'. Position 1 x 7 = 7, and the first term is 9, so you add 2."
+      }
+     ]
+    },
+    {
+     "id": "L5F12",
+     "skill": "term from rule",
+     "variants": [
+      {
+       "stem": "The rule is multiply the position by 8. What is the 5th term?",
+       "sub": null,
+       "seq": [
+        "8",
+        "16",
+        "24",
+        "32",
+        "...",
+        "?"
+       ],
+       "options": [
+        "32",
+        "41",
+        "40",
+        "48"
+       ],
+       "answer": 2,
+       "hint": "Use the rule directly with position 5.",
+       "explain": "<code>5 x 8  = 40</code>."
+      },
+      {
+       "stem": "The rule is multiply the position by 3, then add 4. What is the 6th term?",
+       "sub": null,
+       "seq": [
+        "7",
+        "10",
+        "13",
+        "16",
+        "...",
+        "?"
+       ],
+       "options": [
+        "25",
+        "19",
+        "22",
+        "18"
+       ],
+       "answer": 2,
+       "hint": "Use the rule directly with position 6.",
+       "explain": "<code>6 x 3 + 4 = 22</code>."
+      },
+      {
+       "stem": "The rule is multiply the position by 5, then add 3. What is the 7th term?",
+       "sub": null,
+       "seq": [
+        "8",
+        "13",
+        "18",
+        "23",
+        "...",
+        "?"
+       ],
+       "options": [
+        "35",
+        "33",
+        "43",
+        "38"
+       ],
+       "answer": 3,
+       "hint": "Use the rule directly with position 7.",
+       "explain": "<code>7 x 5 + 3 = 38</code>."
+      }
+     ]
+    },
+    {
+     "id": "L5F13",
+     "skill": "pattern problem",
+     "variants": [
+      {
+       "stem": "A pattern of tiles uses 4 tiles for each step plus 2 extra tiles at the start. How many tiles in pattern number 12?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "50",
+        "18",
+        "48",
+        "54"
+       ],
+       "answer": 0,
+       "hint": "Tiles = position x 4 + 2.",
+       "explain": "<code>12 x 4 = 48</code>, plus 2 = <code>50</code>."
+      },
+      {
+       "stem": "A pattern of tiles uses 6 tiles for each step plus 3 extra tiles at the start. How many tiles in pattern number 9?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "18",
+        "57",
+        "54",
+        "63"
+       ],
+       "answer": 1,
+       "hint": "Tiles = position x 6 + 3.",
+       "explain": "<code>9 x 6 = 54</code>, plus 3 = <code>57</code>."
+      },
+      {
+       "stem": "A pattern of tiles uses 5 tiles for each step plus 1 extra tiles at the start. How many tiles in pattern number 15?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "75",
+        "76",
+        "81",
+        "21"
+       ],
+       "answer": 1,
+       "hint": "Tiles = position x 5 + 1.",
+       "explain": "<code>15 x 5 = 75</code>, plus 1 = <code>76</code>."
+      }
+     ]
+    },
+    {
+     "id": "L5F14",
+     "skill": "reverse the rule",
+     "variants": [
+      {
+       "stem": "Rule: multiply the position by 9, then add 4. A term has the value 103. What is its position?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "12th",
+        "11th",
+        "14th",
+        "10th"
+       ],
+       "answer": 1,
+       "hint": "Undo the last operation first.",
+       "explain": "<code>103 - 4 = 99</code>, and <code>99 / 9 = 11</code>."
+      },
+      {
+       "stem": "Rule: multiply the position by 7, then subtract 5. A term has the value 86. What is its position?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "12th",
+        "16th",
+        "14th",
+        "13th"
+       ],
+       "answer": 3,
+       "hint": "Undo the last operation first.",
+       "explain": "<code>86 + 5 = 91</code>, and <code>91 / 7 = 13</code>."
+      },
+      {
+       "stem": "Rule: multiply the position by 12, then add 6. A term has the value 102. What is its position?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "11th",
+        "7th",
+        "8th",
+        "9th"
+       ],
+       "answer": 2,
+       "hint": "Undo the last operation first.",
+       "explain": "<code>102 - 6 = 96</code>, and <code>96 / 12 = 8</code>."
+      }
+     ]
+    },
+    {
+     "id": "L5F15",
+     "skill": "compare rules",
+     "variants": [
+      {
+       "stem": "Sequence A: multiply the position by 3, then add 5. Sequence B: multiply the position by 4, then add 1. Which has the bigger 6th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "Sequence A",
+        "They are equal",
+        "There is not enough information",
+        "Sequence B"
+       ],
+       "answer": 3,
+       "hint": "Work out both terms, then compare.",
+       "explain": "A: <code>6 x 3 + 5 = 23</code>. B: <code>6 x 4 + 1 = 25</code>."
+      },
+      {
+       "stem": "Sequence A: multiply the position by 5, then add 2. Sequence B: multiply the position by 6, then subtract 2. Which has the bigger 5th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "There is not enough information",
+        "They are equal",
+        "Sequence A",
+        "Sequence B"
+       ],
+       "answer": 3,
+       "hint": "Work out both terms, then compare.",
+       "explain": "A: <code>5 x 5 + 2 = 27</code>. B: <code>5 x 6 - 2 = 28</code>."
+      },
+      {
+       "stem": "Sequence A: multiply the position by 2, then add 9. Sequence B: multiply the position by 3, then add 1. Which has the bigger 7th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "Sequence B",
+        "They are equal",
+        "Sequence A",
+        "There is not enough information"
+       ],
+       "answer": 2,
+       "hint": "Work out both terms, then compare.",
+       "explain": "A: <code>7 x 2 + 9 = 23</code>. B: <code>7 x 3 + 1 = 22</code>."
+      }
+     ]
+    },
+    {
+     "id": "L5F16",
+     "skill": "rule error",
+     "variants": [
+      {
+       "stem": "The rule is multiply the position by 8, but one term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "8",
+        "16",
+        "24",
+        "34",
+        "40"
+       ],
+       "options": [
+        "16",
+        "24",
+        "32",
+        "34"
+       ],
+       "answer": 3,
+       "hint": "Apply the rule to each position in turn.",
+       "explain": "Position 4 should be <code>4 x 8  = 32</code>, not 34."
+      },
+      {
+       "stem": "The rule is multiply the position by 4, then add 3, but one term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "7",
+        "11",
+        "17",
+        "19",
+        "23"
+       ],
+       "options": [
+        "7",
+        "17",
+        "11",
+        "15"
+       ],
+       "answer": 1,
+       "hint": "Apply the rule to each position in turn.",
+       "explain": "Position 3 should be <code>3 x 4 + 3 = 15</code>, not 17."
+      },
+      {
+       "stem": "The rule is multiply the position by 6, then add 1, but one term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "7",
+        "13",
+        "19",
+        "25",
+        "33"
+       ],
+       "options": [
+        "25",
+        "33",
+        "19",
+        "31"
+       ],
+       "answer": 1,
+       "hint": "Apply the rule to each position in turn.",
+       "explain": "Position 5 should be <code>5 x 6 + 1 = 31</code>, not 33."
+      }
+     ]
+    }
+   ]
+  }
+ ]
+};
+
+</script>
+<script>
+/* ============================================================
+   SAMUEL QUEST — ENGINE.JS
+   Subject-agnostic game engine. Reads window.QUIZ_DATA.
+   Never edit this file to add a subject; only add a data file.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var DATA = window.QUIZ_DATA;
+  if (!DATA) { document.body.innerHTML = '<p style="padding:40px">Missing QUIZ_DATA.</p>'; return; }
+
+  var SAVE_KEY = 'samuel-quest:' + DATA.meta.slug;
+  var KEYS = ['A', 'B', 'C', 'D', 'E'];
+
+  /* ---------- SAVE STATE ---------- */
+  function blankSave() {
+    return { levels: {}, totalXP: 0, sound: true, version: 1 };
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return blankSave();
+      var s = JSON.parse(raw);
+      if (!s || typeof s !== 'object' || !s.levels) return blankSave();
+      return s;
+    } catch (e) { return blankSave(); }
+  }
+  function save() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(STATE)); } catch (e) { /* private mode */ }
+  }
+  var STATE = load();
+
+  /* ---------- AUDIO (no assets, pure WebAudio) ---------- */
+  var actx = null;
+  function beep(freq, dur, type, vol) {
+    if (!STATE.sound) return;
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = type || 'square';
+      o.frequency.setValueAtTime(freq, actx.currentTime);
+      g.gain.setValueAtTime(vol == null ? 0.06 : vol, actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(); o.stop(actx.currentTime + dur);
+    } catch (e) { /* audio unavailable */ }
+  }
+  var SFX = {
+    right:  function () { beep(660, .08); setTimeout(function () { beep(990, .12); }, 80); },
+    wrong:  function () { beep(200, .18, 'sawtooth', .05); },
+    click:  function () { beep(440, .04, 'square', .03); },
+    level:  function () { [523, 659, 784, 1047].forEach(function (f, i) { setTimeout(function () { beep(f, .16); }, i * 110); }); },
+    unlock: function () { [392, 523, 659].forEach(function (f, i) { setTimeout(function () { beep(f, .12); }, i * 90); }); }
+  };
+
+  /* ---------- UTIL ---------- */
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function el(id) { return document.getElementById(id); }
+
+  function levelSave(id) {
+    if (!STATE.levels[id]) STATE.levels[id] = { done: false, stars: 0, best: 0, plays: 0 };
+    return STATE.levels[id];
+  }
+  function isUnlocked(idx) {
+    if (idx === 0) return true;
+    var prev = DATA.levels[idx - 1];
+    return !!levelSave(prev.id).done;
+  }
+
+  /* ---------- SPRITE (inline pixel-art Samuel) ---------- */
+  function samuelSVG(mood) {
+    // mood: 'idle' | 'happy' | 'sad'
+    var eye = mood === 'sad' ? 'M6 7h1v1H6z M10 7h1v1h-1z' : 'M6 6h1v2H6z M10 6h1v2h-1z';
+    var mouth = mood === 'happy' ? 'M6 10h5v1H6z M5 9h1v1H5z M11 9h1v1h-1z'
+              : mood === 'sad'   ? 'M6 11h5v1H6z'
+              : 'M7 10h3v1H7z';
+    return '<svg class="avatar" viewBox="0 0 17 20" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">' +
+      // hair
+      '<path fill="#2b1a12" d="M4 1h9v2H4z M3 2h1v4H3z M13 2h1v4h-1z M4 2h9v2H4z"/>' +
+      // face
+      '<path fill="#e8b088" d="M4 4h9v8H4z"/>' +
+      // eyes + mouth
+      '<path fill="#141a33" d="' + eye + '"/>' +
+      '<path fill="#8c4a3a" d="' + mouth + '"/>' +
+      // headset / visor accent
+      '<path fill="var(--accent)" d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/>' +
+      // body
+      '<path fill="var(--accent-2)" d="M5 12h7v6H5z M3 13h2v4H3z M12 13h2v4h-2z"/>' +
+      // chest emblem
+      '<path fill="#fff" d="M8 14h1v3H8z M7 15h3v1H7z"/>' +
+      // legs
+      '<path fill="#1c2555" d="M5 18h3v2H5z M9 18h3v2H9z"/>' +
+      '</svg>';
+  }
+  window.SamuelSprite = samuelSVG;
+
+  /* ---------- QUESTION QUEUE ----------
+     Anti-repeat rule: every question is a FAMILY with >=2 variants.
+     A family is only cleared when answered correctly. On a miss the
+     family goes to the back of the queue and serves a DIFFERENT
+     variant, so Samuel has to reason again, not recall an answer.
+  ------------------------------------------------------------- */
+  function Runner(level) {
+    this.level = level;
+    this.queue = shuffle(level.questions.map(function (q, i) { return i; }));
+    this.total = level.questions.length;
+    this.cleared = 0;
+    this.attempts = 0;
+    this.firstTry = 0;
+    this.misses = 0;
+    this.combo = 0;
+    this.bestCombo = 0;
+    this.xp = 0;
+    this.seen = {};      // familyIndex -> [variantIndex,...]
+    this.answered = {};  // familyIndex -> true once cleared
+    this.startedAt = Date.now();
+  }
+  Runner.prototype.current = function () {
+    if (!this.queue.length) return null;
+    var fi = this.queue[0];
+    var fam = this.level.questions[fi];
+    var used = this.seen[fi] || [];
+    var pool = [];
+    for (var i = 0; i < fam.variants.length; i++) if (used.indexOf(i) === -1) pool.push(i);
+    if (!pool.length) { pool = []; for (var j = 0; j < fam.variants.length; j++) pool.push(j); this.seen[fi] = []; used = []; }
+    var vi = pool[Math.floor(Math.random() * pool.length)];
+    (this.seen[fi] = this.seen[fi] || []).push(vi);
+    return { familyIndex: fi, variantIndex: vi, family: fam, v: fam.variants[vi], firstAttempt: used.length === 0 };
+  };
+  Runner.prototype.resolve = function (correct) {
+    var fi = this.queue.shift();
+    this.attempts++;
+    if (correct) {
+      this.cleared++;
+      this.combo++;
+      if (this.combo > this.bestCombo) this.bestCombo = this.combo;
+      var base = 100;
+      var bonus = Math.min(this.combo, 8) * 20;
+      this.xp += base + bonus;
+      if ((this.seen[fi] || []).length === 1) this.firstTry++;
+      this.answered[fi] = true;
+    } else {
+      this.misses++;
+      this.combo = 0;
+      this.queue.push(fi);   // back of the line, different variant next time
+    }
+  };
+  Runner.prototype.progress = function () { return this.cleared / this.total; };
+  Runner.prototype.stars = function () {
+    var acc = this.firstTry / this.total;
+    if (acc >= 0.9) return 3;
+    if (acc >= 0.7) return 2;
+    return 1;
+  };
+  Runner.prototype.minutes = function () { return Math.max(1, Math.round((Date.now() - this.startedAt) / 60000)); };
+
+  /* ---------- RENDER: SHELL ---------- */
+  var root = el('app');
+  root.innerHTML =
+    '<div class="wrap">' +
+      '<header class="site-head">' +
+        '<div id="heroSprite">' + samuelSVG('idle') + '</div>' +
+        '<div>' +
+          '<h1>SAMUEL QUEST</h1>' +
+          '<p>' + esc(DATA.meta.year) + ' &middot; ' + esc(DATA.meta.subject) + ' &middot; ' + esc(DATA.meta.topic) + '</p>' +
+        '</div>' +
+      '</header>' +
+
+      /* MAP */
+      '<section id="scrMap" class="screen is-on">' +
+        '<div class="pixel-box hud">' +
+          '<div class="hud__group">' +
+            '<span class="hud__stat">XP <b id="mapXP">0</b></span>' +
+            '<span class="hud__stat">LEVELS <b id="mapDone">0/5</b></span>' +
+          '</div>' +
+          '<div class="hud__group">' +
+            '<button class="btn btn--ghost" id="btnSound" type="button">SOUND: ON</button>' +
+            '<button class="btn btn--ghost" id="btnReset" type="button">RESET</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="text-dim" style="font-size:15px">One level per day. About 30 minutes each. Finish a level to unlock the next one.</p>' +
+        '<div class="levels" id="levelList"></div>' +
+        '<div id="allDone"></div>' +
+      '</section>' +
+
+      /* BRIEFING */
+      '<section id="scrBrief" class="screen">' +
+        '<div class="pixel-box brief" id="briefBody"></div>' +
+        '<div class="row row--end mt">' +
+          '<button class="btn btn--ghost" id="briefBack" type="button">&lt; MAP</button>' +
+          '<button class="btn btn--primary" id="briefGo" type="button">START LEVEL &gt;</button>' +
+        '</div>' +
+      '</section>' +
+
+      /* PLAY */
+      '<section id="scrPlay" class="screen">' +
+        '<div class="pixel-box hud">' +
+          '<div class="hud__group" style="flex:1">' +
+            '<span class="hud__stat" id="hudLvl">LV 1</span>' +
+            '<div class="bar"><div class="bar__fill" id="hudBar"></div></div>' +
+            '<span class="hud__stat" id="hudCount">0/0</span>' +
+          '</div>' +
+          '<div class="hud__group">' +
+            '<span class="hud__stat">XP <b id="hudXP">0</b></span>' +
+            '<span class="hud__stat">COMBO <b id="hudCombo">0</b></span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pixel-box stage">' +
+          '<div id="qTag" class="q-tag"></div>' +
+          '<div id="qStem" class="q-stem"></div>' +
+          '<div id="qSub" class="q-sub"></div>' +
+          '<div id="qSeq" class="seq"></div>' +
+          '<div id="qOpts" class="options"></div>' +
+          '<div id="qHint" class="hint"></div>' +
+          '<div class="row mt">' +
+            '<button class="btn btn--ghost" id="btnHint" type="button">HINT</button>' +
+            '<button class="btn btn--ghost" id="btnQuit" type="button">QUIT</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="qFeed" class="pixel-box feedback"></div>' +
+        '<div class="row row--end mt"><button class="btn btn--primary" id="btnNext" type="button" style="display:none">NEXT &gt;</button></div>' +
+      '</section>' +
+
+      /* WIN */
+      '<section id="scrWin" class="screen">' +
+        '<div class="pixel-box victory" id="winBody"></div>' +
+      '</section>' +
+
+      '<footer>Samuel Quest &middot; built for Samuel, Year 6</footer>' +
+    '</div>' +
+    '<div class="combo" id="comboPop"></div>';
+
+  var screens = { map: el('scrMap'), brief: el('scrBrief'), play: el('scrPlay'), win: el('scrWin') };
+  function show(name) {
+    Object.keys(screens).forEach(function (k) { screens[k].classList.toggle('is-on', k === name); });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ---------- MAP ---------- */
+  function starStr(n) {
+    var s = '';
+    for (var i = 0; i < 3; i++) s += (i < n ? '<span>&#9733;</span>' : '<span class="off">&#9733;</span>');
+    return s;
+  }
+
+  function renderMap() {
+    var list = el('levelList');
+    list.innerHTML = '';
+    var done = 0;
+    DATA.levels.forEach(function (lv, idx) {
+      var ls = levelSave(lv.id);
+      if (ls.done) done++;
+      var unlocked = isUnlocked(idx);
+      var card = document.createElement('div');
+      card.className = 'pixel-box level-card' + (unlocked ? '' : ' is-locked') + (ls.done ? ' is-done' : '');
+      card.innerHTML =
+        '<div class="level-card__num">' + (unlocked ? lv.id : '&#128274;') + '</div>' +
+        '<div>' +
+          '<div class="level-card__name">' + esc(lv.name) + '</div>' +
+          '<div class="level-card__sub">' + esc(lv.subtitle) + '</div>' +
+          '<div class="level-card__sub text-dim" style="margin-top:6px;font-size:13px">Day ' + lv.id +
+            ' &middot; ' + lv.questions.length + ' challenges' +
+            (ls.done ? ' &middot; best ' + ls.best + ' XP' : '') + '</div>' +
+        '</div>' +
+        '<div class="stars">' + starStr(ls.stars) + '</div>';
+      if (unlocked) {
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        var open = function () { SFX.click(); openBrief(idx); };
+        card.addEventListener('click', open);
+        card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+      }
+      list.appendChild(card);
+    });
+    el('mapXP').textContent = STATE.totalXP;
+    el('mapDone').textContent = done + '/' + DATA.levels.length;
+    el('btnSound').textContent = 'SOUND: ' + (STATE.sound ? 'ON' : 'OFF');
+    el('allDone').innerHTML = (done === DATA.levels.length)
+      ? '<div class="pixel-box victory mt-lg"><h2>&#127942; ALL LEVELS CLEARED</h2>' +
+        '<p>You are ready for the ' + esc(DATA.meta.test) + '. Replay any level to push for 3 stars.</p></div>'
+      : '';
+  }
+
+  /* ---------- BRIEFING ---------- */
+  var currentIdx = 0, run = null;
+
+  function openBrief(idx) {
+    currentIdx = idx;
+    var lv = DATA.levels[idx];
+    el('briefBody').innerHTML =
+      '<div class="q-tag">DAY ' + lv.id + ' &middot; BRIEFING</div>' +
+      '<h2>' + esc(lv.name) + '</h2>' +
+      lv.briefing.join('');
+    show('brief');
+  }
+
+  el('briefBack').addEventListener('click', function () { SFX.click(); renderMap(); show('map'); });
+  el('briefGo').addEventListener('click', function () { SFX.click(); startLevel(currentIdx); });
+
+  /* ---------- PLAY ---------- */
+  var q = null, locked = false;
+
+  function startLevel(idx) {
+    var lv = DATA.levels[idx];
+    run = new Runner(lv);
+    el('hudLvl').textContent = 'LV ' + lv.id;
+    show('play');
+    nextQuestion();
+  }
+
+  function nextQuestion() {
+    if (!run.queue.length) return winLevel();
+    q = run.current();
+    locked = false;
+
+    el('qTag').textContent = q.family.skill.toUpperCase().replace(/-/g, ' ');
+    el('qStem').innerHTML = q.v.stem;
+    el('qSub').innerHTML = q.v.sub || '';
+    el('qSub').style.display = q.v.sub ? 'block' : 'none';
+
+    // sequence tiles
+    var seqBox = el('qSeq');
+    if (q.v.seq && q.v.seq.length) {
+      seqBox.style.display = 'flex';
+      seqBox.innerHTML = q.v.seq.map(function (t) {
+        var blank = (t === '?' || t === '' || t === null);
+        return '<div class="tile' + (blank ? ' tile--blank' : '') + '">' + esc(blank ? '?' : t) + '</div>';
+      }).join('');
+    } else { seqBox.style.display = 'none'; seqBox.innerHTML = ''; }
+
+    // options — shuffled every single time
+    var order = shuffle(q.v.options.map(function (_, i) { return i; }));
+    var box = el('qOpts');
+    box.innerHTML = '';
+    order.forEach(function (origIdx, pos) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.setAttribute('data-orig', String(origIdx));
+      b.innerHTML = '<span class="opt__key">' + KEYS[pos] + '</span><span>' + q.v.options[origIdx] + '</span>';
+      b.addEventListener('click', function () { answer(origIdx, b); });
+      box.appendChild(b);
+    });
+
+    el('qHint').className = 'hint';
+    el('qHint').innerHTML = '<b>Hint:</b> ' + (q.v.hint || 'Look at the size of each jump.');
+    el('btnHint').style.display = 'inline-block';
+    el('qFeed').className = 'pixel-box feedback';
+    el('btnNext').style.display = 'none';
+    updateHUD();
+  }
+
+  function updateHUD() {
+    el('hudBar').style.width = Math.round(run.progress() * 100) + '%';
+    el('hudCount').textContent = run.cleared + '/' + run.total;
+    el('hudXP').textContent = run.xp;
+    el('hudCombo').textContent = run.combo;
+  }
+
+  function popCombo(text) {
+    var p = el('comboPop');
+    p.textContent = text;
+    p.className = 'combo';
+    void p.offsetWidth;
+    p.className = 'combo is-on';
+  }
+
+  function answer(chosen, btn) {
+    if (locked) return;
+    locked = true;
+    var correct = (chosen === q.v.answer);
+    var buttons = el('qOpts').querySelectorAll('.opt');
+
+    Array.prototype.forEach.call(buttons, function (b) {
+      b.disabled = true;
+      if (parseInt(b.getAttribute('data-orig'), 10) === q.v.answer) b.classList.add('is-right');
+    });
+    if (!correct) { btn.classList.add('is-wrong', 'shake'); }
+    else { btn.classList.add('pop'); }
+
+    var fb = el('qFeed');
+    if (correct) {
+      SFX.right();
+      run.resolve(true);
+      if (run.combo >= 3) popCombo('COMBO x' + run.combo + '!');
+      fb.className = 'pixel-box feedback is-on feedback--good';
+      fb.innerHTML = '<div class="feedback__title">&#10003; CORRECT</div><div class="feedback__body">' + q.v.explain + '</div>';
+    } else {
+      SFX.wrong();
+      run.resolve(false);
+      fb.className = 'pixel-box feedback is-on feedback--bad';
+      fb.innerHTML = '<div class="feedback__title">&#10007; NOT YET</div><div class="feedback__body">' + q.v.explain +
+        '<p style="margin-top:12px;color:var(--warn)"><b>This challenge comes back later with different numbers</b> &mdash; so work out the method, not the answer.</p></div>';
+    }
+    el('btnHint').style.display = 'none';
+    el('btnNext').style.display = 'inline-block';
+    el('btnNext').textContent = run.queue.length ? 'NEXT >' : 'FINISH LEVEL >';
+    el('btnNext').focus();
+    updateHUD();
+  }
+
+  el('btnNext').addEventListener('click', function () { SFX.click(); nextQuestion(); });
+  el('btnHint').addEventListener('click', function () { SFX.click(); el('qHint').classList.add('is-on'); });
+  el('btnQuit').addEventListener('click', function () {
+    if (confirm('Leave this level? Progress in this level is not saved.')) { renderMap(); show('map'); }
+  });
+
+  // keyboard: A/B/C/D or 1-4
+  document.addEventListener('keydown', function (e) {
+    if (!screens.play.classList.contains('is-on')) return;
+    if (e.key === 'Enter' && el('btnNext').style.display !== 'none') { el('btnNext').click(); return; }
+    var k = e.key.toUpperCase();
+    var idx = KEYS.indexOf(k);
+    if (idx === -1 && /^[1-5]$/.test(k)) idx = parseInt(k, 10) - 1;
+    if (idx === -1) return;
+    var btns = el('qOpts').querySelectorAll('.opt');
+    if (btns[idx] && !btns[idx].disabled) btns[idx].click();
+  });
+
+  /* ---------- WIN ---------- */
+  function winLevel() {
+    var lv = DATA.levels[currentIdx];
+    var ls = levelSave(lv.id);
+    var stars = run.stars();
+    var wasNew = !ls.done;
+
+    ls.done = true;
+    ls.plays++;
+    if (stars > ls.stars) ls.stars = stars;
+    if (run.xp > ls.best) { STATE.totalXP += (run.xp - ls.best); ls.best = run.xp; }
+    save();
+
+    SFX.level();
+    var nextLv = DATA.levels[currentIdx + 1];
+    el('winBody').innerHTML =
+      '<div style="display:flex;justify-content:center">' + samuelSVG('happy').replace('class="avatar"', 'class="avatar avatar--lg avatar--bob"') + '</div>' +
+      '<h2>LEVEL ' + lv.id + ' CLEARED</h2>' +
+      '<div class="stars">' + starStr(stars) + '</div>' +
+      '<div class="victory__stats">' +
+        '<div><span>XP</span>' + run.xp + '</div>' +
+        '<div><span>FIRST TRY</span>' + run.firstTry + '/' + run.total + '</div>' +
+        '<div><span>BEST COMBO</span>' + run.bestCombo + '</div>' +
+        '<div><span>MISSES</span>' + run.misses + '</div>' +
+      '</div>' +
+      '<p class="text-dim" style="font-size:15px">' +
+        (stars === 3 ? 'Perfect run. You have this topic locked in.'
+         : stars === 2 ? 'Strong. Replay to hunt the third star.'
+         : 'Cleared it. Replay this level tomorrow &mdash; the questions come back with new numbers.') +
+      '</p>' +
+      (nextLv && wasNew ? '<p class="mt" style="color:var(--good);font-family:var(--font-ui);font-size:11px">&#128275; UNLOCKED: LEVEL ' + nextLv.id + ' &mdash; ' + esc(nextLv.name) + '</p>' : '') +
+      '<div class="row mt-lg" style="justify-content:center">' +
+        '<button class="btn btn--ghost" id="winReplay" type="button">REPLAY</button>' +
+        '<button class="btn btn--primary" id="winMap" type="button">' + (nextLv ? 'BACK TO MAP >' : 'BACK TO MAP >') + '</button>' +
+      '</div>';
+
+    if (nextLv && wasNew) setTimeout(SFX.unlock, 700);
+
+    el('winReplay').addEventListener('click', function () { SFX.click(); startLevel(currentIdx); });
+    el('winMap').addEventListener('click', function () { SFX.click(); renderMap(); show('map'); });
+    show('win');
+  }
+
+  /* ---------- MAP CONTROLS ---------- */
+  el('btnSound').addEventListener('click', function () {
+    STATE.sound = !STATE.sound; save(); SFX.click();
+    el('btnSound').textContent = 'SOUND: ' + (STATE.sound ? 'ON' : 'OFF');
+  });
+  el('btnReset').addEventListener('click', function () {
+    if (confirm('Reset all progress for ' + DATA.meta.topic + '?')) {
+      STATE = blankSave(); save(); renderMap();
+    }
+  });
+
+  renderMap();
+})();
+
+</script>
+</body>
+</html>
