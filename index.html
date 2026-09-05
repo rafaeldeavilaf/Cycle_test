@@ -196,6 +196,47 @@ h3 { font-size: 12px; }
 @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 .avatar--bob { animation: bob 1.4s steps(4) infinite; }
 
+/* Reacciones a la respuesta */
+@keyframes cheer {
+  0%   { transform: translateY(0)     scale(1); }
+  20%  { transform: translateY(-16px) scale(1.1); }
+  40%  { transform: translateY(0)     scale(1); }
+  60%  { transform: translateY(-10px) scale(1.06); }
+  80%  { transform: translateY(0)     scale(1); }
+  100% { transform: translateY(-4px)  scale(1.02); }
+}
+.avatar--cheer { animation: cheer .8s steps(8) forwards; }
+
+@keyframes slump {
+  0%   { transform: translateY(0)   rotate(0deg); }
+  25%  { transform: translateY(3px) rotate(-7deg); }
+  55%  { transform: translateY(6px) rotate(5deg); }
+  100% { transform: translateY(7px) rotate(0deg); filter: grayscale(.5) drop-shadow(0 2px 0 rgba(0,0,0,.6)); }
+}
+.avatar--down { animation: slump .55s steps(5) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar--bob, .avatar--cheer, .avatar--down { animation: none; }
+  .shake, .pop { animation: none; }
+}
+
+/* Compañero en la pantalla de juego */
+.mate {
+  display: flex; align-items: center; gap: 12px;
+  flex: none;
+  min-width: 190px;
+}
+.mate__sprite { width: 56px; height: 56px; display: grid; place-items: center; flex: none; }
+.mate__sprite .avatar { width: 56px; height: 56px; }
+.mate__msg {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+}
+.mate__msg.is-good { color: var(--good); }
+.mate__msg.is-bad  { color: var(--bad); }
+
 /* ---------- 7. LEVEL MAP ---------- */
 .levels { display: grid; gap: 16px; margin-top: 22px; }
 

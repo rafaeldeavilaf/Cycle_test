@@ -196,6 +196,47 @@ h3 { font-size: 12px; }
 @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 .avatar--bob { animation: bob 1.4s steps(4) infinite; }
 
+/* Reacciones a la respuesta */
+@keyframes cheer {
+  0%   { transform: translateY(0)     scale(1); }
+  20%  { transform: translateY(-16px) scale(1.1); }
+  40%  { transform: translateY(0)     scale(1); }
+  60%  { transform: translateY(-10px) scale(1.06); }
+  80%  { transform: translateY(0)     scale(1); }
+  100% { transform: translateY(-4px)  scale(1.02); }
+}
+.avatar--cheer { animation: cheer .8s steps(8) forwards; }
+
+@keyframes slump {
+  0%   { transform: translateY(0)   rotate(0deg); }
+  25%  { transform: translateY(3px) rotate(-7deg); }
+  55%  { transform: translateY(6px) rotate(5deg); }
+  100% { transform: translateY(7px) rotate(0deg); filter: grayscale(.5) drop-shadow(0 2px 0 rgba(0,0,0,.6)); }
+}
+.avatar--down { animation: slump .55s steps(5) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar--bob, .avatar--cheer, .avatar--down { animation: none; }
+  .shake, .pop { animation: none; }
+}
+
+/* Compañero en la pantalla de juego */
+.mate {
+  display: flex; align-items: center; gap: 12px;
+  flex: none;
+  min-width: 190px;
+}
+.mate__sprite { width: 56px; height: 56px; display: grid; place-items: center; flex: none; }
+.mate__sprite .avatar { width: 56px; height: 56px; }
+.mate__msg {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+}
+.mate__msg.is-good { color: var(--good); }
+.mate__msg.is-bad  { color: var(--bad); }
+
 /* ---------- 7. LEVEL MAP ---------- */
 .levels { display: grid; gap: 16px; margin-top: 22px; }
 
@@ -5130,7 +5171,7 @@ window.QUIZ_DATA = {
 
   /* ---------- SAVE STATE ---------- */
   function blankSave() {
-    return { levels: {}, totalXP: 0, sound: true, version: 1 };
+    return { levels: {}, totalXP: 0, sound: true, music: true, version: 2 };
   }
   function load() {
     try {
@@ -5138,6 +5179,8 @@ window.QUIZ_DATA = {
       if (!raw) return blankSave();
       var s = JSON.parse(raw);
       if (!s || typeof s !== 'object' || !s.levels) return blankSave();
+      if (typeof s.music !== 'boolean') s.music = true;   // saves anteriores
+      if (typeof s.sound !== 'boolean') s.sound = true;
       return s;
     } catch (e) { return blankSave(); }
   }
@@ -5170,6 +5213,136 @@ window.QUIZ_DATA = {
     unlock: function () { [392, 523, 659].forEach(function (f, i) { setTimeout(function () { beep(f, .12); }, i * 90); }); }
   };
 
+  /* ---------- MUSICA CHIPTUNE ----------
+     Secuenciador de 8 compases generado con osciladores. Cero archivos,
+     cero peso, cero licencias. Lead cuadrada + bajo triangular + bateria.
+     Progresion I-V-vi-IV en Do mayor, 126 BPM.
+  --------------------------------------- */
+  var MUSIC = (function () {
+    var mctx = null, bus = null, noise = null;
+    var timer = null, step = 0, nextT = 0, on = false;
+    var BPM = 126, EIGHTH = 30 / BPM;   // segundos por corchea
+
+    // 0 = silencio. Notas MIDI.
+    var LEAD_A = [
+      64,67,72,67, 64,67,72,74,      // C
+      74,71,67,71, 74,71,67,69,      // G
+      72,69,64,69, 72,69,64,65,      // Am
+      69,65,60,65, 69,72,67, 0       // F
+    ];
+    var LEAD_B = [
+      72,76,79,76, 72,76,79,81,      // C (octava alta)
+      79,74,71,74, 79,74,71,72,      // G
+      76,72,69,72, 76,81,79,76,      // Am
+      72,69,65,69, 72,76,72, 0       // F
+    ];
+
+    var BASS  = [48,0,55,0, 48,0,55,0,  43,0,50,0, 43,0,50,0,
+                 45,0,52,0, 45,0,52,0,  41,0,48,0, 41,0,48,0];
+    var KICK  = [1,0,0,0, 1,0,0,0];      // por compas
+    var HAT   = [0,1,0,1, 0,1,0,1];
+
+    function f(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+
+    function noiseBuf() {
+      if (noise) return noise;
+      var len = Math.floor(mctx.sampleRate * 0.2);
+      noise = mctx.createBuffer(1, len, mctx.sampleRate);
+      var d = noise.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      return noise;
+    }
+
+    function tone(freq, t, dur, type, vol) {
+      var o = mctx.createOscillator(), g = mctx.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(bus);
+      o.start(t); o.stop(t + dur + 0.02);
+    }
+
+    function kick(t) {
+      var o = mctx.createOscillator(), g = mctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(130, t);
+      o.frequency.exponentialRampToValueAtTime(45, t + 0.11);
+      g.gain.setValueAtTime(0.16, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+      o.connect(g); g.connect(bus);
+      o.start(t); o.stop(t + 0.18);
+    }
+
+    function hat(t) {
+      var s = mctx.createBufferSource(), g = mctx.createGain(), hp = mctx.createBiquadFilter();
+      s.buffer = noiseBuf();
+      hp.type = 'highpass'; hp.frequency.value = 7000;
+      g.gain.setValueAtTime(0.035, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+      s.connect(hp); hp.connect(g); g.connect(bus);
+      s.start(t); s.stop(t + 0.05);
+    }
+
+    function playStep(i, t) {
+      var n = i % 32;                       // 32 corcheas = 4 compases
+      var loop = Math.floor(i / 32) % 2;    // alterna frase A / B
+      var lead = (loop === 0 ? LEAD_A : LEAD_B)[n];
+      if (lead) tone(f(lead), t, EIGHTH * 0.85, 'square', 0.045);
+      if (BASS[n]) tone(f(BASS[n]), t, EIGHTH * 1.6, 'triangle', 0.075);
+      var b = n % 8;
+      if (KICK[b]) kick(t);
+      if (HAT[b])  hat(t);
+    }
+
+    function scheduler() {
+      if (!on || !mctx) return;
+      while (nextT < mctx.currentTime + 0.2) {
+        playStep(step, nextT);
+        nextT += EIGHTH;
+        step++;
+      }
+    }
+
+    var LEVEL = 0.5;
+    function setGain(v, tau) {
+      if (bus && mctx) bus.gain.setTargetAtTime(v, mctx.currentTime, tau || 0.06);
+    }
+
+    var api = {
+      start: function () {
+        if (on) return;
+        try {
+          if (!mctx) {
+            mctx = new (window.AudioContext || window.webkitAudioContext)();
+            bus = mctx.createGain();
+            bus.gain.value = LEVEL;
+            bus.connect(mctx.destination);
+          }
+          if (mctx.state === 'suspended') mctx.resume();
+          on = true;
+          setGain(LEVEL);
+          nextT = mctx.currentTime + 0.08;
+          scheduler();
+          timer = setInterval(scheduler, 45);
+        } catch (e) { on = false; }
+      },
+      stop: function () {
+        on = false;
+        if (timer) { clearInterval(timer); timer = null; }
+        setGain(0, 0.04);
+      },
+      // Baja el volumen un momento para que se oiga un efecto de sonido.
+      duck: function (ms) {
+        if (!on) return;
+        setGain(0.12, 0.04);
+        setTimeout(function () { if (on) setGain(LEVEL, 0.08); }, ms || 1500);
+      },
+      isOn: function () { return on; }
+    };
+    return api;
+  })();
+
   /* ---------- UTIL ---------- */
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -5196,32 +5369,69 @@ window.QUIZ_DATA = {
     return !!levelSave(prev.id).done;
   }
 
-  /* ---------- SPRITE (inline pixel-art Samuel) ---------- */
+  /* ---------- SPRITE (inline pixel-art Samuel) ----------
+     Moods: 'idle' | 'happy' (celebra) | 'sad' (derrotado)
+     Cada mood cambia ojos, boca y BRAZOS. Nada de archivos de imagen.
+  -------------------------------------------------------- */
   function samuelSVG(mood) {
-    // mood: 'idle' | 'happy' | 'sad'
-    var eye = mood === 'sad' ? 'M6 7h1v1H6z M10 7h1v1h-1z' : 'M6 6h1v2H6z M10 6h1v2h-1z';
-    var mouth = mood === 'happy' ? 'M6 10h5v1H6z M5 9h1v1H5z M11 9h1v1h-1z'
-              : mood === 'sad'   ? 'M6 11h5v1H6z'
-              : 'M7 10h3v1H7z';
+    var eyes, brow = '', mouth, arms, extra = '';
+
+    if (mood === 'happy') {
+      // ojos cerrados en arco ^ ^
+      eyes  = 'M5 7h1v1H5z M6 6h1v1H6z M7 7h1v1H7z M9 7h1v1H9z M10 6h1v1h-1z M11 7h1v1h-1z';
+      mouth = 'M6 10h5v1H6z M5 9h1v1H5z M11 9h1v1h-1z M7 11h3v1H7z';
+      arms  = 'M3 8h2v5H3z M12 8h2v5h-2z';           // brazos ARRIBA
+      // chispas de celebracion
+      extra = '<path fill="var(--warn)" d="M1 6h1v1H1z M15 5h1v1h-1z M2 11h1v1H2z M14 10h1v1h-1z"/>';
+    } else if (mood === 'sad') {
+      eyes  = 'M6 8h1v1H6z M10 8h1v1h-1z';           // ojos pequenos y bajos
+      brow  = '<path fill="#141a33" d="M5 6h2v1H5z M10 6h2v1h-2z"/>';
+      mouth = 'M6 11h5v1H6z M5 10h1v1H5z M11 10h1v1h-1z';  // comisuras hacia abajo
+      arms  = 'M3 14h2v4H3z M12 14h2v4h-2z';         // brazos caidos
+      extra = '<path fill="#7ee8fa" d="M13 7h1v2h-1z M13 9h1v1h-1z"/>'; // gota de sudor
+    } else {
+      eyes  = 'M6 6h1v2H6z M10 6h1v2h-1z';
+      mouth = 'M7 10h3v1H7z';
+      arms  = 'M3 13h2v4H3z M12 13h2v4h-2z';
+    }
+
     return '<svg class="avatar" viewBox="0 0 17 20" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">' +
-      // hair
+      extra +
+      // pelo
       '<path fill="#2b1a12" d="M4 1h9v2H4z M3 2h1v4H3z M13 2h1v4h-1z M4 2h9v2H4z"/>' +
-      // face
+      // cara
       '<path fill="#e8b088" d="M4 4h9v8H4z"/>' +
-      // eyes + mouth
-      '<path fill="#141a33" d="' + eye + '"/>' +
+      brow +
+      '<path fill="#141a33" d="' + eyes + '"/>' +
       '<path fill="#8c4a3a" d="' + mouth + '"/>' +
-      // headset / visor accent
+      // diadema / visor con el color de la materia
       '<path fill="var(--accent)" d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/>' +
-      // body
-      '<path fill="var(--accent-2)" d="M5 12h7v6H5z M3 13h2v4H3z M12 13h2v4h-2z"/>' +
-      // chest emblem
+      // torso + brazos
+      '<path fill="var(--accent-2)" d="M5 12h7v6H5z ' + arms + '"/>' +
+      // emblema del pecho
       '<path fill="#fff" d="M8 14h1v3H8z M7 15h3v1H7z"/>' +
-      // legs
+      // piernas
       '<path fill="#1c2555" d="M5 18h3v2H5z M9 18h3v2H9z"/>' +
       '</svg>';
   }
   window.SamuelSprite = samuelSVG;
+
+  var CHEERS = ['NICE ONE!', 'GOT IT!', 'YES!', 'SHARP!', 'CLEAN WORK!', 'THAT\'S IT!'];
+  var CONSOLES = ['NOT YET...', 'ALMOST!', 'TRY AGAIN', 'KEEP GOING', 'SHAKE IT OFF'];
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+  /* Cambia la cara de Samuel en la pantalla de juego. */
+  function setMate(mood, msg, cls) {
+    var box = el('mateSprite');
+    if (!box) return;
+    box.innerHTML = samuelSVG(mood);
+    var sprite = box.querySelector('.avatar');
+    if (mood === 'happy') sprite.classList.add('avatar--cheer');
+    else if (mood === 'sad') sprite.classList.add('avatar--down');
+    else sprite.classList.add('avatar--bob');
+    var m = el('mateMsg');
+    if (m) { m.textContent = msg || ''; m.className = 'mate__msg' + (cls ? ' ' + cls : ''); }
+  }
 
   /* ---------- QUESTION QUEUE ----------
      Anti-repeat rule: every question is a FAMILY with >=2 variants.
@@ -5303,6 +5513,7 @@ window.QUIZ_DATA = {
             '<span class="hud__stat">LEVELS <b id="mapDone">0/5</b></span>' +
           '</div>' +
           '<div class="hud__group">' +
+            '<button class="btn btn--ghost" id="btnMusic" type="button">MUSIC: ON</button>' +
             '<button class="btn btn--ghost" id="btnSound" type="button">SOUND: ON</button>' +
             '<button class="btn btn--ghost" id="btnReset" type="button">RESET</button>' +
           '</div>' +
@@ -5324,6 +5535,10 @@ window.QUIZ_DATA = {
       /* PLAY */
       '<section id="scrPlay" class="screen">' +
         '<div class="pixel-box hud">' +
+          '<div class="mate">' +
+            '<div class="mate__sprite" id="mateSprite"></div>' +
+            '<div class="mate__msg" id="mateMsg">LET\'S GO</div>' +
+          '</div>' +
           '<div class="hud__group" style="flex:1">' +
             '<span class="hud__stat" id="hudLvl">LV 1</span>' +
             '<div class="bar"><div class="bar__fill" id="hudBar"></div></div>' +
@@ -5343,6 +5558,7 @@ window.QUIZ_DATA = {
           '<div id="qHint" class="hint"></div>' +
           '<div class="row mt">' +
             '<button class="btn btn--ghost" id="btnHint" type="button">HINT</button>' +
+            '<button class="btn btn--ghost" id="btnMusic2" type="button">MUSIC</button>' +
             '<button class="btn btn--ghost" id="btnQuit" type="button">QUIT</button>' +
           '</div>' +
         '</div>' +
@@ -5404,6 +5620,7 @@ window.QUIZ_DATA = {
     el('mapXP').textContent = STATE.totalXP;
     el('mapDone').textContent = done + '/' + DATA.levels.length;
     el('btnSound').textContent = 'SOUND: ' + (STATE.sound ? 'ON' : 'OFF');
+    el('btnMusic').textContent = 'MUSIC: ' + (STATE.music ? 'ON' : 'OFF');
     el('allDone').innerHTML = (done === DATA.levels.length)
       ? '<div class="pixel-box victory mt-lg"><h2>&#127942; ALL LEVELS CLEARED</h2>' +
         '<p>You are ready for the ' + esc(DATA.meta.test) + '. Replay any level to push for 3 stars.</p></div>'
@@ -5433,6 +5650,8 @@ window.QUIZ_DATA = {
     var lv = DATA.levels[idx];
     run = new Runner(lv);
     el('hudLvl').textContent = 'LV ' + lv.id;
+    setMate('idle', 'LET\'S GO');
+    if (STATE.music) MUSIC.start();
     show('play');
     nextQuestion();
   }
@@ -5476,6 +5695,7 @@ window.QUIZ_DATA = {
     el('btnHint').style.display = 'inline-block';
     el('qFeed').className = 'pixel-box feedback';
     el('btnNext').style.display = 'none';
+    setMate('idle', run.combo >= 3 ? 'COMBO x' + run.combo : 'YOUR TURN');
     updateHUD();
   }
 
@@ -5510,13 +5730,17 @@ window.QUIZ_DATA = {
     var fb = el('qFeed');
     if (correct) {
       SFX.right();
+      MUSIC.duck(900);
       run.resolve(true);
+      setMate('happy', run.combo >= 3 ? 'COMBO x' + run.combo + '!' : pick(CHEERS), 'is-good');
       if (run.combo >= 3) popCombo('COMBO x' + run.combo + '!');
       fb.className = 'pixel-box feedback is-on feedback--good';
       fb.innerHTML = '<div class="feedback__title">&#10003; CORRECT</div><div class="feedback__body">' + q.v.explain + '</div>';
     } else {
       SFX.wrong();
+      MUSIC.duck(900);
       run.resolve(false);
+      setMate('sad', pick(CONSOLES), 'is-bad');
       fb.className = 'pixel-box feedback is-on feedback--bad';
       fb.innerHTML = '<div class="feedback__title">&#10007; NOT YET</div><div class="feedback__body">' + q.v.explain +
         '<p style="margin-top:12px;color:var(--warn)"><b>This challenge comes back later with different numbers</b> &mdash; so work out the method, not the answer.</p></div>';
@@ -5560,6 +5784,7 @@ window.QUIZ_DATA = {
     save();
 
     SFX.level();
+    MUSIC.duck(2600);
     var nextLv = DATA.levels[currentIdx + 1];
     el('winBody').innerHTML =
       '<div style="display:flex;justify-content:center">' + samuelSVG('happy').replace('class="avatar"', 'class="avatar avatar--lg avatar--bob"') + '</div>' +
@@ -5593,6 +5818,29 @@ window.QUIZ_DATA = {
   el('btnSound').addEventListener('click', function () {
     STATE.sound = !STATE.sound; save(); SFX.click();
     el('btnSound').textContent = 'SOUND: ' + (STATE.sound ? 'ON' : 'OFF');
+  });
+
+  function toggleMusic() {
+    STATE.music = !STATE.music;
+    save();
+    if (STATE.music) MUSIC.start(); else MUSIC.stop();
+    el('btnMusic').textContent = 'MUSIC: ' + (STATE.music ? 'ON' : 'OFF');
+    el('btnMusic2').textContent = 'MUSIC: ' + (STATE.music ? 'ON' : 'OFF');
+  }
+  el('btnMusic').addEventListener('click', toggleMusic);
+  el('btnMusic2').addEventListener('click', toggleMusic);
+  el('btnMusic2').textContent = 'MUSIC: ' + (STATE.music ? 'ON' : 'OFF');
+
+  // Los navegadores solo permiten audio tras una interaccion del usuario.
+  document.addEventListener('click', function once() {
+    document.removeEventListener('click', once);
+    if (STATE.music) MUSIC.start();
+  });
+
+  // Silencia si Samuel cambia de pestana.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) MUSIC.stop();
+    else if (STATE.music) MUSIC.start();
   });
   el('btnReset').addEventListener('click', function () {
     if (confirm('Reset all progress for ' + DATA.meta.topic + '?')) {

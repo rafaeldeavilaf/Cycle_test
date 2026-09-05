@@ -92,7 +92,8 @@ Ambas se cargan por `@import` desde Google Fonts, con fallback a monospace y sys
 | `.feedback` | panel de explicación; `--good` / `--bad` |
 | `.brief` | pantalla de mini-lección; `.example` para el bloque de ejemplo |
 | `.victory` | pantalla de fin de nivel con estrellas y estadísticas |
-| `.avatar` | sprite de Samuel; `--sm`, `--lg`, `--bob` |
+| `.avatar` | sprite de Samuel; `--sm`, `--lg`, `--bob`, `--cheer`, `--down` |
+| `.mate` | compañero en el HUD de juego: sprite + mensaje reactivo |
 
 ---
 
@@ -122,6 +123,44 @@ Nunca se añade una pantalla nueva sin actualizar este documento.
 - Guardado en `localStorage`, clave `samuel-quest:<slug>`.
 - Sonido 8-bit generado con WebAudio (osciladores square), sin archivos, con interruptor.
 - Teclado: `A B C D` o `1 2 3 4` para responder, `Enter` para avanzar.
+
+---
+
+## 9. Samuel reacciona
+
+El sprite vive en el HUD de la pantalla de juego (`.mate`) y tiene tres estados.
+La función `samuelSVG(mood)` de `engine.js` cambia **ojos, boca y brazos**; el CSS
+añade el movimiento.
+
+| Estado | Cuándo | Cara | Brazos | Animación |
+|---|---|---|---|---|
+| `idle` | esperando respuesta | ojos normales, boca recta | a los lados | `--bob` (flota) |
+| `happy` | acierto | ojos `^ ^`, sonrisa, chispas | **arriba** | `--cheer` (salta) |
+| `sad` | fallo | ojos bajos, cejas caídas, gota | caídos | `--down` (se hunde) |
+
+Va acompañado de un mensaje corto en `#mateMsg` (`is-good` verde / `is-bad` rojo),
+tomado al azar de `CHEERS` y `CONSOLES`. Con combo de 3 o más, el mensaje de acierto
+lo reemplaza el contador de combo.
+
+Las tres animaciones se desactivan con `prefers-reduced-motion`.
+
+---
+
+## 10. Música
+
+Chiptune de 8 compases **generada por código** con WebAudio. Cero archivos, cero peso,
+cero licencias.
+
+- 126 BPM, progresión I–V–vi–IV en Do mayor.
+- Tres voces: lead cuadrada, bajo triangular, batería (bombo sinusoidal + hi-hat de ruido).
+- Dos frases que se alternan en cada vuelta (`LEAD_A` / `LEAD_B`) para que no canse.
+- Volumen bajo. Baja aún más (`MUSIC.duck`) cuando suena un efecto o al terminar un nivel.
+- Se pausa sola si Samuel cambia de pestaña.
+- Interruptor propio, separado del de efectos: botón `MUSIC` en el mapa y en el juego,
+  ambos sincronizados y guardados en `localStorage`.
+- Arranca en el primer clic, nunca antes: los navegadores bloquean el audio automático.
+
+**No añadas archivos de audio al proyecto.** Rompería la regla del HTML autocontenido.
 
 ---
 
