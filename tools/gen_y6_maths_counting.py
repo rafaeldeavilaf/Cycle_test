@@ -1406,6 +1406,893 @@ LEVELS.append({
     "questions": L5,
 })
 
+# ================================================================== v2: 7 NIVELES
+# Hasta aqui se han construido los 5 mundos de v1, repartidos por TIPO DE NUMERO.
+# v2 reparte por HABILIDAD (PLAN-V2 §1): las cuatro primeras siguen siendo
+# "aplicar un paso" en enteros/decimales/fracciones/negativos, y se anaden los
+# dos niveles donde esta la dificultad real del Cycle Test —hallar el paso e
+# invertir la regla—. Cada nivel baja de 16 a 12 familias para dejar sitio al
+# jefe sin alargar la partida.
+#
+# Las familias existentes NO se reescriben: se recolocan. Su aritmetica ya esta
+# auditada; volver a escribirla seria reintroducir el riesgo mas caro del
+# proyecto.
+
+BYID = {}
+for _src in (L1, L2, L3, L4, L5):
+    for _f in _src:
+        BYID[_f["id"]] = _f
+
+def take(*ids):
+    """Recoloca familias existentes por id, fallando si alguna no existe."""
+    out = []
+    for i in ids:
+        assert i in BYID, "familia inexistente: " + i
+        out.append(BYID[i])
+    return out
+
+# ---------------------------------------------------------------- nuevas familias
+
+def four_opts(correct, wrongs):
+    """Descarta distractores que coincidan con la respuesta y deja 3."""
+    seen, out = {str(correct)}, []
+    for w in wrongs:
+        w = str(w)
+        if w not in seen:
+            seen.add(w); out.append(w)
+    assert len(out) >= 3, (correct, wrongs)
+    return out[:3]
+
+# --- N1: dos terminos siguientes (aplicar el paso dos veces) -----------------
+v = []
+for start, step, shown in [(4, 7, 3), (100, -25, 3), (13, 6, 3), (60, -12, 3), (8, 9, 3)]:
+    f = FMT["int"]
+    a = F(start) + shown * F(step)
+    b = a + F(step)
+    good = f"{f(a)}, {f(b)}"
+    v.append(mk(
+        "What are the next TWO numbers?",
+        good,
+        four_opts(good, [f"{f(a)}, {f(a + 2*F(step))}", f"{f(a - F(step))}, {f(a)}", f"{f(b)}, {f(b + F(step))}"]),
+        f"Find the step first, then take it twice from the last number you can see.",
+        f"The step is <code>{f(F(step))}</code>. <code>{f(F(start)+(shown-1)*F(step))} &rarr; {f(a)} &rarr; {f(b)}</code>.",
+        seq=seq_of(start, step, shown + 2, "int", blanks={shown, shown + 1}),
+    ))
+N1_NEW = [fam("L1F17", "next two terms", v)]
+
+# --- N5: hallar el paso y la direccion ---------------------------------------
+N5_NEW = []
+
+# paso negativo cruzando el cero
+v = []
+for start, step in [(8, -3), (5, -4), (11, -5), (7, -6), (9, -7)]:
+    f = FMT["int"]
+    v.append(mk(
+        "What is the step in this sequence?",
+        f(F(step)),
+        four_opts(f(F(step)), [f(-F(step)), f(F(step) + 1), f(F(step) - 1)]),
+        "Take one term away from the one before it. Going down means the step is negative.",
+        f"<code>{f(F(start)+F(step))} - {f(F(start))} = {f(F(step))}</code>, so the step is <code>{f(F(step))}</code>.",
+        seq=seq_of(start, step, 4, "int"),
+    ))
+N5_NEW.append(fam("L5NF1", "negative step", v))
+
+# direccion + tamano del paso, en palabras
+v = []
+for start, step, mode in [(F(75,10), F(-3,10), "dec"), (12, 4, "int"), (F(21,10), F(3,10), "dec"),
+                          (40, -8, "int"), (F(95,100), F(-5,100), "dec")]:
+    f = FMT[mode]
+    word = "back" if step < 0 else "on"
+    good = f"count {word} in {f(abs(F(step)))}s"
+    other = "on" if step < 0 else "back"
+    v.append(mk(
+        "Which rule describes this sequence?",
+        good,
+        four_opts(good, [f"count {other} in {f(abs(F(step)))}s",
+                         f"count {word} in {f(abs(F(step))*2)}s",
+                         f"count {other} in {f(abs(F(step))*2)}s"]),
+        "Two things to get right: the direction, and the size of the jump.",
+        f"The numbers get {'smaller' if step < 0 else 'bigger'}, and each jump is <code>{f(abs(F(step)))}</code>.",
+        seq=seq_of(start, step, 4, mode),
+    ))
+N5_NEW.append(fam("L5NF2", "direction and step", v))
+
+# paso oculto entre terminos NO consecutivos (decimales)
+v = []
+for start, step, gaps in [(F(21,10), F(3,10), 3), (F(4,1), F(-25,100), 4), (F(12,10), F(2,10), 4),
+                          (F(5,1), F(-5,10), 3), (F(65,100), F(15,100), 3)]:
+    f = FMT["dec"]
+    end = start + gaps * step
+    v.append(mk(
+        f"The sequence goes from {f(start)} to {f(end)} in {gaps} equal jumps. How big is each jump?",
+        f(abs(step)),
+        four_opts(f(abs(step)), [f(abs(step) * 2), f(abs(end - start)), f(abs(step) / 2)]),
+        f"Find the total change first, then share it between the {gaps} jumps.",
+        f"Total change <code>{f(abs(end-start))}</code> over {gaps} jumps: <code>{f(abs(end-start))} / {gaps} = {f(abs(step))}</code>.",
+        seq=seq_of(start, step, gaps + 1, "dec", blanks=set(range(1, gaps))),
+    ))
+N5_NEW.append(fam("L5NF3", "hidden decimal step", v))
+
+# paso oculto en fracciones
+v = []
+for start, step, gaps in [(F(1,1), F(1,3), 3), (F(3,1), F(-1,4), 4), (F(1,2), F(1,2), 3),
+                          (F(2,1), F(-1,3), 3), (F(1,4), F(1,4), 4)]:
+    f = FMT["frac"]
+    end = start + gaps * step
+    v.append(mk(
+        f"The sequence goes from {f(start)} to {f(end)} in {gaps} equal jumps. How big is each jump?",
+        f(abs(step)),
+        four_opts(f(abs(step)), [f(abs(step) * 2), f(abs(end - start)), f(abs(step) + F(1,12))]),
+        f"Work out the whole change, then split it into {gaps} equal parts.",
+        f"The whole change is <code>{f(abs(end-start))}</code>, shared between {gaps} jumps: "
+        f"<code>{f(abs(end-start))} / {gaps} = {f(abs(step))}</code>.",
+        seq=seq_of(start, step, gaps + 1, "frac", blanks=set(range(1, gaps))),
+    ))
+N5_NEW.append(fam("L5NF4", "hidden fraction step", v))
+
+# elegir la secuencia que encaja con una regla dada
+v = []
+for start, step, mode in [(6, 6, "int"), (F(15,10), F(5,10), "dec"), (30, -7, "int"),
+                          (F(2,1), F(-3,10), "dec"), (9, 11, "int")]:
+    f = FMT[mode]
+    word = "back" if step < 0 else "on"
+    good = ", ".join(seq_of(start, step, 4, mode))
+    v.append(mk(
+        f"Which sequence counts {word} in {f(abs(F(step)))}s?",
+        good,
+        four_opts(good, [", ".join(seq_of(start, -F(step), 4, mode)),
+                         ", ".join(seq_of(start, F(step) * 2, 4, mode)),
+                         ", ".join(seq_of(start + F(step), F(step) + (F(1,10) if mode == "dec" else 1), 4, mode))]),
+        "Check the direction first, then measure one jump.",
+        f"Starting at <code>{f(F(start))}</code> and jumping <code>{f(F(step))}</code> each time gives <code>{good}</code>.",
+    ))
+N5_NEW.append(fam("L5NF5", "match the sequence", v))
+
+# que secuencia tiene el paso mas grande
+v = []
+# El formato se declara, no se adivina: un tercio no tiene decimal exacto y
+# fdec() falla. Explicito = el generador no puede equivocarse solo.
+for a_start, a_step, b_start, b_step, mode in [
+        (4, 6, 10, 4, "int"),
+        (F(1,1), F(3,10), F(2,1), F(5,10), "dec"),
+        (20, -9, 30, -5, "int"),
+        (F(1,2), F(1,4), F(1,1), F(3,4), "frac"),
+        (7, 8, 12, 11, "int")]:
+    f = FMT[mode]
+    A = ", ".join(seq_of(a_start, a_step, 3, mode))
+    B = ", ".join(seq_of(b_start, b_step, 3, mode))
+    bigger = "A" if abs(F(a_step)) > abs(F(b_step)) else "B"
+    v.append(mk(
+        f"Sequence A: {A}<br>Sequence B: {B}<br>Which one has the bigger step?",
+        bigger,
+        ["A" if bigger == "B" else "B", "They are the same", "Neither: they have no step"],
+        "Measure one jump in each. Ignore the direction: compare the size.",
+        f"A jumps <code>{f(abs(F(a_step)))}</code> and B jumps <code>{f(abs(F(b_step)))}</code>, so <b>{bigger}</b> is bigger.",
+    ))
+N5_NEW.append(fam("L5NF6", "compare two steps", v))
+
+# solo la direccion, con tipos mezclados
+v = []
+for start, step, mode in [(F(-7,1), 3, "int"), (F(15,10), F(-2,10), "dec"), (F(1,1), F(1,4), "frac"),
+                          (-2, -4, "int"), (F(3,1), F(-1,3), "frac")]:
+    f = FMT[mode]
+    good = "counting on" if step > 0 else "counting back"
+    v.append(mk(
+        "Is this sequence counting on or counting back?",
+        good,
+        ["counting back" if step > 0 else "counting on", "neither: it repeats", "both at the same time"],
+        "Look at whether the numbers get bigger or smaller from left to right.",
+        f"Each jump is <code>{f(F(step))}</code>, so the numbers get {'bigger' if step > 0 else 'smaller'}.",
+        seq=seq_of(start, step, 4, mode),
+    ))
+N5_NEW.append(fam("L5NF7", "direction only", v))
+
+# paso a partir del 1.o y el 5.o termino
+v = []
+for start, step in [(3, 7), (100, -15), (12, 9), (45, -6), (8, 13)]:
+    f = FMT["int"]
+    fifth = F(start) + 4 * F(step)
+    v.append(mk(
+        f"The 1st term is {f(F(start))} and the 5th term is {f(fifth)}. What is the step?",
+        f(F(step)),
+        # Distractores = errores reales: quedarse con el cambio total, dividir
+        # entre 5 posiciones en vez de 4 jumps, o perder la direccion.
+        four_opts(f(F(step)), [f(abs(fifth - F(start))), f(F(step) + 1), f(-F(step))]),
+        "From the 1st term to the 5th there are 4 jumps, not 5.",
+        f"<code>{f(abs(fifth - F(start)))} / 4 = {f(abs(F(step)))}</code>, so the step is <code>{f(F(step))}</code>.",
+    ))
+N5_NEW.append(fam("L5NF8", "step from first and fifth", v))
+
+# --- N7: invertir la regla (valor -> posicion) y pertenencia ------------------
+N7_NEW = []
+fi = FMT["int"]
+
+# posicion de un valor en la tabla del k
+v = []
+for k, pos in [(8, 12), (7, 9), (6, 15), (9, 11), (4, 18)]:
+    val = k * pos
+    v.append(mk(
+        f"The rule is: multiply the position by {k}. Which position has the value {val}?",
+        fi(pos),
+        four_opts(fi(pos), [fi(pos + 1), fi(pos - 1), fi(val - k)]),
+        "Going backwards from a value undoes the rule: divide instead of multiply.",
+        f"<code>{val} / {k} = {pos}</code>, so {val} is the {pos}th term.",
+    ))
+N7_NEW.append(fam("L7NF1", "position from value", v))
+
+# pertenencia: division exacta o no
+v = []
+for k, val, yes in [(8, 50, False), (7, 63, True), (6, 40, False), (9, 72, True), (4, 30, False)]:
+    good = "Yes" if yes else "No"
+    q, r = divmod(val, k)
+    v.append(mk(
+        f"The rule is: multiply the position by {k}. Is {val} in this sequence?",
+        good,
+        ["No" if yes else "Yes", "Only if you count backwards", "There is not enough information"],
+        f"Divide {val} by {k}. If it does not divide exactly, the value is not a term.",
+        (f"<code>{val} / {k} = {q}</code> exactly, so {val} is the {q}th term."
+         if yes else
+         f"<code>{val} / {k} = {q}</code> remainder <code>{r}</code>. It does not divide exactly, so {val} is <b>not</b> a term."),
+    ))
+N7_NEW.append(fam("L7NF2", "is the value a term", v))
+
+# cual de estos valores NO pertenece
+v = []
+for k, pos_list, bad in [(8, [3, 5, 7], 30), (6, [4, 6, 9], 40), (7, [2, 5, 8], 50), (9, [3, 4, 7], 40), (5, [3, 7, 11], 32)]:
+    good = fi(bad)
+    others = [fi(k * p) for p in pos_list]
+    v.append(mk(
+        f"The rule is: multiply the position by {k}. Which of these is <b>not</b> a term?",
+        good,
+        others,
+        f"Try dividing each one by {k}. The odd one out leaves a remainder.",
+        f"<code>{bad} / {k}</code> does not divide exactly. All the others do.",
+    ))
+N7_NEW.append(fam("L7NF3", "the odd value out", v))
+
+# invertir una regla de dos pasos
+v = []
+for k, b, pos in [(3, 2, 7), (4, 1, 6), (5, 3, 8), (2, 5, 9), (6, 2, 5)]:
+    val = k * pos + b
+    v.append(mk(
+        f"The rule is: multiply the position by {k}, then add {b}. Which position has the value {val}?",
+        fi(pos),
+        # El error tipico es dividir antes de quitar el +b, o quitarlo dos veces.
+        four_opts(fi(pos), [fi((val - b) // k + 1), fi(pos - 1), fi(val - b), fi(val)]),
+        f"Undo the rule in reverse order: take away {b} first, then divide by {k}.",
+        f"<code>{val} - {b} = {k * pos}</code>, then <code>{k * pos} / {k} = {pos}</code>.",
+    ))
+N7_NEW.append(fam("L7NF4", "reverse a two-step rule", v))
+
+# cuantos terminos hay por debajo de un tope
+v = []
+for k, cap in [(7, 100), (6, 50), (9, 100), (4, 30), (8, 90)]:
+    n = (cap - 1) // k
+    v.append(mk(
+        f"The rule is: multiply the position by {k}. How many terms are smaller than {cap}?",
+        fi(n),
+        # Contar de mas (incluir el que ya pasa el tope), contar de menos, o
+        # confundir "cuantos terminos" con "el valor del ultimo".
+        four_opts(fi(n), [fi(n + 1), fi(n - 1), fi(k * n), fi(cap)]),
+        f"Find the biggest multiple of {k} below {cap}, then say which position it is.",
+        f"The last term below {cap} is <code>{k * n}</code>, which is the {n}th. So there are {n}.",
+    ))
+N7_NEW.append(fam("L7NF5", "how many terms below", v))
+
+# el mayor termino por debajo de un tope
+v = []
+for k, cap in [(6, 50), (7, 60), (9, 80), (8, 70), (5, 43)]:
+    n = (cap - 1) // k
+    v.append(mk(
+        f"The rule is: multiply the position by {k}. What is the largest term smaller than {cap}?",
+        fi(k * n),
+        four_opts(fi(k * n), [fi(k * (n + 1)), fi(k * (n - 1)), fi(cap - k)]),
+        f"Count up in {k}s and stop before you pass {cap}.",
+        f"<code>{k} x {n} = {k * n}</code> and <code>{k} x {n + 1} = {k * (n + 1)}</code>, which is too big.",
+    ))
+N7_NEW.append(fam("L7NF6", "largest term below", v))
+
+# de valor a posicion, contando hacia atras (paso constante, no tabla)
+v = []
+for first, step, pos in [(5, 4, 8), (3, 6, 7), (10, 5, 9), (2, 7, 6), (6, 3, 11)]:
+    val = first + (pos - 1) * step
+    v.append(mk(
+        f"A sequence starts at {first} and counts on in {step}s. Which position has the value {val}?",
+        fi(pos),
+        # El error de siempre: contar los saltos (pos-1) en vez de la posicion.
+        four_opts(fi(pos), [fi(pos - 1), fi(pos + 1), fi((val - first) // step + 2), fi(val)]),
+        "Take the first term away first, then see how many jumps fit.",
+        f"<code>{val} - {first} = {val - first}</code>, and <code>{val - first} / {step} = {pos - 1}</code> jumps. "
+        f"That is the <code>{pos}</code>th term, because the 1st term needs no jumps.",
+    ))
+N7_NEW.append(fam("L7NF7", "position in a step sequence", v))
+
+# comparar dos posiciones
+v = []
+for k, v1, v2 in [(8, 96, 64), (6, 54, 72), (7, 49, 84), (9, 81, 63), (4, 48, 36)]:
+    p1, p2 = v1 // k, v2 // k
+    good = fi(max(v1, v2)) if (p1 > p2) == (v1 > v2) else fi(v1 if p1 > p2 else v2)
+    good = fi(v1) if p1 > p2 else fi(v2)
+    v.append(mk(
+        f"The rule is: multiply the position by {k}. Which value comes <b>later</b> in the sequence?",
+        good,
+        [fi(v2) if p1 > p2 else fi(v1), "They are at the same position", "Neither is a term"],
+        f"Divide both by {k}. The bigger position comes later.",
+        f"<code>{v1} / {k} = {p1}</code> and <code>{v2} / {k} = {p2}</code>, so <code>{good}</code> comes later.",
+    ))
+N7_NEW.append(fam("L7NF8", "which value comes later", v))
+
+# ---------------------------------------------------------------- jefes
+# Regla dura (PLAN-V2 §0.5): un jefe evalua lo que su nivel NO evalua. Cada
+# familia lleva `evaluates` y su `skill` no puede coincidir con ninguna del
+# nivel; el generador lo comprueba abajo y falla si se rompe.
+BOSSES = {}
+
+def bfam(fid, skill, evaluates, variants):
+    f = fam(fid, skill, variants)
+    f["evaluates"] = evaluates
+    return f
+
+# --- JEFE 1: trabajar hacia atras (el nivel solo va hacia delante) -----------
+B1 = []
+v = []
+for first, step, shown in [(4, 7, 3), (10, 6, 3), (3, 9, 3), (12, 5, 3), (7, 8, 3)]:
+    f = FMT["int"]
+    v.append(mk(
+        "The start of the sequence was stolen. What was the first number?",
+        f(F(first)),
+        four_opts(f(F(first)), [f(F(first) + F(step)), f(F(first) - F(step)), f(F(first) + 1)]),
+        "Go backwards: take the step away from the first number you can still see.",
+        f"The step is <code>{f(F(step))}</code>. Going back from <code>{f(F(first)+F(step))}</code> gives <code>{f(F(first))}</code>.",
+        seq=["?"] + [f(F(first) + i * F(step)) for i in range(1, shown + 1)],
+    ))
+B1.append(bfam("B1F1", "stolen first term", "inverse", v))
+
+v = []
+for first, step in [(60, -7), (40, -6), (85, -9), (33, -4), (52, -8)]:
+    f = FMT["int"]
+    v.append(mk(
+        "This sequence counts back. What was the number before the first one you can see?",
+        f(F(first) - F(step)),
+        four_opts(f(F(first) - F(step)), [f(F(first) + F(step)), f(F(first)), f(F(first) - 2 * F(step))]),
+        "To step backwards in a count-back sequence you have to ADD the step.",
+        f"The sequence goes down by <code>{f(abs(F(step)))}</code>, so the number before <code>{f(F(first))}</code> is "
+        f"<code>{f(F(first))} + {f(abs(F(step)))} = {f(F(first) - F(step))}</code>.",
+        seq=["?"] + seq_of(first, step, 3, "int"),
+    ))
+B1.append(bfam("B1F2", "the term before", "inverse", v))
+
+v = []
+for first, step, n in [(5, 6, 4), (9, 7, 4), (2, 8, 4), (11, 4, 4), (6, 9, 4)]:
+    f = FMT["int"]
+    last = F(first) + (n - 1) * F(step)
+    v.append(mk(
+        f"The {n}th term is {f(last)} and the step is {f(F(step))}. What is the 1st term?",
+        f(F(first)),
+        four_opts(f(F(first)), [f(last - n * F(step)), f(F(first) + F(step)), f(last - F(step))]),
+        f"From the 1st term to the {n}th there are {n-1} jumps. Take them all back off.",
+        f"<code>{f(last)} - {n-1} x {f(F(step))} = {f(F(first))}</code>.",
+    ))
+B1.append(bfam("B1F3", "first term from the nth", "inverse", v))
+
+v = []
+for first, step in [(F(12,10), F(4,10)), (F(25,100), F(15,100)), (F(3,1), F(-3,10)), (F(45,10), F(-5,10)), (F(8,10), F(6,10))]:
+    f = FMT["dec"]
+    v.append(mk(
+        "The start was rubbed out. What was the first number?",
+        f(first),
+        four_opts(f(first), [f(first + step), f(first - step), f(first + step * 2)]),
+        "Find the step from the numbers you can see, then take one step backwards.",
+        f"The step is <code>{f(step)}</code>, so before <code>{f(first + step)}</code> came <code>{f(first)}</code>.",
+        seq=["?"] + [f(first + i * step) for i in range(1, 4)],
+    ))
+B1.append(bfam("B1F4", "stolen decimal start", "inverse", v))
+BOSSES[1] = B1
+
+# --- JEFE 2: pasos ocultos y cuenta de saltos (decimales) --------------------
+B2 = []
+v = []
+for a, b, jumps in [(F(21,10), F(3,1), 3), (F(5,1), F(35,10), 3), (F(12,10), F(2,1), 4),
+                    (F(75,100), F(1,1), 5), (F(4,1), F(3,1), 4)]:
+    f = FMT["dec"]
+    step = (b - a) / jumps
+    v.append(mk(
+        f"The tornado tore out the marks between {f(a)} and {f(b)}. There are {jumps} equal jumps. How big is each one?",
+        f(abs(step)),
+        four_opts(f(abs(step)), [f(abs(b - a)), f(abs(step) * 2), f(abs(step) / 2)]),
+        f"Work out the whole distance first, then share it between the {jumps} jumps.",
+        f"<code>{f(abs(b-a))} / {jumps} = {f(abs(step))}</code>.",
+    ))
+B2.append(bfam("B2F1", "step torn out", "inverse", v))
+
+v = []
+for a, b, step in [(F(21,10), F(3,1), F(3,10)), (F(1,1), F(2,1), F(2,10)), (F(5,1), F(4,1), F(-25,100)),
+                   (F(3,1), F(45,10), F(5,10)), (F(6,1), F(51,10), F(-3,10))]:
+    f = FMT["dec"]
+    n = int(abs((b - a) / step))
+    v.append(mk(
+        f"How many jumps of {f(abs(step))} does it take to get from {f(a)} to {f(b)}?",
+        fi(n),
+        four_opts(fi(n), [fi(n + 1), fi(n - 1), fi(n * 2)]),
+        "Distance first, then divide by the size of one jump.",
+        f"<code>{f(abs(b-a))} / {f(abs(step))} = {n}</code> jumps.",
+    ))
+B2.append(bfam("B2F2", "count the jumps", "inverse", v))
+
+# AUDITORIA: los pasos aqui son SIEMPRE positivos. Con un paso negativo,
+# "3 jumps of 0.5 before 5" daba 6.5 como respuesta correcta: el nino lee
+# "antes" y resta, y el enunciado nunca le dice en que direccion va la
+# secuencia. Era una respuesta bien calculada a una pregunta ambigua.
+v = []
+for start, step, back in [(F(3,1), F(3,10), 3), (F(2,1), F(25,100), 4), (F(5,1), F(5,10), 3),
+                          (F(18,10), F(2,10), 4), (F(4,1), F(3,10), 3)]:
+    f = FMT["dec"]
+    val = start - back * step
+    v.append(mk(
+        f"A mark sits at {f(start)}. Which value is {back} jumps of {f(step)} <b>before</b> it?",
+        f(val),
+        four_opts(f(val), [f(start + back * step), f(start - (back - 1) * step), f(start - (back + 1) * step)]),
+        "Before means going backwards along the ruler: take the jumps off.",
+        f"<code>{f(start)} - {back} x {f(step)} = {f(val)}</code>.",
+    ))
+B2.append(bfam("B2F3", "jumps before a mark", "inverse", v))
+
+v = []
+for a, b in [(F(27,10), F(3,1)), (F(19,10), F(21,10)), (F(45,10), F(5,1)), (F(88,100), F(1,1)), (F(35,10), F(4,1))]:
+    f = FMT["dec"]
+    n = int((b - a) / F(1,10))
+    v.append(mk(
+        f"How many tenths are there between {f(a)} and {f(b)}?",
+        fi(n),
+        four_opts(fi(n), [fi(n * 10), fi(n + 1), fi(n - 1)]),
+        "One tenth is 0.1. Count how many of them fit in the gap.",
+        f"<code>{f(b - a)}</code> is <code>{n}</code> lots of <code>0.1</code>.",
+    ))
+B2.append(bfam("B2F4", "how many tenths", "inverse", v))
+BOSSES[2] = B2
+
+# --- JEFE 3: saltos de 1/k y cruce de enteros -------------------------------
+B3 = []
+v = []
+for a, b, k in [(F(1,1), F(3,1), 3), (F(2,1), F(4,1), 4), (F(1,2), F(2,1), 2),
+                (F(3,1), F(1,1), 3), (F(1,1), F(5,2), 2)]:
+    f = FMT["frac"]
+    n = int(abs(b - a) * k)
+    v.append(mk(
+        f"How many planks of 1/{k} does it take to get from {f(a)} to {f(b)}?",
+        fi(n),
+        four_opts(fi(n), [fi(n + 1), fi(n - 1), fi(int(abs(b - a)))]),
+        f"How far is it altogether? Then ask how many {'thirds' if k == 3 else 'quarters' if k == 4 else 'halves'} fit in that.",
+        f"The distance is <code>{f(abs(b-a))}</code>, and that is <code>{n}</code> lots of <code>1/{k}</code>.",
+    ))
+B3.append(bfam("B3F1", "count the planks", "inverse", v))
+
+v = []
+# El punto de partida nunca cae a UN solo salto del entero: si no, el distractor
+# "land - 1" vale 0 y se pisa con la respuesta. Ademas, a un salto la pregunta
+# se contesta sin contar, que es justo lo que el jefe quiere que hagas.
+for start, k, steps in [(F(1,3), 3, 5), (F(1,4), 4, 7), (F(1,2), 4, 6), (F(4,3), 3, 5), (F(5,4), 4, 7)]:
+    f = FMT["frac"]
+    # cual de los saltos cae justo en un entero
+    land = None
+    for i in range(1, steps + 1):
+        if (start + i * F(1, k)).denominator == 1:
+            land = i
+            break
+    assert land is not None
+    v.append(mk(
+        f"You start at {f(start)} and jump 1/{k} each time. On which jump do you land on a whole number?",
+        fi(land),
+        four_opts(fi(land), [fi(land + 1), fi(land + k), fi(max(1, land - 1))]),
+        "Count along and watch for the moment the fraction part disappears.",
+        f"After <code>{land}</code> jumps you are at <code>{f(start + land * F(1,k))}</code>, a whole number.",
+    ))
+B3.append(bfam("B3F2", "landing on a whole", "inverse", v))
+
+v = []
+for a, b, jumps in [(F(1,1), F(2,1), 3), (F(2,1), F(4,1), 4), (F(1,2), F(2,1), 3), (F(3,1), F(1,1), 4), (F(1,1), F(3,1), 4)]:
+    f = FMT["frac"]
+    step = (b - a) / jumps
+    v.append(mk(
+        f"The crab took the planks between {f(a)} and {f(b)}. There were {jumps} equal jumps. How long was each plank?",
+        f(abs(step)),
+        four_opts(f(abs(step)), [f(abs(b - a)), f(abs(step) * 2), f(abs(step) / 2)]),
+        f"Share the whole distance between the {jumps} jumps.",
+        f"<code>{f(abs(b-a))} / {jumps} = {f(abs(step))}</code>.",
+    ))
+B3.append(bfam("B3F3", "plank length", "inverse", v))
+
+v = []
+for whole, k in [(3, 3), (2, 4), (4, 2), (5, 3), (2, 5)]:
+    f = FMT["frac"]
+    v.append(mk(
+        f"How many {'thirds' if k == 3 else 'quarters' if k == 4 else 'halves' if k == 2 else 'fifths'} are there in {whole}?",
+        fi(whole * k),
+        four_opts(fi(whole * k), [fi(whole + k), fi(whole * k - 1), fi(whole * k + k)]),
+        f"Each whole is made of {k} of them.",
+        f"<code>{whole} x {k} = {whole * k}</code>.",
+    ))
+B3.append(bfam("B3F4", "parts in a whole", "inverse", v))
+BOSSES[3] = B3
+
+# --- JEFE 4: distancia cruzando el cero, en los dos sentidos -----------------
+B4 = []
+v = []
+for a, b, step in [(-7, 5, 4), (-9, 3, 4), (-6, 6, 3), (-10, 2, 6), (-5, 7, 4)]:
+    d = b - a
+    n = d // step
+    assert d % step == 0
+    v.append(mk(
+        f"From floor {a} to floor {b}, in jumps of {step}. How many jumps?",
+        fi(n),
+        # Errores reales: contar el cero dos veces, quedarse corto, o restar
+        # las distancias en vez de sumarlas al cruzar el cero.
+        four_opts(fi(n), [fi(n + 1), fi(n - 1), fi(d), fi(abs(abs(b) - abs(a)))]),
+        "Count the floors from the negative up to zero, then from zero up to the target.",
+        f"From <code>{a}</code> to <code>0</code> is <code>{abs(a)}</code>, and <code>0</code> to <code>{b}</code> is <code>{b}</code>. "
+        f"That is <code>{d}</code> altogether: <code>{d} / {step} = {n}</code> jumps.",
+    ))
+B4.append(bfam("B4F1", "jumps across zero", "distinguish", v))
+
+v = []
+for start, step, n in [(2, 3, 3), (5, 4, 3), (1, 5, 2), (4, 2, 4), (3, 6, 2)]:
+    val = start - step * n
+    v.append(mk(
+        f"Which floor is {n} jumps of {step} <b>below</b> floor {start}?",
+        fi(val),
+        four_opts(fi(val), [fi(start + step * n), fi(val + step), fi(-(start + step * n))]),
+        "Going below zero keeps counting: -1, -2, -3...",
+        f"<code>{start} - {n} x {step} = {val}</code>.",
+    ))
+B4.append(bfam("B4F2", "floors below", "distinguish", v))
+
+v = []
+for a1, b1, a2, b2 in [(-3, 4, -5, 1), (-8, 2, -4, 5), (-6, 6, -2, 9), (-10, 1, -7, 3), (-2, 8, -9, 2)]:
+    d1, d2 = b1 - a1, b2 - a2
+    good = f"{a1} to {b1}" if d1 > d2 else f"{a2} to {b2}"
+    other = f"{a2} to {b2}" if d1 > d2 else f"{a1} to {b1}"
+    v.append(mk(
+        f"Which is the longer trip: {a1} to {b1}, or {a2} to {b2}?",
+        good,
+        [other, "They are the same length", "You cannot compare them"],
+        "Count each trip through zero, then compare the totals.",
+        f"<code>{a1}</code> to <code>{b1}</code> is <code>{d1}</code>; <code>{a2}</code> to <code>{b2}</code> is <code>{d2}</code>.",
+    ))
+B4.append(bfam("B4F3", "longer trip", "distinguish", v))
+
+v = []
+for a, b in [(-7, 5), (-4, 9), (-12, 3), (-6, 2), (-9, 8)]:
+    v.append(mk(
+        f"How many floors are there between {a} and {b}?",
+        fi(b - a),
+        # Errores REALES: contar el cero dos veces, restar los tamanos en vez
+        # de sumarlos, o quedarse solo con el lado negativo. Nada de relleno
+        # absurdo: multiplicar |a| por |b| no es un error que nadie cometa.
+        four_opts(fi(b - a), [fi(abs(a) + abs(b) + 1), fi(abs(abs(b) - abs(a))), fi(abs(a)), fi(abs(b))]),
+        "Zero is a floor too, but it is not counted twice.",
+        f"<code>{abs(a)}</code> floors up to zero, then <code>{b}</code> more: <code>{b - a}</code>.",
+    ))
+B4.append(bfam("B4F4", "floors between", "distinguish", v))
+BOSSES[4] = B4
+
+# --- JEFE 5: verificar (encontrar el termino falso) --------------------------
+B5 = []
+v = []
+for start, step, bad_i, off in [(4, 7, 2, 1), (100, -25, 3, 5), (6, 9, 1, -2), (13, 6, 3, 3), (50, -8, 2, -4)]:
+    f = FMT["int"]
+    terms = [F(start) + i * F(step) for i in range(5)]
+    good = f(terms[bad_i] + off)
+    shown = [f(t) for t in terms]
+    shown[bad_i] = good
+    v.append(mk(
+        f"This should count {'on' if step > 0 else 'back'} in {abs(step)}s, but the Mimic swapped one number. Which one is wrong?",
+        good,
+        four_opts(good, [shown[(bad_i + 1) % 5], shown[(bad_i + 2) % 5], shown[(bad_i + 3) % 5]]),
+        "Check every jump, not just the first one. The wrong number breaks two jumps.",
+        f"It should be <code>{f(terms[bad_i])}</code>, not <code>{good}</code>.",
+        seq=shown,
+    ))
+B5.append(bfam("B5F1", "the impostor term", "verify", v))
+
+v = []
+for start, step, bad_i, off in [(F(21,10), F(3,10), 2, F(1,10)), (F(5,1), F(-5,10), 3, F(-2,10)),
+                                (F(12,10), F(2,10), 1, F(3,10)), (F(4,1), F(-25,100), 2, F(1,10)),
+                                (F(65,100), F(15,100), 3, F(-1,10))]:
+    f = FMT["dec"]
+    terms = [start + i * step for i in range(5)]
+    good = f(terms[bad_i] + off)
+    shown = [f(t) for t in terms]
+    shown[bad_i] = good
+    v.append(mk(
+        "One decimal is wrong. Which one?",
+        good,
+        four_opts(good, [shown[(bad_i + 1) % 5], shown[(bad_i + 2) % 5], shown[(bad_i + 3) % 5]]),
+        "Measure each jump. The odd one out will not match the rest.",
+        f"It should be <code>{f(terms[bad_i])}</code>.",
+        seq=shown,
+    ))
+B5.append(bfam("B5F2", "the wrong decimal", "verify", v))
+
+# Se pregunta por la POSICION, no por el valor: al invertir un paso el numero
+# falso coincide con uno anterior de la propia secuencia (9, 15, 21, 15, 33), y
+# "cual es el 15 malo" no tiene respuesta unica.
+ORD = ["1st", "2nd", "3rd", "4th", "5th"]
+v = []
+for start, step, bad in [(9, 6, 3), (40, -7, 3), (12, 8, 2), (55, -9, 3), (7, 11, 2)]:
+    f = FMT["int"]
+    terms = [F(start) + i * F(step) for i in range(5)]
+    shown = [f(t) for t in terms]
+    shown[bad] = f(terms[bad - 1] - F(step))     # va en la direccion contraria
+    v.append(mk(
+        "One number goes the wrong way. Which <b>position</b> is wrong?",
+        ORD[bad],
+        [o for o in ORD if o != ORD[bad]],
+        "The wrong one does not have the wrong size: it goes backwards.",
+        f"After <code>{f(terms[bad-1])}</code> the sequence should keep going "
+        f"{'up' if step > 0 else 'down'} to <code>{f(terms[bad])}</code>, "
+        f"but it goes back to <code>{shown[bad]}</code>.",
+        seq=shown,
+    ))
+B5.append(bfam("B5F3", "the wrong direction", "verify", v))
+
+v = []
+for start, step in [(5, 5), (30, -6), (8, 7), (44, -4), (11, 9)]:
+    f = FMT["int"]
+    terms = [F(start) + i * F(step) for i in range(5)]
+    good = "Yes, every jump is the same"
+    v.append(mk(
+        f"Is this a true sequence counting {'on' if step > 0 else 'back'} in {abs(step)}s?",
+        good,
+        ["No, one jump is too big", "No, one jump goes the wrong way", "No, the first number is wrong"],
+        "Check all four jumps before you answer. Sometimes nothing is wrong.",
+        f"Every jump is exactly <code>{f(F(step))}</code>, so the sequence is correct.",
+        seq=[f(t) for t in terms],
+    ))
+B5.append(bfam("B5F4", "is the sequence true", "verify", v))
+BOSSES[5] = B5
+
+# --- JEFE 6: distinguir termino-a-termino de posicion-a-termino --------------
+B6 = []
+v = []
+for k, n in [(8, 50), (6, 30), (7, 40), (9, 25), (4, 60)]:
+    good = f"multiply the position by {k}"
+    v.append(mk(
+        f"Sequence: {k}, {2*k}, {3*k}, {4*k}<br>Which rule lets you find the {n}th term <b>without</b> writing them all out?",
+        good,
+        [f"add {k} to the term before", f"add {k} to the position", f"multiply the term before by {k}"],
+        "One rule needs the term before it. The other only needs the position.",
+        f"Adding {k} each time works, but you would need all {n} terms. "
+        f"<code>{n} x {k} = {n*k}</code> gets there in one step.",
+    ))
+B6.append(bfam("B6F1", "which rule for a far term", "distinguish", v))
+
+v = []
+for k in [8, 6, 7, 9, 5]:
+    good = f"add {k} to the term before"
+    v.append(mk(
+        f"Sequence: {k}, {2*k}, {3*k}, {4*k}<br>Which of these is the <b>term-to-term</b> rule?",
+        good,
+        [f"multiply the position by {k}", f"multiply the term before by {k}", f"add {k} to the position"],
+        "Term-to-term means: what do I do to one term to get the next one?",
+        f"Each term is <code>{k}</code> more than the one before, so the term-to-term rule is 'add {k}'.",
+    ))
+B6.append(bfam("B6F2", "name the term-to-term rule", "distinguish", v))
+
+v = []
+for k, n in [(8, 10), (6, 12), (7, 11), (9, 8), (4, 15)]:
+    both = f"Both: they describe the same sequence"
+    v.append(mk(
+        f"'Add {k} to the term before' and 'multiply the position by {k}' describe the sequence "
+        f"{k}, {2*k}, {3*k}, {4*k}. Which one is right?",
+        both,
+        ["Only 'add " + str(k) + " to the term before'",
+         "Only 'multiply the position by " + str(k) + "'",
+         "Neither is right"],
+        "They are two ways of saying the same thing. One is quicker for far terms.",
+        f"Both give <code>{k}, {2*k}, {3*k}, {4*k}</code>. The second one is faster when you need the {n}th term.",
+    ))
+B6.append(bfam("B6F3", "two mouths one sequence", "distinguish", v))
+
+v = []
+for k, b in [(3, 2), (4, 1), (5, 3), (6, 2), (2, 5)]:
+    good = f"multiply the position by {k}, then add {b}"
+    v.append(mk(
+        f"Sequence: {k+b}, {2*k+b}, {3*k+b}, {4*k+b}<br>Which is the <b>position-to-term</b> rule?",
+        good,
+        [f"add {k} to the term before", f"multiply the position by {k+b}", f"add {k+b} to the position"],
+        "The gap tells you what to multiply by. Then check what you still need to add.",
+        f"The gap is <code>{k}</code>, so start with 'x {k}'. Position 1 gives <code>{k}</code>, but the term is "
+        f"<code>{k+b}</code>, so also '+ {b}'.",
+    ))
+B6.append(bfam("B6F4", "spot the position-to-term rule", "distinguish", v))
+BOSSES[6] = B6
+
+# --- JEFE 7: combinar (tipo de regla, pertenencia, dos pasos encadenados) ----
+B7 = []
+v = []
+for k, n in [(8, 10), (7, 12), (6, 15), (9, 9), (4, 20)]:
+    v.append(mk(
+        f"Sequence: {k}, {2*k}, {3*k}, {4*k}<br>Find the rule, then use it: what is the {n}th term?",
+        fi(k * n),
+        # Errores reales: una posicion de mas o de menos, sumar el paso al
+        # ultimo termino visible, o sumar en vez de multiplicar.
+        four_opts(fi(k * n), [fi(k * (n + 1)), fi(k * (n - 1)), fi(4 * k + k), fi(k + n)]),
+        "Two steps: name the rule first, then apply it to the position.",
+        f"The rule is 'multiply the position by {k}'. <code>{n} x {k} = {k*n}</code>.",
+    ))
+B7.append(bfam("B7F1", "find the rule then the term", "combine", v))
+
+v = []
+for k, val, yes in [(8, 50, False), (6, 54, True), (7, 60, False), (9, 90, True), (4, 38, False)]:
+    good = "Yes" if yes else "No"
+    q, r = divmod(val, k)
+    v.append(mk(
+        f"Sequence: {k}, {2*k}, {3*k}, {4*k}<br>Does {val} ever appear?",
+        good,
+        ["No" if yes else "Yes", "Only after the 100th term", "Only if you count backwards"],
+        f"Find the rule, then divide {val} by it and see if it comes out exactly.",
+        (f"<code>{val} / {k} = {q}</code> exactly: it is the {q}th term."
+         if yes else f"<code>{val} / {k} = {q}</code> remainder <code>{r}</code>, so it never appears."),
+    ))
+B7.append(bfam("B7F2", "does it ever appear", "combine", v))
+
+v = []
+for first, step, val in [(5, 4, 33), (3, 6, 45), (10, 5, 50), (2, 7, 44), (6, 3, 30)]:
+    pos = (val - first) // step + 1
+    assert (val - first) % step == 0
+    v.append(mk(
+        f"A sequence starts at {first} and counts on in {step}s. Find the rule, then say which position holds {val}.",
+        fi(pos),
+        # El error de siempre: dar el numero de saltos (pos-1) como si fuera la posicion.
+        four_opts(fi(pos), [fi(pos - 1), fi(pos + 1), fi(val - first), fi(val)]),
+        "Take the first term off, divide by the step, then remember the 1st term needs no jumps.",
+        f"<code>{val} - {first} = {val-first}</code>, <code>{val-first} / {step} = {pos-1}</code> jumps, so it is the "
+        f"<code>{pos}</code>th term.",
+    ))
+B7.append(bfam("B7F3", "rule then position", "combine", v))
+
+v = []
+for start, step in [(4, -3), (7, -4), (10, -5), (5, -2), (9, -6)]:
+    f = FMT["int"]
+    hits = (start % abs(step) == 0)
+    good = "Yes" if hits else "No"
+    v.append(mk(
+        f"Counting back from {start} in {abs(step)}s, do you ever land exactly on 0?",
+        good,
+        ["No" if hits else "Yes", "Only if you start again", "Zero is not a number in sequences"],
+        f"Ask whether {start} divides exactly by {abs(step)}.",
+        (f"<code>{start} / {abs(step)} = {start // abs(step)}</code> exactly, so you land on 0."
+         if hits else
+         f"<code>{start} / {abs(step)} = {start // abs(step)}</code> remainder <code>{start % abs(step)}</code>, "
+         f"so you step over 0 to <code>{start - (start // abs(step) + 1) * abs(step)}</code>."),
+    ))
+B7.append(bfam("B7F4", "landing exactly on zero", "combine", v))
+BOSSES[7] = B7
+
+# ================================================================== ensamblado
+# Cada nivel: una habilidad, 12 familias, una mecanica y un jefe.
+# `mech` es la escena con la que se juega (PLAN-V2 §3.1). Hoy solo existe
+# `doors`, que es el fallback; la Fase 5 construye las demas y el dato ya esta.
+
+BOSS_TEXT = {
+    1: dict(name="BACKTRACK BANDIT", hp=3, phases=1, mech="bridge",
+            enter="A thief has been rubbing out the START of every sequence.",
+            win="The Bandit drops the stolen numbers and runs.",
+            lose="The Bandit shoves you out of the arena.",
+            retry="He comes back with different numbers. The method is the same: work backwards."),
+    2: dict(name="TENTH TWISTER", hp=3, phases=1, mech="ruler",
+            enter="A tornado has torn the marks off the ruler.",
+            win="The Twister blows itself out. The marks settle back.",
+            lose="The Twister spins you off the wall.",
+            retry="New gaps, same trick: find the whole distance, then share it."),
+    3: dict(name="PLANK PINCHER", hp=4, phases=2, mech="planks",
+            enter="A crab is stealing planks from the ford.",
+            win="The Pincher scuttles away and drops the planks.",
+            lose="The Pincher tips you into the water.",
+            retry="Different planks this time. Count how many fit."),
+    4: dict(name="ZERO WARDEN", hp=4, phases=2, mech="lift",
+            enter="The Warden guards floor 0 and will not let you pass.",
+            win="The Warden steps aside. Floor 0 is yours.",
+            lose="The Warden sends you back up the shaft.",
+            retry="New floors. Remember: count up to zero, then up from zero."),
+    5: dict(name="THE MIMIC", hp=4, phases=2, mech="smash",
+            enter="Something is copying the sequence and slipping in a lie.",
+            win="The Mimic loses its shape and vanishes.",
+            lose="The Mimic tricks you one time too many.",
+            retry="It will hide the lie somewhere else. Check every jump."),
+    6: dict(name="TERM TITAN", hp=4, phases=2, mech="machine",
+            enter="A giant with two mouths: one says 'add', the other says 'multiply'.",
+            win="The Titan closes both mouths and steps back.",
+            lose="The Titan talks over you and you lose your place.",
+            retry="Same two mouths. Ask which one gets you there fastest."),
+    7: dict(name="SEQUENCE SOVEREIGN", hp=5, phases=3, mech="machine",
+            enter="The Sovereign rules every sequence you have met so far.",
+            win="The Sovereign bows. You have the run of the whole tower.",
+            lose="The Sovereign dismisses you from the throne room.",
+            retry="The crown does not change. Find the rule, then use it."),
+}
+
+SPEC = [
+    # (id, nombre, subtitulo, habilidad, mech, familias)
+    (1, "STEP COUNTER", "Counting on and back with whole numbers", "apply a whole-number step", "bridge",
+     take("L1F1", "L1F2", "L1F4", "L1F6", "L1F7", "L1F9", "L1F10", "L1F11", "L1F12", "L1F14", "L1F16") + N1_NEW),
+    (2, "TENTHS TRAIL", "Counting on and back in decimal steps", "apply a decimal step", "ruler",
+     take("L2F1", "L2F2", "L2F3", "L2F5", "L2F6", "L2F7", "L2F8", "L2F9", "L2F10", "L2F13", "L2F14", "L2F16")),
+    (3, "FRACTION FORD", "Counting in fraction steps, past the whole numbers", "apply a fraction step", "planks",
+     take("L3F1", "L3F2", "L3F4", "L3F5", "L3F6", "L3F7", "L3F8", "L3F9", "L3F10", "L3F11", "L3F12", "L3F13")),
+    (4, "BELOW ZERO", "Counting through zero into negative numbers", "apply a step across zero", "lift",
+     take("L4F1", "L4F2", "L4F3", "L4F4", "L4F7", "L4F8", "L4F9", "L4F11", "L4F13", "L4F14", "L4F15", "L4F16")),
+    (5, "PATTERN DETECTIVE", "Working out the step and the direction yourself", "find the step and direction", "rule",
+     take("L1F3", "L1F13", "L2F4", "L3F3") + N5_NEW),
+    (6, "RULE MACHINE", "Position-to-term rules: jump straight to any term", "position to term", "machine",
+     take("L5F1", "L5F2", "L5F4", "L5F5", "L5F8", "L5F9", "L5F10", "L5F11", "L5F12", "L5F13", "L5F15", "L5F16")),
+    (7, "REVERSE ENGINE", "Running the rule backwards: from a value to its position", "term to position", "machine",
+     take("L5F3", "L5F6", "L5F7", "L5F14") + N7_NEW),
+]
+
+BRIEFINGS = {
+    1: LEVELS[0]["briefing"], 2: LEVELS[1]["briefing"], 3: LEVELS[2]["briefing"],
+    4: LEVELS[3]["briefing"], 6: LEVELS[4]["briefing"],
+}
+BRIEFINGS[5] = [
+    "<p>So far the step was given to you. From here you have to <b>find it yourself</b>.</p>",
+    "<p>Two things to work out, and they are separate:</p>",
+    "<ul><li><b>The direction.</b> Do the numbers get bigger (count on) or smaller (count back)?</li>"
+    "<li><b>The size of the step.</b> Take one term away from the one before it.</li></ul>",
+    "<div class='example'>7.5, 7.2, 6.9<br>7.5 - 7.2 = 0.3 and the numbers shrink<br>Rule: count back in 0.3s</div>",
+    "<p>If terms are missing in the middle, find the <b>whole</b> change first and share it between the jumps:</p>",
+    "<div class='example'>2.1, ?, ?, 3.0<br>Change: 3.0 - 2.1 = 0.9<br>Jumps: 3<br>0.9 / 3 = 0.3</div>",
+    "<p class='text-dim'>Always check <i>two</i> jumps before you decide. One jump can fool you.</p>",
+]
+BRIEFINGS[7] = [
+    "<p>The rule takes a <b>position</b> and gives you a <b>term</b>. Now run it backwards.</p>",
+    "<div class='example'>Rule: multiply the position by 8<br>Forwards: 12th term = 12 x 8 = 96<br>"
+    "Backwards: 96 is at position 96 / 8 = 12</div>",
+    "<p>Doing the opposite of the rule means <b>dividing</b> instead of multiplying.</p>",
+    "<p>For a two-step rule, undo the steps in reverse order:</p>",
+    "<div class='example'>Rule: multiply by 3, then add 2<br>Value 23: first 23 - 2 = 21, then 21 / 3 = 7<br>"
+    "So 23 is the 7th term.</div>",
+    "<p>And the question that catches everyone: <b>does this value belong at all?</b> "
+    "If the division does not come out exactly, the answer is no.</p>",
+    "<div class='example'>Is 50 in the 8 times table?<br>50 / 8 = 6 remainder 2<br>No: 50 is not a term.</div>",
+]
+
+# Una habilidad no puede vivir en dos niveles: la medalla mezclaria enteros con
+# decimales, y la barra de progreso daria por aprendida en el nivel 2 una
+# familia que solo se acerto en el nivel 1. Se cualifican por tipo de numero.
+SKILL_FIX = {
+    "L2F10": "fill two decimal gaps",
+    "L3F13": "fill two fraction gaps",
+    "L4F16": "crossing zero backwards",
+}
+
+LEVELS = []
+for lid, name, subtitle, skill, mech, fams in SPEC:
+    fams = [dict(f) for f in fams]
+    for f in fams:
+        f["mech"] = mech
+        if f["id"] in SKILL_FIX:
+            f["skill"] = SKILL_FIX[f["id"]]
+    bt = BOSS_TEXT[lid]
+    rounds = [dict(b) for b in BOSSES[lid]]
+    for r in rounds:
+        r["mech"] = bt["mech"]
+    LEVELS.append({
+        "id": lid,
+        "name": name,
+        "subtitle": subtitle,
+        "skill": skill,
+        "mech": mech,
+        "briefing": BRIEFINGS[lid],
+        "questions": fams,
+        "boss": {
+            "name": bt["name"], "hp": bt["hp"], "phases": bt["phases"], "shields": 3, "mercy": 2,
+            "mech": bt["mech"], "enter": bt["enter"], "win": bt["win"],
+            "lose": bt["lose"], "retry": bt["retry"],
+            "rounds": rounds,
+        },
+    })
+
 # ---------------------------------------------------------------- lugares
 # Cada nivel es un LUGAR (PLAN-AMBIENTES.md). Aqui se declara con props de
 # assets/props.js, materiales y una paleta. El motor no conoce "castillo" ni
@@ -1474,10 +2361,35 @@ ENVS = {
         "gate": "gate",
         "transition": "slide",
     },
-    5: {  # taller de maquinas en lo alto de la torre
+    5: {  # sala de compuertas de la presa: palancas en muro de piedra
+        "palette": {"sky": "#101c2a", "sky2": "#1b3348", "far": "#1a2c3e", "wall": "#5a6a72",
+                    "floor": "#3a4a52", "prop": "#4a3a2a", "prop2": "#7a8a92", "glow": "#7ee8fa",
+                    "glow2": "#d8f6ff", "line": "#6a7a86", "slot": "#2a3a44", "slotline": "#9fd0e0"},
+        "materials": {"wall": "stone", "floor": "metal"},
+        "far":  [{"prop": "tower", "x": 14, "scale": 0.5}, {"prop": "tower", "x": 80, "scale": 0.45}],
+        "wall": [{"prop": "lamp", "x": 20, "y": "top", "top": 0, "scale": 0.5},
+                 {"prop": "lamp", "x": 80, "y": "top", "top": 0, "scale": 0.5}],
+        "fg":   [{"prop": "gear", "x": 8, "scale": 0.7}, {"prop": "gear", "x": 92, "scale": 0.7}],
+        "gate": "gate",
+        "transition": "slide",
+    },
+    6: {  # taller de maquinas en lo alto de la torre
         "palette": {"sky": "#2a1a08", "sky2": "#3e2c10", "far": "#4a3618", "wall": "#6a4a20",
                     "floor": "#5a3d1a", "prop": "#3a2a10", "prop2": "#c48a2a", "glow": "#ffd93d",
                     "glow2": "#fff2b0", "line": "#8a6a2a", "slot": "#3e2c10", "slotline": "#ffd93d"},
+        "materials": {"wall": "metal", "floor": "plank"},
+        "far":  [{"prop": "gear", "x": 15, "y": "top", "top": 6, "scale": 1.2},
+                 {"prop": "gear", "x": 78, "y": "top", "top": 2, "scale": 0.9}],
+        "wall": [{"prop": "lamp", "x": 25, "y": "top", "top": 0, "scale": 0.55},
+                 {"prop": "lamp", "x": 75, "y": "top", "top": 0, "scale": 0.55}],
+        "fg":   [{"prop": "gear", "x": 50, "scale": 0.9}],
+        "gate": "gate",
+        "transition": "slide",
+    },
+    7: {  # el MISMO taller, apagado y en rojo: la maquina al reves
+        "palette": {"sky": "#1a0a0a", "sky2": "#2e1212", "far": "#3a1a1a", "wall": "#4a2a2a",
+                    "floor": "#3a2018", "prop": "#2a1410", "prop2": "#8a4a3a", "glow": "#ff6a5c",
+                    "glow2": "#ffc0b0", "line": "#7a3a30", "slot": "#2e1a16", "slotline": "#ff8a70"},
         "materials": {"wall": "metal", "floor": "plank"},
         "far":  [{"prop": "gear", "x": 15, "y": "top", "top": 6, "scale": 1.2},
                  {"prop": "gear", "x": 78, "y": "top", "top": 2, "scale": 0.9}],
@@ -1504,15 +2416,72 @@ DATA = {
     "levels": LEVELS,
 }
 
-# sanity checks
+# ---------------------------------------------------------------- validaciones
+# Escribir cientos de preguntas a mano garantiza errores, y una respuesta mal
+# marcada le ensena algo falso a 25 ninos. Estas comprobaciones son el ultimo
+# filtro automatico; la auditoria humana leyendo una muestra sigue siendo
+# obligatoria (no hay assert que detecte un submarino que sube sobre el mar).
+assert len(DATA["levels"]) == 7, len(DATA["levels"])
+
+MECHS = {"doors", "bridge", "ruler", "planks", "lift", "rule", "machine", "smash"}
+EVALS = {"inverse", "verify", "distinguish", "combine"}
+_ids, _n_fam, _n_var = set(), 0, 0
+
+def check_variants(q, where):
+    global _n_var
+    assert len(q["variants"]) >= 5, (where, q["id"], len(q["variants"]))
+    for var in q["variants"]:
+        _n_var += 1
+        assert len(var["options"]) == 4, (where, q["id"])
+        assert len(set(var["options"])) == 4, (where, q["id"], var["options"])
+        assert 0 <= var["answer"] < 4, (where, q["id"])
+        assert var["options"][var["answer"]] is not None, (where, q["id"])
+        for o in var["options"]:
+            assert str(o).strip() != "", (where, q["id"], "opcion vacia")
+        assert var["hint"] and var["explain"], (where, q["id"], "sin pista o sin explicacion")
+
 for lv in DATA["levels"]:
-    assert len(lv["questions"]) >= 15, (lv["id"], len(lv["questions"]))
+    L = lv["id"]
+    assert lv["mech"] in MECHS, (L, lv["mech"])
+    assert len(lv["questions"]) == 12, (L, "familias", len(lv["questions"]))
+    assert lv["briefing"], (L, "sin briefing")
     for q in lv["questions"]:
-        assert len(q["variants"]) >= 3, q["id"]
-        for var in q["variants"]:
-            assert len(var["options"]) == 4, q["id"]
-            assert len(set(var["options"])) == 4, (q["id"], var["options"])
-            assert 0 <= var["answer"] < 4, q["id"]
+        assert q["id"] not in _ids, ("id repetido", q["id"])
+        _ids.add(q["id"]); _n_fam += 1
+        assert q["mech"] == lv["mech"], (L, q["id"])
+        check_variants(q, "nivel %d" % L)
+
+    b = lv["boss"]
+    assert b["name"] and b["enter"] and b["win"] and b["lose"] and b["retry"], (L, "jefe sin textos")
+    assert 3 <= b["hp"] <= 5 and 1 <= b["phases"] <= 3, (L, b["hp"], b["phases"])
+    assert b["mech"] in MECHS, (L, b["mech"])
+    assert 4 <= len(b["rounds"]) <= 5, (L, "rondas", len(b["rounds"]))
+
+    # LA regla del jefe: evalua lo que el nivel NO evalua.
+    level_skills = {q["skill"] for q in lv["questions"]}
+    for r in b["rounds"]:
+        assert r["id"] not in _ids, ("id repetido", r["id"])
+        _ids.add(r["id"]); _n_fam += 1
+        assert r.get("evaluates") in EVALS, (L, r["id"], r.get("evaluates"))
+        assert r["skill"] not in level_skills, (
+            "El jefe %d repite la habilidad '%s' que ya evalua su nivel" % (L, r["skill"]))
+        check_variants(r, "jefe %d" % L)
+
+# Ninguna habilidad puede aparecer en dos niveles: si pasa, el reparto por
+# habilidad no se sostiene y las medallas cuentan dos cosas distintas juntas.
+_seen_skill = {}
+for lv in DATA["levels"]:
+    for q in lv["questions"]:
+        prev = _seen_skill.get(q["skill"])
+        assert prev is None, ("habilidad '%s' en los niveles %s y %s" % (q["skill"], prev, lv["id"]))
+        _seen_skill[q["skill"]] = lv["id"]
+
+# Cada nivel es un lugar distinto.
+_skies = [lv["env"]["palette"]["sky"] for lv in DATA["levels"]]
+assert len(set(_skies)) >= 6, "hay niveles con el mismo cielo: no se distinguen como lugares"
+for lv in DATA["levels"]:
+    for o in lv["env"].get("wall", []):
+        assert o.get("y") == "top", (lv["id"], "prop de pared apoyado en el suelo: caeria tras las puertas")
 
 import os, sys
 # Por defecto, la carpeta de ESTA materia. Antes el defecto era "." y ejecutarlo

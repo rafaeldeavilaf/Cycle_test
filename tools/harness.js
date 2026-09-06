@@ -367,8 +367,16 @@ async function main() {
                 wrong: r.layout.wrong.concat(rk.layout.wrong) };
   check('el corredor se pone vertical exactamente cuando toca',
         lay.wrong.length === 0, lay.wrong.slice(0, 4).join(' | '));
-  check('se vieron las dos maquetaciones en la misma partida',
-        lay.stacked > 0 && lay.row > 0, 'vertical=' + lay.stacked + ' horizontal=' + lay.row);
+  /* Las dos maquetaciones tienen que existir en el juego. No en una sola
+     partida: tras el reparto por habilidad, las opciones largas viven en los
+     niveles donde se compara la regla, no en el de aplicar el paso. */
+  const optLens = r.win.QUIZ_DATA.levels.flatMap(l =>
+    l.questions.concat(l.boss ? l.boss.rounds : []).flatMap(f =>
+      f.variants.flatMap(v => v.options.map(o => String(o).replace(/<[^>]*>/g, '').length))));
+  check('el juego tiene opciones cortas y largas (las dos maquetaciones se usan)',
+        optLens.some(n => n <= 12) && optLens.some(n => n > 12),
+        'max=' + Math.max.apply(null, optLens));
+  check('se vio al menos una maquetacion jugando', lay.stacked + lay.row > 0);
 
   /* ---------- 2. Anti-repeticion ---------- */
   section('2. Anti-repeticion de variantes');
@@ -972,6 +980,96 @@ async function main() {
   check('los keydown repetidos se ignoran: el heroe sigue en la primera puerta',
         hereK && hereK === kd.querySelectorAll('#qScene .scene-slot:not(.is-out) .door')[0]);
   ek.window.close();
+
+  /* ============================================================
+     11. CONTENIDO v2: 7 niveles por habilidad, con jefe (Fase 4)
+     ============================================================ */
+  section('11. Los 7 niveles y sus jefes, como datos');
+  const dv = openGame(slug, null, { hero: heroDone() });
+  const LV = dv.window.QUIZ_DATA.levels;
+  check('hay 7 niveles', LV.length === 7, 'niveles=' + LV.length);
+  check('cada nivel tiene 12 familias', LV.every(l => l.questions.length === 12),
+        LV.map(l => l.questions.length).join(','));
+  check('cada familia tiene al menos 5 variantes',
+        LV.every(l => l.questions.every(f => f.variants.length >= 5)));
+  check('cada nivel declara una habilidad y una mecanica',
+        LV.every(l => l.skill && l.mech));
+  const MECHS = ['doors', 'bridge', 'ruler', 'planks', 'lift', 'rule', 'machine', 'smash'];
+  check('las mecanicas son las del plan', LV.every(l => MECHS.indexOf(l.mech) !== -1),
+        LV.map(l => l.mech).join(','));
+  check('cada familia hereda la mecanica de su nivel',
+        LV.every(l => l.questions.every(f => f.mech === l.mech)));
+  check('las 5 mecanicas nuevas ya estan en datos (la Fase 5 solo las dibuja)',
+        new Set(LV.map(l => l.mech)).size >= 5, [...new Set(LV.map(l => l.mech))].join(','));
+
+  // Ninguna habilidad en dos niveles: si no, una medalla mezclaria dos cosas.
+  const skillHome = {};
+  let dupSkill = null;
+  LV.forEach(l => l.questions.forEach(f => {
+    if (skillHome[f.skill] != null && skillHome[f.skill] !== l.id) dupSkill = f.skill;
+    skillHome[f.skill] = l.id;
+  }));
+  check('ninguna habilidad aparece en dos niveles', dupSkill === null, dupSkill || '');
+
+  section('11b. Los jefes evaluan lo que su nivel NO evalua');
+  check('los 7 niveles tienen jefe', LV.every(l => l.boss && l.boss.name));
+  check('cada jefe tiene 4-5 rondas',
+        LV.every(l => l.boss.rounds.length >= 4 && l.boss.rounds.length <= 5));
+  check('cada jefe tiene vidas, fases, escudos y modo coach',
+        LV.every(l => l.boss.hp >= 3 && l.boss.phases >= 1 && l.boss.shields === 3 && l.boss.mercy === 2));
+  check('la dificultad del jefe escala del 1 al 7',
+        LV[0].boss.hp <= LV[6].boss.hp && LV[0].boss.phases < LV[6].boss.phases,
+        'N1 hp=' + LV[0].boss.hp + '/f=' + LV[0].boss.phases + ' N7 hp=' + LV[6].boss.hp + '/f=' + LV[6].boss.phases);
+  const EVALS = ['inverse', 'verify', 'distinguish', 'combine'];
+  check('cada ronda declara que evalua',
+        LV.every(l => l.boss.rounds.every(r => EVALS.indexOf(r.evaluates) !== -1)));
+  /* LA regla del plan (§0.5): un jefe no puede ser "mas preguntas del nivel". */
+  const bossLeak = [];
+  LV.forEach(l => {
+    const own = new Set(l.questions.map(f => f.skill));
+    l.boss.rounds.forEach(r => { if (own.has(r.skill)) bossLeak.push('N' + l.id + ':' + r.skill); });
+  });
+  check('ningun jefe repite una habilidad de su propio nivel', bossLeak.length === 0, bossLeak.join(', '));
+  check('los cuatro tipos de evaluacion se usan en el juego',
+        new Set(LV.flatMap(l => l.boss.rounds.map(r => r.evaluates))).size === 4);
+  check('todos los textos del jefe estan en datos, no en el motor',
+        LV.every(l => l.boss.enter && l.boss.win && l.boss.lose && l.boss.retry));
+  const bossNames = LV.map(l => l.boss.name);
+  check('ningun nombre de jefe aparece en engine.js ni en ui.js',
+        bossNames.every(n => engSrc.indexOf(n) === -1 &&
+          fs.readFileSync(path.join(ROOT, 'assets', 'ui.js'), 'utf8').indexOf(n) === -1),
+        bossNames.filter(n => engSrc.indexOf(n) !== -1).join(','));
+
+  section('11c. El motor de hoy sigue jugando con los datos nuevos');
+  check('el mapa pinta los 7 niveles',
+        dv.window.document.querySelectorAll('#levelList .level-card').length === 7);
+  check('el registro dice 7 niveles', subs[0].levels === 7, 'subjects.js dice ' + subs[0].levels);
+  check('el nivel 7 esta bloqueado al empezar',
+        dv.window.document.querySelectorAll('#levelList .level-card')[6].classList.contains('is-locked'));
+  /* Las mecanicas nuevas todavia no tienen escena: deben caer en `doors` sin
+     romperse, que es justo para lo que existe el fallback. */
+  dv.window.document.querySelectorAll('#levelList .level-card')[0]
+    .dispatchEvent(new dv.window.MouseEvent('click', { bubbles: true }));
+  dv.window.document.getElementById('briefGo').click();
+  check('una mecanica sin escena todavia cae en doors y se puede jugar',
+        dv.window.document.querySelectorAll('#qScene .scene-slot:not(.is-out) .door').length === 4);
+  dv.window.close();
+
+  section('11d. Contenido: nada imposible de leer');
+  const allV = LV.flatMap(l => l.questions.concat(l.boss.rounds).flatMap(f =>
+    f.variants.map(v => ({ id: f.id, v }))));
+  check('ninguna variante repite opciones',
+        allV.every(x => new Set(x.v.options.map(String)).size === 4),
+        (allV.find(x => new Set(x.v.options.map(String)).size !== 4) || { id: '' }).id);
+  check('la respuesta correcta siempre esta entre las opciones',
+        allV.every(x => x.v.answer >= 0 && x.v.answer < 4 && x.v.options[x.v.answer] != null));
+  check('ninguna opcion esta vacia', allV.every(x => x.v.options.every(o => String(o).trim() !== '')));
+  check('toda variante tiene pista y explicacion', allV.every(x => x.v.hint && x.v.explain));
+  check('ningun enunciado quedo con un marcador sin sustituir',
+        allV.every(x => !/\{\w+\}/.test(x.v.stem + String(x.v.explain))));
+  console.log('       (contenido total: ' + LV.length + ' niveles, ' +
+              LV.reduce((a, l) => a + l.questions.length + l.boss.rounds.length, 0) + ' familias, ' +
+              allV.length + ' variantes)');
 
   /* ---------- resumen ---------- */
   console.log('\n' + '-'.repeat(56));

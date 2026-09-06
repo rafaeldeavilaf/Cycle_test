@@ -17,7 +17,7 @@ knowledge del proyecto.
 | 2 — HERO + armería + animación de la calculadora | **Hecha** |
 | 3 — Puntuación v2 | **Hecha** |
 | 3b — Lugares (`PLAN-AMBIENTES.md`): ENV, props, camino de tramos, modo aula, colores por dominio | **Hecha** |
-| 4 — Generador v2: 7 niveles, `mech`, jefes | Pendiente |
+| 4 — Generador v2: 7 niveles, `mech`, jefes | **Hecha** (datos; el sistema de jefes es la Fase 6) |
 | 5 — Escenas `bridge`/`ruler`/`planks`/`lift`/`rule`/`machine`/`smash` | Pendiente |
 | 6 — Sistema de jefes | Pendiente |
 | 7 — Documentación | Pendiente |
@@ -141,6 +141,27 @@ casillas, suelo) detrás de la escena y no sabe qué mecánica hay encima.
   contenida (sin brinco escalado).
 - **Colores por dominio:** 4 de salida + 1 por nivel con 2+ estrellas, calculado
   (no guardado). Un color ya puesto nunca se bloquea.
+
+**7e. Contenido: 7 niveles por habilidad, cada uno con jefe (Fase 4).**
+84 familias de nivel (12 × 7) + 28 de jefe, 560 variantes. Reglas que el
+generador comprueba y **falla** si se rompen:
+
+- 12 familias por nivel, ≥ 5 variantes por familia, 4 opciones únicas.
+- **Una habilidad no puede vivir en dos niveles**: la medalla mezclaría enteros
+  con decimales y la barra de progreso daría por aprendida en el nivel 2 una
+  familia acertada en el 1. Las que se repetían se cualificaron
+  (`fill two decimal gaps`, `crossing zero backwards`).
+- **Un jefe no puede repetir una habilidad de su propio nivel** (plan §0.5):
+  evalúa la inversa, la verificación, la distinción o la combinación, y lo
+  declara en `evaluates`. Comprobado por script, no por buena voluntad.
+- Cada familia hereda el `mech` de su nivel (`bridge`, `ruler`, `planks`,
+  `lift`, `rule`, `machine`, `smash`). **Las escenas aún no existen: caen en
+  `doors` por el fallback.** La Fase 5 solo las dibuja.
+- Los textos del jefe (nombre, entrada, victoria, derrota, reintento) van en
+  `data.js`. El harness falla si un nombre de jefe aparece en el motor.
+- **El generador no basta.** Auditar leyendo una muestra como el niño encontró
+  "3 jumps of 0.5 before 5 = 6.5": aritmética impecable, pregunta ambigua. Los
+  `assert` nunca detectan eso. La auditoría humana sigue siendo obligatoria.
 
 **8. DOM + CSS, nunca canvas.** Un héroe y ≤ 12 casillas no lo justifican, y
 canvas obliga a construir una capa de accesibilidad paralela.
