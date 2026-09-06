@@ -1,14 +1,14 @@
 # Prompt para el chat del plan de mejora — v2
 
 > Copia todo lo que sigue en un chat nuevo con Claude (modelo Fable). Antes de enviarlo,
-> adjunta: `PROJECT_INSTRUCTIONS.md`, `DESIGN_SYSTEM.md`, `README.md`, `PROMPT.md`,
-> `assets/engine.js`, `assets/engine.css`, el material de estudio del Cycle Test y el
-> archivo publicable `y6-maths-counting-sequences.html`.
+> adjunta: `PROJECT_INSTRUCTIONS.md`, `NIVELES-Y-JEFES.md`, `DESIGN_SYSTEM.md`,
+> `README.md`, `PROMPT.md`, `assets/engine.js`, `assets/engine.css`, el material de
+> estudio del Cycle Test y el archivo publicable `y6-maths-counting-sequences.html`.
 
 ---
 
 Actúa como un equipo de expertos: un diseñador de videojuegos senior especializado en
-juegos infantiles y mecánicas de plataformas/Obby, un experto en pedagogía y diseño
+juegos infantiles y mecánicas de exploración 2D, un experto en pedagogía y diseño
 instruccional para niños de 10-11 años (currículo IB, Year 6), y un ingeniero front-end
 senior en JavaScript/HTML/CSS sin frameworks. Los tres deben analizar el proyecto adjunto
 y construir juntos un **plan de mejora sustancial**, no implementarlo todavía.
@@ -22,6 +22,7 @@ para preparar los Cycle Tests de un colegio británico IB, Year 6. Empezó para 
 cada niño en su propio navegador.
 
 Lo que existe hoy (v1, publicado): 5 niveles de opción múltiple en pantalla estática,
+sin movimiento del personaje,
 80 familias de preguntas con 5 variantes cada una, motor de anti-repetición (nunca repite
 la variante fallada, agota todas antes de reciclar), pista automática al reintentar,
 sprite reactivo, música chiptune generada por código, progreso en `localStorage`.
@@ -38,46 +39,58 @@ explícitamente como una decisión de rediseño, con su justificación.
 
 Producir un **plan de mejora** (documento, no código) para v2, con estas siete piezas.
 
-### 1. Definir los 7 niveles
+### 1. Validar y cerrar los 7 niveles
 
-v2 pasa de 5 a **7 niveles**. El equipo debe **definir cuáles son**: qué habilidad entrena
-cada uno, en qué orden, cómo escala la dificultad del 1 al 7, y contra qué parte del
-material de estudio se mapea cada uno. Entregar la lista completa con nombre de nivel,
-habilidad, y qué debe saber hacer el niño al terminarlo.
+v2 pasa de 5 a **7 niveles**. En `NIVELES-Y-JEFES.md` adjunto hay una **propuesta base**:
+siete mundos mapeados contra el material real del Cycle Test #1, con la habilidad que
+entrena cada uno y la mecánica que le corresponde.
 
-**Punto a resolver, no a esquivar:** con 5 niveles la cadencia era "un nivel por día, los
-5 días antes del test". Con 7 no cierra. Decidid si el repaso empieza 7 días antes, si
-algunos días llevan dos niveles cortos, u otra cosa — y decid por qué. Tened en cuenta el
-dato medido: en v1, un nivel real dura 15-20 minutos, no 30.
+Vuestro trabajo no es aceptarla: es **auditarla y cerrarla**. Decid qué mundo sobra, cuál
+falta, si el corte del material es el correcto, y entregad la lista definitiva con nombre,
+habilidad, qué debe saber hacer el niño al terminarlo, y cuántas familias de preguntas
+lleva. Tened en cuenta el dato medido: en v1, un nivel de 16 familias dura 15-20 minutos.
 
-### 2. Cada Obby con un propósito de aprendizaje
+Dos mundos de la propuesta **no tienen contenido generado todavía**. Decid qué preguntas
+hacen falta y cuánto cuesta generarlas.
+
+**El progreso se mide en niveles, nunca en días.** No propongáis calendarios de estudio ni
+cadencias diarias: es un juego, y cada niño avanza a su ritmo.
+
+### 2. Cada nivel con un propósito de aprendizaje
 
 La regla que ordena todo el rediseño:
 
-> **Jugar, aprender y evaluarse. Ningún Obby existe solo porque sea divertido.**
+> **Jugar, aprender y evaluarse. La forma de moverse debe encarnar la habilidad, no
+> decorarla.**
 
 Para cada uno de los 7 niveles, declarad por escrito:
 
 - **Qué habilidad entrena** — una sola, tomada del material del Cycle Test.
-- **Por qué esa mecánica y no otra** — la forma de moverse debe *encarnar* la habilidad,
-  no decorarla. Ejemplo del nivel de concreción que espero, **que no debéis copiar**:
-  saltar entre plataformas numeradas de 6 en 6 *es* contar en saltos; una plataforma que
-  se mueve mientras el niño responde es solo ruido que compite con el razonamiento.
+- **Por qué esa mecánica y no otra.**
 - **Cómo se evalúa** — qué demuestra que lo domina, y qué pasa cuando no.
 
-Un Obby cuya mecánica podría sustituirse por otra sin que cambie lo que el niño aprende
+Un nivel cuya mecánica podría sustituirse por otra sin que cambie lo que el niño aprende
 está mal diseñado. Aplicad ese filtro a vuestras propias propuestas antes de entregarlas.
 
-### 3. Rediseño de la interacción como Obby
+### 3. La interacción: moverse *es* responder
 
-Responder una pregunta debe integrarse en un recorrido de obstáculos (saltos, plataformas,
-checkpoints) en vez de una pantalla estática. Definid cómo se resuelve en 2D —canvas o
-DOM+CSS, sin motor de físicas pesado— manteniendo compatible el modelo de datos actual
-(familias/variantes) y sin romper el guardado de progreso ni la garantía de
-anti-repetición, que es el requisito central del proyecto.
+**Decisión ya tomada: se descarta el plataformeo de destreza.** El riesgo era que un niño
+que domina la matemática se atascara en un salto y que el juego midiera reflejos en vez de
+razonamiento. No lo reabráis.
 
-Cuidado con el riesgo pedagógico: la destreza motriz no puede convertirse en el cuello de
-botella. Un niño que sabe matemáticas pero falla el salto no debe quedarse atascado.
+La mecánica es **opción múltiple interactiva**: el personaje se mueve con el teclado y su
+desplazamiento es la respuesta. Cuatro puertas rotuladas y cruza la correcta; un puente de
+losas donde solo pisa las que continúan la secuencia; un ascensor vertical que es una recta
+numérica con el cero marcado. **Sin reloj, sin saltos con temporización, sin caídas.**
+Elegir mal devuelve al inicio del tramo y la pregunta vuelve luego con otra variante.
+
+En `NIVELES-Y-JEFES.md` hay seis formas de moverse propuestas. Auditadlas: añadid las que
+falten, descartad las que sean decorado, y proponed variantes más imaginativas si las
+tenéis — el único filtro es que la mecánica encarne la habilidad.
+
+Definid cómo se implementa en 2D —canvas o DOM+CSS, sin motor de físicas pesado—
+manteniendo compatible el modelo de datos actual (familias/variantes) y sin romper el
+guardado de progreso ni la garantía de anti-repetición.
 
 ### 4. Esquema de puntuación
 
@@ -113,11 +126,22 @@ Al entrar, el jugador elige si su personaje es femenino o masculino. Debe persis
 
 ### 7. Jefes de nivel
 
-Cada uno de los 7 niveles termina con un jefe al que hay que vencer. Definid la mecánica
-del combate, cómo se relaciona con el desempeño en las preguntas del nivel (¿el daño
-depende de los aciertos?, ¿hay una pregunta final decisiva?), cómo escala del nivel 1 al 7,
-y —esto es lo importante— **qué evalúa el jefe que no evalúen ya las preguntas del nivel**.
-Un jefe que es solo "más preguntas con música épica" no justifica su costo.
+Cada uno de los 7 niveles termina con un jefe. En `NIVELES-Y-JEFES.md` hay siete jefes
+propuestos con sus fases y el sistema de combate: la vida del jefe son preguntas, acertar
+a la primera hace daño crítico, sin reloj nunca, tres corazones, y perder reinicia solo el
+combate —nunca el mundo—.
+
+Auditad esa propuesta y cerradla. El filtro duro, aplicado uno por uno:
+
+> **¿Qué evalúa este jefe que no evalúen ya las preguntas de su nivel?**
+
+Casi siempre la respuesta debe ser la habilidad **invertida** o dos habilidades a la vez.
+Un jefe que es "más preguntas con música épica" no justifica lo que cuesta construirlo:
+decidlo y proponed otro.
+
+Resolved además: si el jefe sustituye a las últimas preguntas del nivel o se suma a ellas
+(sumarlo alarga, sustituirlo reduce cobertura), y cómo se anima un ataque de jefe sin
+archivos de imagen, solo con SVG inline, CSS y WebAudio.
 
 ## Restricciones que el plan debe respetar
 
@@ -135,8 +159,9 @@ Un jefe que es solo "más preguntas con música épica" no justifica su costo.
   lado y sin mensajes dirigidos a Samuel por su nombre. Debe funcionar en el PC del
   colegio y en el de casa.
 - **Accesibilidad y edad objetivo no se negocian.** Mantener o mejorar el contraste
-  WCAG AA, `aria-live`, tamaños de fuente, y `prefers-reduced-motion`. Un Obby con
-  animación constante puede chocar con esto: resolvedlo, no lo ignoréis.
+  WCAG AA, `aria-live`, tamaños de fuente y `prefers-reduced-motion`. Un nivel con
+  movimiento constante puede chocar con esto: resolvedlo, no lo ignoréis. Todo debe
+  seguir siendo jugable solo con teclado.
 - **Anti-repetición intacta.** Es el requisito central del proyecto: una pregunta fallada
   nunca reaparece idéntica.
 

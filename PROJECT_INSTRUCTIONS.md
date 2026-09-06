@@ -8,8 +8,9 @@ con el contexto completo.
 
 - **v1 — lo que está publicado y funcionando hoy.** 5 niveles, preguntas de opción
   múltiple en pantalla estática. Se llama todavía "Samuel Quest" dentro del HTML.
-- **v2 — el rediseño aprobado, todavía sin construir.** 7 niveles tipo Obby, jefes,
-  personaje configurable, puntuación visible, nombre "Samu: A Link to the Math".
+- **v2 — el rediseño aprobado, todavía sin construir.** 7 niveles donde el personaje se
+  mueve con el teclado para responder, un jefe por nivel, personaje configurable,
+  puntuación visible, nombre "Samu: A Link to the Math".
 
 Las secciones marcadas **[v2]** son objetivo, no realidad. No las describas como hechas.
 
@@ -20,6 +21,10 @@ Las secciones marcadas **[v2]** son objetivo, no realidad. No las describas como
 Un juego web para estudiar para los Cycle Tests de un colegio británico IB, Year 6
 (niños de 10-11 años). Nació para **Samuel** y a partir de v2 **se comparte con sus
 compañeros de curso**: cada niño abre el mismo link y juega en su propio navegador.
+
+**El progreso se mide en niveles, no en días.** Cada niño avanza a su ritmo y juega lo que
+quiera de una sentada. En ningún documento ni pantalla se habla de "un nivel por día" ni
+de calendarios de estudio: es un juego, no un plan de deberes.
 
 Todo el contenido del juego está **en inglés**. La documentación y la conversación
 conmigo, en español.
@@ -67,6 +72,7 @@ samu-link-to-the-math/
 │   └── build.py          inlina motor+datos en los .html de la raíz
 ├── PROMPT.md             prompt maestro para materias nuevas
 ├── PROMPT-PLAN-MEJORA.md prompt para el plan de rediseño v2
+├── NIVELES-Y-JEFES.md    propuesta de los 7 mundos y los 7 jefes (v2)
 ├── DESIGN_SYSTEM.md      reglas visuales inviolables
 └── PROJECT_INSTRUCTIONS.md
 ```
@@ -88,7 +94,7 @@ siempre soy yo quien ejecuta el script.
 | Niveles | 5 | **7** |
 | Familias de preguntas por nivel | 16 mínimo | lo define el plan v2 |
 | Variantes por familia | 5 mínimo | 5 mínimo |
-| Formato | Opción múltiple, 4 opciones | Opción múltiple dentro de un Obby |
+| Formato | Opción múltiple, 4 opciones | Opción múltiple interactiva: te mueves para responder |
 | Progresión | Creciente entre y dentro de niveles | Igual |
 | Nivel curricular | Year 6 británico, 10-11 años | Igual |
 
@@ -114,29 +120,33 @@ el terreno. No se introducen temas que el material no menciona.
 
 ---
 
-## [v2] Cada nivel es un Obby con un propósito de aprendizaje
+## [v2] Moverse *es* responder, y cada nivel tiene un propósito
 
-Los 7 niveles son recorridos de obstáculos. La regla que ordena todo el rediseño:
+**Se descartó el plataformeo de destreza.** El riesgo era que un niño que domina la
+matemática se atascara en un salto, y que el juego acabara midiendo reflejos en vez de
+razonamiento.
 
-> **Jugar, aprender y evaluarse. Ningún Obby existe solo porque sea divertido.**
+La mecánica es **opción múltiple interactiva**: el personaje se mueve con el teclado y su
+desplazamiento *es* la respuesta. Cuatro puertas rotuladas y cruzas la correcta; un puente
+de losas donde solo pisas las que continúan la secuencia; un ascensor vertical que es una
+recta numérica con el cero marcado. Sin saltos con temporización, sin reloj, sin caídas.
+Elegir mal devuelve al inicio del tramo y la pregunta vuelve más tarde con otra variante.
 
-Cada nivel debe declarar por escrito, antes de construirse:
+La regla que ordena todo el rediseño:
 
-1. **Qué habilidad entrena** — una sola, tomada del material del Cycle Test.
-2. **Por qué esa mecánica y no otra** — la forma de moverse debe encarnar la habilidad,
-   no decorarla. Saltar entre plataformas numeradas de 6 en 6 *es* contar en saltos;
-   una plataforma que se mueve mientras respondes es ruido.
-3. **Cómo se evalúa** — qué demuestra que el niño lo domina, y qué pasa si no.
+> **Jugar, aprender y evaluarse. La forma de moverse debe encarnar la habilidad, no
+> decorarla.** Si la mecánica se puede cambiar por otra sin que cambie lo que el niño
+> aprende, está mal diseñada.
 
-Un Obby cuya mecánica podría cambiarse por otra sin que cambie lo que el niño aprende
-está mal diseñado.
+Cada nivel debe declarar por escrito, antes de construirse: qué habilidad entrena (una
+sola), por qué esa mecánica y no otra, y cómo se evalúa que el niño la domina.
 
-**Los 7 niveles concretos los define el plan v2**, mapeados contra el material real del
-Cycle Test.
+**Cada nivel termina con un jefe** que evalúa algo que las preguntas del nivel no evalúan
+—normalmente la habilidad invertida, o dos habilidades a la vez—.
 
-**Punto abierto que el plan debe resolver:** con 5 niveles la cadencia era "un nivel por
-día, los 5 días antes del test". Con 7 no cierra. O el repaso empieza 7 días antes, o
-algunos días llevan dos niveles cortos. Hay que decidirlo, no dejarlo implícito.
+El detalle está en [`NIVELES-Y-JEFES.md`](NIVELES-Y-JEFES.md): las seis formas de moverse,
+los 7 mundos mapeados al material real y los 7 jefes con sus fases. Es una **propuesta
+base** que el plan v2 debe validar o corregir con argumentos.
 
 ---
 
@@ -221,8 +231,8 @@ variantes como si fueras el niño.
 | Maths — Counting and Sequences | `y6-maths-counting-sequences` | Cycle Test #1 | 5 | Publicado — 80 familias, 400 variantes, auditado |
 
 **Duración real medida (v1):** con 70-90% de acierto, un nivel son 18-23 respuestas
-≈ 15-20 min con briefing incluido, no los 30 previstos. El plan v2 debe partir de este
-dato medido, no del supuesto.
+≈ 15-20 minutos con briefing incluido. El plan v2 debe partir de este dato medido al
+repartir la carga entre 7 niveles.
 
 ---
 
@@ -231,7 +241,10 @@ dato medido, no del supuesto.
 - **Nombre: "Samu: A Link to the Math".** El HTML publicado todavía dice "Samuel Quest";
   se cambia al construir v2, junto con el `<title>` y el hub. La clave de `localStorage`
   no cambia.
-- **7 niveles en v2**, cada uno un Obby con propósito de aprendizaje declarado.
+- **7 niveles en v2**, cada uno con un propósito de aprendizaje declarado y un jefe.
+- **El progreso se mide en niveles, nunca en días.** Nada de calendarios de estudio.
+- **Nada de plataformeo de destreza.** El movimiento es la forma de responder, no una
+  prueba de reflejos. Sin reloj y sin saltos con temporización.
 - **Puntuación personal, sin ranking compartido ni backend.** Motivo arriba.
 - **Motor + JSON en la fuente, HTML autocontenido en la publicación.** El motor sigue
   siendo uno solo (`assets/`), pero `tools/build.py` lo inlina en cada juego antes de

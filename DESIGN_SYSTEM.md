@@ -7,7 +7,7 @@ Si una materia futura se ve distinta, el error está aquí: alguien editó `asse
 en vez de añadir un `data-accent`.
 
 > **Alcance.** Lo que sigue describe la v1 publicada (5 niveles, opción múltiple). El
-> rediseño v2 —Obby, 7 niveles, jefes, personaje configurable— cambiará varias de estas
+> rediseño v2 —7 niveles con movimiento, jefes, personaje configurable— cambiará varias de estas
 > reglas; cuando se apruebe el plan, este documento se actualiza **antes** de escribir
 > código, no después.
 
@@ -109,7 +109,7 @@ Ambas se cargan por `@import` desde Google Fonts, con fallback a monospace y sys
 ```
 HUB (index.html)
  └─ MAPA DE NIVELES   5 tarjetas, 4 bloqueadas al inicio
-     └─ BRIEFING      mini-lección del día
+     └─ BRIEFING      mini-lección del nivel
          └─ JUEGO     pregunta → respuesta → explicación → siguiente
              └─ VICTORIA  estrellas, XP, primer intento, mejor combo
 ```
@@ -120,7 +120,7 @@ Nunca se añade una pantalla nueva sin actualizar este documento.
 
 ## 7. Reglas de juego (constantes del motor)
 
-- 5 niveles, uno por día.
+- 5 niveles en v1 (7 en v2). Se avanza nivel a nivel, sin cadencia de calendario.
 - 16 familias de preguntas por nivel, 5 variantes cada una.
 - Un nivel se supera cuando **todas** las familias se han respondido bien una vez.
 - Al fallar, la familia vuelve al final de la cola con **otra variante**. El motor agota

@@ -4,7 +4,7 @@ Copia este bloque completo en una conversación nueva de Claude, adjunta el PDF/
 del material de estudio de la semana y envía. No hace falta editar nada salvo la última línea.
 
 > **Vigencia.** Este prompt genera materias para la **v1** del motor (5 niveles, opción
-> múltiple). Cuando se construya la v2 —7 niveles tipo Obby, jefes, propósito de
+> múltiple). Cuando se construya la v2 —7 niveles con movimiento, jefes, propósito de
 > aprendizaje declarado por nivel— hay que reescribirlo. No lo uses para diseñar v2.
 
 ---
@@ -69,7 +69,8 @@ tiene, dímelo antes de escribirla.
 
 - **Todo en inglés**, incluidos briefings, pistas y explicaciones. Registro: claro,
   directo, para un chico de 10-11 años. Sin infantilizar.
-- **5 niveles = 5 días**, uno por día, ~30 minutos cada uno.
+- **5 niveles**, de dificultad creciente, ~15-20 minutos cada uno. El progreso se mide en
+  niveles: nada de "un nivel por día" ni de calendarios de estudio.
 - **Mínimo 16 familias de preguntas por nivel** (80 en total) y **5 variantes por familia**
   (400 preguntas). Una familia solo se supera al responderla bien; al fallar vuelve a la
   cola y el motor sirve **otra variante**, nunca la misma pregunta. Por eso las variantes

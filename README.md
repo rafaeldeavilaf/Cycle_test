@@ -1,7 +1,7 @@
 # Samu: A Link to the Math
 
 Juegos de estudio para los Cycle Tests de Year 6 (colegio británico IB).
-Cada test es un juego de niveles; cada nivel es un día de estudio.
+Cada test es un juego de varios niveles. Cada niño avanza a su ritmo.
 
 - **Juego actual:** Maths — Counting and Sequences (Cycle Test #1)
 - **Link del juego:** <https://rafaeldeavilaf.github.io/Cycle_test/>
@@ -9,9 +9,11 @@ Cada test es un juego de niveles; cada nivel es un día de estudio.
 - **Stack:** HTML plano. Sin dependencias, sin backend. Infraestructura: USD 0/mes.
 
 > **Estado.** Lo publicado hoy es la v1: 5 niveles de opción múltiple, y el HTML todavía
-> dice "Samuel Quest" por dentro. La v2 —7 niveles tipo Obby, jefes, personaje
-> configurable, puntuación visible y el nombre nuevo— está en fase de plan, sin construir.
-> Ver [`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md) y
+> dice "Samuel Quest" por dentro. La v2 —7 niveles donde el personaje se mueve con el
+> teclado para responder, un jefe por nivel, personaje configurable, puntuación visible y
+> el nombre nuevo— está en fase de plan, sin construir.
+> Ver [`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md),
+> [`NIVELES-Y-JEFES.md`](NIVELES-Y-JEFES.md) y
 > [`PROMPT-PLAN-MEJORA.md`](PROMPT-PLAN-MEJORA.md).
 
 ---
@@ -77,7 +79,7 @@ Ahí vive el diseño compartido. Ver [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) y
 
 ## Cómo se juega
 
-- Un nivel por día, cinco días antes del test.
+- Se avanza nivel a nivel, al ritmo de cada niño.
 - Cada nivel abre con un **briefing** que enseña el método antes de preguntar.
 - Se responde con el ratón o con el teclado: `A B C D` o `1 2 3 4`; `Enter` para avanzar.
 - Si falla una pregunta, esa pregunta **vuelve más tarde con números distintos**: tiene
