@@ -108,8 +108,18 @@ personaje en cada una. Guarda `{v, body:'a'|'b', alias, chosen, colors}`.
   `var(--h-helm|body|glove|boot)`; ningún `fill` fijo en esas piezas.
 - **Todo color de armadura elegible debe cumplir contraste ≥ 3:1 sobre
   `--bg-1`**, y **todo color por defecto debe estar en la paleta** — si no, la
-  armería muestra esa fila sin nada marcado. Ambas cosas las comprueba el
+  pantalla muestra esa fila sin nada marcado. Ambas cosas las comprueba el
   harness. El `#1c2555` de las piernas de v1 da 1.16:1 y por eso no está.
+- **El tono de piel NUNCA se bloquea.** Los colores de armadura se ganan
+  jugando; reconocerse no es un premio. 12 tonos, y cada uno trae sus propios
+  rasgos (`eye` blanco del ojo, `ink` pupila, `mouth`): unos ojos oscuros sobre
+  piel oscura dan 1.55:1 y la cara desaparece. En piel clara manda la pupila;
+  en piel oscura, el blanco del ojo. El harness exige ojo ≥ 3:1 y boca ≥ 2.2:1
+  en los doce. **Si se añade un tono, hay que volver a medirlo.**
+- El sprite lleva **contorno oscuro** (cuatro `drop-shadow`) para leerse sobre
+  cualquier fondo. Ninguna animación puede sobreescribir `filter` en `.avatar`:
+  al fallar y al invocar la calculadora lo hacían y el héroe se quedaba sin
+  contorno justo cuando más se le mira.
 
 **7d. Cada nivel es un LUGAR, declarado en datos (`PLAN-AMBIENTES.md`).**
 Módulo `ENV` hermano de `SCENES`: pinta cinco capas (cielo, lejano, pared,

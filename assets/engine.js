@@ -133,6 +133,8 @@
          Estos tres hex SON los acentos de Mates, asi que el aspecto de v1 se
          conserva exacto. Las botas pasan de #1c2555 (1.16:1, invisible sobre
          el fondo) a un azul que cumple contraste. */
+      // La piel no es un color de armadura: no se bloquea nunca y vive aparte.
+      skin: '#e8b088',      // SAND, el tono del sprite de v1
       colors: {
         helm:  '#7ee8fa',   // CYAN   — era var(--accent) en Mates
         body:  '#c77dff',   // PURPLE — era var(--accent-2)
@@ -149,6 +151,7 @@
       var s = JSON.parse(raw);
       if (!s || typeof s !== 'object') return h;
       if (s.body === 'a' || s.body === 'b') h.body = s.body;
+      if (typeof s.skin === 'string' && s.skin) h.skin = s.skin;
       // Un `alias` de una version anterior se ignora y desaparece al guardar.
       h.chosen = !!s.chosen;
       if (s.colors && typeof s.colors === 'object') {
@@ -164,13 +167,26 @@
   }
   var HERO = loadHero();
 
-  /* Pinta las 4 variables de armadura sobre cualquier contenedor de sprites. */
+  /* El tono de piel elegido, con sus rasgos. Si el guardado trae un valor que
+     ya no esta en la paleta, se cae al primero en vez de dejar la cara rota. */
+  function skinTone() {
+    var list = (UI.armoury && UI.armoury.skins) || [];
+    for (var i = 0; i < list.length; i++) if (list[i].value === HERO.skin) return list[i];
+    return list[0] || { value: HERO.skin, eye: '#fae8d6', ink: '#2d1f16', mouth: '#5e4534' };
+  }
+
+  /* Pinta armadura y piel sobre cualquier contenedor de sprites. */
   function paintHero(node) {
     if (!node || !node.style) return;
+    var t = skinTone();
     node.style.setProperty('--h-helm',  HERO.colors.helm);
     node.style.setProperty('--h-body',  HERO.colors.body);
     node.style.setProperty('--h-glove', HERO.colors.glove);
     node.style.setProperty('--h-boot',  HERO.colors.boot);
+    node.style.setProperty('--h-skin',  t.value);
+    node.style.setProperty('--h-eye',   t.eye);
+    node.style.setProperty('--h-ink',   t.ink);
+    node.style.setProperty('--h-mouth', t.mouth);
   }
   function paintAllHeroes() {
     paintHero(document.documentElement);
@@ -480,8 +496,9 @@
     idle:   { eyes: 'M6 6h1v2H6z M10 6h1v2h-1z', mouth: 'M7 10h3v1H7z' },
     happy:  { eyes: 'M5 7h1v1H5z M6 6h1v1H6z M7 7h1v1H7z M9 7h1v1H9z M10 6h1v1h-1z M11 7h1v1h-1z',
               mouth: 'M6 10h5v1H6z M5 9h1v1H5z M11 9h1v1h-1z M7 11h3v1H7z' },
-    sad:    { eyes: 'M6 8h1v1H6z M10 8h1v1h-1z', mouth: 'M6 11h5v1H6z M5 10h1v1H5z M11 10h1v1h-1z',
-              brow: 'M5 6h2v1H5z M10 6h2v1h-2z' },
+    // Ojos dentro del blanco (y 6-7) para que se lean en todos los tonos de piel.
+    sad:    { eyes: 'M6 7h1v1H6z M10 7h1v1h-1z', mouth: 'M6 11h5v1H6z M5 10h1v1H5z M11 10h1v1h-1z',
+              brow: 'M5 5h2v1H5z M10 5h2v1h-2z' },
     summon: { eyes: 'M6 6h1v2H6z M10 6h1v2h-1z', mouth: 'M7 10h2v2H7z' }   // boca abierta
   };
 
@@ -517,10 +534,14 @@
       // tiene que leerse sobre cualquier fondo, no sobre uno.
       '<path fill="#8a5a30" d="' + B.hair + '"/>' +
       '<path fill="#3f2a18" d="' + B.hairdark + '"/>' +
-      '<path fill="#e8b088" d="M4 4h9v8H4z"/>' +
-      (F.brow ? '<path fill="#141a33" d="' + F.brow + '"/>' : '') +
-      '<path fill="#141a33" d="' + F.eyes + '"/>' +
-      '<path fill="#8c4a3a" d="' + F.mouth + '"/>' +
+      '<path fill="var(--h-skin)" d="M4 4h9v8H4z"/>' +
+      // Blanco del ojo bajo los rasgos: sin el, unos ojos oscuros sobre piel
+      // oscura dan 1.55:1 y la cara desaparece. En piel clara manda la pupila;
+      // en piel oscura, este blanco. Con los dos, se lee en los 12 tonos.
+      '<path fill="var(--h-eye)" d="M5 6h2v2H5z M10 6h2v2h-2z"/>' +
+      (F.brow ? '<path fill="var(--h-ink)" d="' + F.brow + '"/>' : '') +
+      '<path fill="var(--h-ink)" d="' + F.eyes + '"/>' +
+      '<path fill="var(--h-mouth)" d="' + F.mouth + '"/>' +
       '<path fill="var(--h-helm)"  d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/>' +
       '<path fill="var(--h-body)"  d="' + B.torso + ' ' + L.arms + '"/>' +
       '<path fill="var(--h-glove)" d="' + L.hands + '"/>' +
@@ -1194,7 +1215,10 @@
     });
   }
 
+  /* `skin: true` = paleta propia (12 tonos) y SIN candado. Reconocerse no se
+     gana jugando; los colores de armadura si. */
   var PIECES = [
+    { key: 'skin',  label: UI.armoury.pieceSkin,  skin: true },
     { key: 'helm',  label: UI.armoury.pieceHelm },
     { key: 'body',  label: UI.armoury.pieceBody },
     { key: 'glove', label: UI.armoury.pieceGlove },
@@ -1232,11 +1256,12 @@
       lab.className = 'arm-row__label';
       lab.textContent = p.label;
       var strip = document.createElement('div');
-      strip.className = 'arm-row__strip';
-      UI.armoury.colours.forEach(function (c, ci) {
-        var on = HERO.colors[p.key] === c.value;
-        // Un color ya elegido (en otra materia, quiza) nunca se bloquea.
-        var locked = ci >= have && !on;
+      strip.className = 'arm-row__strip' + (p.skin ? ' arm-row__strip--skin' : '');
+      var palette = p.skin ? UI.armoury.skins : UI.armoury.colours;
+      palette.forEach(function (c, ci) {
+        var on = p.skin ? (HERO.skin === c.value) : (HERO.colors[p.key] === c.value);
+        // La piel nunca se bloquea. Un color ya elegido, tampoco.
+        var locked = !p.skin && ci >= have && !on;
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'swatch' + (on ? ' is-on' : '') + (locked ? ' is-locked' : '');
@@ -1253,7 +1278,8 @@
         } else {
           b.setAttribute('aria-label', fmt(UI.armoury.swatchAria, { piece: p.label, colour: c.name }));
           b.addEventListener('click', function () {
-            HERO.colors[p.key] = c.value; saveHero(); SFX.click();
+            if (p.skin) HERO.skin = c.value; else HERO.colors[p.key] = c.value;
+            saveHero(); SFX.click();
             renderArmoury(ri, ci); refreshSprites();
           });
         }
@@ -1276,14 +1302,23 @@
     if (!t || !t.classList || !t.classList.contains('swatch')) return;
     var r = parseInt(t.getAttribute('data-row'), 10);
     var c = parseInt(t.getAttribute('data-col'), 10);
-    var nr = r, nc = c, n = UI.armoury.colours.length;
+    // Cada fila puede tener distinto numero de muestras (la piel tiene 12).
+    var rowStrip = t.parentNode;
+    var n = rowStrip ? rowStrip.children.length : 0;
+    var nr = r, nc = c;
     if (e.key === 'ArrowRight')     nc = Math.min(n - 1, c + 1);
     else if (e.key === 'ArrowLeft') nc = Math.max(0, c - 1);
     else if (e.key === 'ArrowDown') nr = Math.min(PIECES.length - 1, r + 1);
     else if (e.key === 'ArrowUp')   nr = Math.max(0, r - 1);
     else return;
     e.preventDefault();
-    var next = el('armRows').querySelector('.swatch[data-row="' + nr + '"][data-col="' + nc + '"]');
+    var rows = el('armRows');
+    var next = rows.querySelector('.swatch[data-row="' + nr + '"][data-col="' + nc + '"]');
+    // Al cambiar de fila, la columna puede no existir: se cae a la ultima.
+    if (!next && nr !== r) {
+      var strip = rows.querySelectorAll('.arm-row__strip')[nr];
+      if (strip && strip.children.length) next = strip.children[Math.min(nc, strip.children.length - 1)];
+    }
     if (next) next.focus();
   });
 

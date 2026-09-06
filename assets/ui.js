@@ -115,14 +115,15 @@ window.GAME_UI = {
     pickAria:     'Choose the {name} hero',
     you:          'you',
     btnStart:     'START &gt;',
-    btnArmoury:   'ARMOURY',
+    btnArmoury:   'CUSTOMIZE',
     btnHero:      'HERO',
     btnBack:      '&lt; MAP'
   },
 
   armoury: {
-    title:      'ARMOURY',
-    intro:      'Paint your armour. Four pieces, eight colours.',
+    title:      'CHARACTER CUSTOMIZATION',
+    intro:      'Make this hero yours. Choose a skin tone, then paint the armour.',
+    pieceSkin:  'SKIN',
     /* Es una cinta/visor sobre la frente, no un casco: en dorado se leia como
        pelo rubio y el nino no entendia que estaba pintando. */
     pieceHelm:  'HEADBAND',
@@ -150,6 +151,31 @@ window.GAME_UI = {
       { name: 'GOLD',   value: '#ffd93d' },
       { name: 'LIME',   value: '#a0ff5c' },
       { name: 'GREEN',  value: '#3ce88a' }
+    ],
+
+    /* PIEL: doce tonos, y NUNCA se bloquean. Los colores de armadura se ganan
+       jugando; el tono de piel no es un premio, es reconocerse. Un nino que no
+       encuentra el suyo el primer dia no vuelve.
+
+       Cada tono trae sus propios rasgos porque unos ojos oscuros sobre piel
+       oscura dan 1.55:1 y la cara desaparece: `eye` es el blanco del ojo,
+       `ink` la pupila y `mouth` la boca, elegidos para que en los doce tonos
+       el ojo separe >= 3:1 y la boca >= 2.2:1. En los tonos claros lo que se
+       ve es la pupila; en los oscuros, el blanco. Si se anade un tono nuevo,
+       hay que volver a medirlo. */
+    skins: [
+      { name: 'PORCELAIN',  value: '#f6dcc8', eye: '#fdf0e3', ink: '#2f241e', mouth: '#63544a' },
+      { name: 'IVORY',      value: '#f0cfae', eye: '#fceede', ink: '#2e231b', mouth: '#615041' },
+      { name: 'SAND',       value: '#e8b088', eye: '#fae8d6', ink: '#2d1f16', mouth: '#5e4534' },
+      { name: 'HONEY',      value: '#dda06a', eye: '#f8e4d0', ink: '#2c1d12', mouth: '#5a3f29' },
+      { name: 'GOLDEN',     value: '#c98c58', eye: '#f4e0cc', ink: '#291b10', mouth: '#533823' },
+      { name: 'CARAMEL',    value: '#b87a4a', eye: '#f0ddca', ink: '#27190f', mouth: '#4d321e' },
+      { name: 'AMBER',      value: '#a86a3e', eye: '#eddac7', ink: '#25170d', mouth: '#472c1a' },
+      { name: 'TERRACOTTA', value: '#965c34', eye: '#ead7c5', ink: '#23150c', mouth: '#dac0aa' },
+      { name: 'CHESTNUT',   value: '#82502e', eye: '#e6d4c4', ink: '#21140b', mouth: '#d3bba8' },
+      { name: 'COCOA',      value: '#6e4326', eye: '#e2d2c2', ink: '#1e120a', mouth: '#ccb7a5' },
+      { name: 'ESPRESSO',   value: '#5c3821', eye: '#ded0c1', ink: '#1c110a', mouth: '#c5b3a3' },
+      { name: 'EBONY',      value: '#4a2d1b', eye: '#dacdc0', ink: '#1a0f09', mouth: '#bfafa1' }
     ]
   },
 

@@ -45,8 +45,9 @@ SPRITE = """<svg class="avatar avatar--lg avatar--bob" viewBox="0 0 17 20" xmlns
       <path fill="#8a5a30" d="M4 1h9v2H4z M3 2h1v3H3z M13 2h1v3h-1z M4 2h9v2H4z"/>
       <path fill="#3f2a18" d="M4 1h9v1H4z M3 2h1v1H3z M13 2h1v1h-1z"/>
       <path fill="#e8b088" d="M4 4h9v8H4z"/>
-      <path fill="#141a33" d="M6 6h1v2H6z M10 6h1v2h-1z"/>
-      <path fill="#8c4a3a" d="M7 10h3v1H7z"/>
+      <path fill="#fae8d6" d="M5 6h2v2H5z M10 6h2v2h-2z"/>
+      <path fill="#2d1f16" d="M6 6h1v2H6z M10 6h1v2h-1z"/>
+      <path fill="#5e4534" d="M7 10h3v1H7z"/>
       <path fill="var(--accent)" d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/>
       <path fill="var(--accent-2)" d="M5 12h7v6H5z M3 13h2v2H3z M12 13h2v2h-2z"/>
       <path fill="var(--accent-2)" d="M3 15h2v2H3z M12 15h2v2h-2z"/>

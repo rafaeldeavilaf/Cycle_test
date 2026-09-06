@@ -550,7 +550,7 @@ async function main() {
   check('la pantalla HERO no pide ningun nombre',
         hd.querySelector('#scrHero input') === null && !/name/i.test(hd.getElementById('scrHero').textContent));
   check('el heroe guardado no lleva alias ni texto libre',
-        !('alias' in hero1) && Object.keys(hero1).every(k => ['v', 'body', 'chosen', 'colors'].indexOf(k) !== -1),
+        !('alias' in hero1) && Object.keys(hero1).every(k => ['v', 'body', 'chosen', 'skin', 'colors'].indexOf(k) !== -1),
         Object.keys(hero1).join(','));
   h1.window.close();
 
@@ -568,31 +568,47 @@ async function main() {
   ad.getElementById('btnArm').click();
   check('la armeria se abre desde el mapa', visible(ad, 'scrArm'));
   const rows = ad.querySelectorAll('#armRows .arm-row');
-  check('hay 4 filas, una por pieza', rows.length === 4, 'filas=' + rows.length);
+  check('hay 5 filas: piel y las 4 piezas de armadura', rows.length === 5, 'filas=' + rows.length);
+  check('la primera fila es la piel',
+        rows[0].querySelector('.arm-row__label').textContent === 'SKIN');
+  const nSkins = aw.GAME_UI.armoury.skins.length;
+  check('la paleta de piel es amplia (12 tonos)', nSkins === 12, 'tonos=' + nSkins);
   const swatches = ad.querySelectorAll('#armRows .swatch');
-  check('hay 8 colores por pieza', swatches.length === 32, 'muestras=' + swatches.length);
+  check('hay 12 tonos de piel y 8 colores en cada pieza',
+        swatches.length === nSkins + 32, 'muestras=' + swatches.length);
   check('cada muestra dice pieza y color por aria-label',
         Array.from(swatches).every(s => (s.getAttribute('aria-label') || '').indexOf(':') !== -1));
-  /* Si un color por defecto no esta en la paleta, el nino abre la armeria y ve
+  /* Si un color por defecto no esta en la paleta, el nino abre la pantalla y ve
      esa fila sin nada marcado. Paso con var(--accent). */
   const marked = ad.querySelectorAll('#armRows .swatch.is-on');
-  check('las 4 filas arrancan con su color marcado', marked.length === 4,
-        'marcadas=' + marked.length + ' de 4');
-  /* Colores desbloqueables: un jugador nuevo tiene 4 de 8. */
-  check('un jugador nuevo ve 4 colores bloqueados por fila',
-        ad.querySelectorAll('.arm-row').length === 4 &&
-        Array.from(ad.querySelectorAll('.arm-row')).every(r => r.querySelectorAll('.swatch.is-locked').length === 4));
+  check('las 5 filas arrancan con su color marcado', marked.length === 5,
+        'marcadas=' + marked.length + ' de 5');
+
+  /* LA regla de la piel: nunca se bloquea. Reconocerse no es un premio que se
+     gana jugando; un nino que no encuentra su tono el primer dia no vuelve. */
+  check('ningun tono de piel esta bloqueado, ni para un jugador nuevo',
+        rows[0].querySelectorAll('.swatch.is-locked').length === 0);
+  check('todos los tonos de piel se pueden pulsar',
+        Array.from(rows[0].querySelectorAll('.swatch')).every(s => !s.disabled));
+  /* Los colores de armadura si se ganan: 4 de 8 al empezar. */
+  check('un jugador nuevo ve 4 colores de armadura bloqueados por pieza',
+        Array.from(rows).slice(1).every(r => r.querySelectorAll('.swatch.is-locked').length === 4));
   check('los bloqueados estan deshabilitados y explican como desbloquear',
         Array.from(ad.querySelectorAll('.swatch.is-locked')).every(s => s.disabled && /locked/i.test(s.getAttribute('aria-label'))));
-  check('la armeria dice cuantos colores hay desbloqueados', /4 of 8/.test(ad.getElementById('armUnlock').textContent));
+  check('la pantalla dice cuantos colores hay desbloqueados', /4 of 8/.test(ad.getElementById('armUnlock').textContent));
   const beforeLocked = JSON.stringify(JSON.parse(aw.localStorage.getItem(HERO_KEY)).colors);
-  ad.querySelector('.swatch[data-row="0"][data-col="7"]').click();
+  ad.querySelector('.swatch[data-row="1"][data-col="7"]').click();
   check('clicar un color bloqueado no cambia nada',
         beforeLocked === JSON.stringify(JSON.parse(aw.localStorage.getItem(HERO_KEY)).colors));
-  // Pinta una pieza distinta en cada fila, con colores desbloqueados.
+
+  // Un tono de piel del extremo oscuro de la rampa, y una pieza por fila.
+  const deep = aw.GAME_UI.armoury.skins[nSkins - 1];
+  ad.querySelector('.swatch[data-row="0"][data-col="' + (nSkins - 1) + '"]').click();
+  check('el tono de piel elegido se guarda',
+        JSON.parse(aw.localStorage.getItem(HERO_KEY)).skin === deep.value, deep.name);
   const wanted = {};
-  [0, 1, 2, 3].forEach(r => {
-    const col = (r + 1) % 4;
+  [1, 2, 3, 4].forEach(r => {
+    const col = r % 4;
     const s = ad.querySelector('.swatch[data-row="' + r + '"][data-col="' + col + '"]');
     wanted[s.getAttribute('data-piece')] = aw.GAME_UI.armoury.colours[col].value;
     s.click();
@@ -601,6 +617,23 @@ async function main() {
   check('las 4 piezas quedan guardadas con el color elegido',
         ['helm', 'body', 'glove', 'boot'].every(k => colours[k] === wanted[k]),
         JSON.stringify(colours) + ' vs ' + JSON.stringify(wanted));
+
+  /* La cara tiene que leerse en los 12 tonos: sin blanco del ojo, unos ojos
+     oscuros sobre piel oscura dan 1.55:1 y la cabeza se queda sin cara. */
+  function lum(h) {
+    const v = h.replace('#', '').match(/../g).map(x => {
+      const c = parseInt(x, 16) / 255;
+      return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+  }
+  const cr = (a, b) => { const x = lum(a) + 0.05, y = lum(b) + 0.05; return x > y ? x / y : y / x; };
+  const skinBad = aw.GAME_UI.armoury.skins.filter(s =>
+    Math.max(cr(s.ink, s.value), cr(s.eye, s.value)) < 3 || cr(s.mouth, s.value) < 2.2);
+  check('la cara se lee en los 12 tonos de piel (ojo >= 3:1, boca >= 2.2:1)',
+        skinBad.length === 0, skinBad.map(s => s.name).join(','));
+  check('cada tono trae sus propios rasgos',
+        aw.GAME_UI.armoury.skins.every(s => s.eye && s.ink && s.mouth));
   h2.window.close();
 
   // Recargar (y "cambiar de materia" = misma clave de heroe, otra partida).
@@ -627,15 +660,17 @@ async function main() {
               3: { done: true, stars: 1, best: 2000, plays: 1, bossClean: false, history: [] } }
   }, { hero: heroDone() });
   hu.window.document.getElementById('btnArm').click();
+  // La fila 0 es la piel (nunca bloqueada); la 1 es la primera de armadura.
   check('dos niveles con 2+ estrellas desbloquean dos colores mas (6 de 8)',
-        hu.window.document.querySelectorAll('.arm-row')[0].querySelectorAll('.swatch.is-locked').length === 2 &&
+        hu.window.document.querySelectorAll('.arm-row')[1].querySelectorAll('.swatch.is-locked').length === 2 &&
         /6 of 8/.test(hu.window.document.getElementById('armUnlock').textContent));
-  check('un nivel con 1 estrella no desbloquea nada', true);
+  check('un nivel con solo 1 estrella no desbloquea nada',
+        hu.window.document.querySelectorAll('.arm-row')[1].querySelectorAll('.swatch.is-locked').length === 2);
   hu.window.close();
   // Un color elegido en otra materia nunca se bloquea aqui.
   const hk = openGame(slug, null, { hero: heroDone({ colors: { helm: '#3ce88a', body: '#c77dff', glove: '#c77dff', boot: '#5b8cff' } }) });
   hk.window.document.getElementById('btnArm').click();
-  const helmRow = hk.window.document.querySelectorAll('.arm-row')[0];
+  const helmRow = hk.window.document.querySelectorAll('.arm-row')[1];
   check('un color ya puesto (de otra materia) no aparece bloqueado',
         helmRow.querySelector('.swatch.is-on') && !helmRow.querySelector('.swatch.is-on').classList.contains('is-locked'));
   hk.window.close();

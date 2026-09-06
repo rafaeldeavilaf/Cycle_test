@@ -306,6 +306,10 @@ h3 { font-size: 12px; }
 .arm-row { display: grid; gap: 8px; margin-bottom: 16px; }
 .arm-row__label { font-family: var(--font-ui); font-size: 9px; color: var(--ink-dim); }
 .arm-row__strip { display: flex; gap: 8px; flex-wrap: wrap; }
+/* La piel trae 12 tonos: muestras algo mas pequenas para que la rampa se lea
+   entera de un vistazo, de mas claro a mas oscuro. */
+.arm-row__strip--skin .swatch { width: 32px; height: 32px; }
+@media (max-width: 620px) { .arm-row__strip--skin .swatch { width: 28px; height: 28px; } }
 
 .swatch {
   width: 38px; height: 38px;
