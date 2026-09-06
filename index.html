@@ -304,42 +304,142 @@ h3 { font-size: 12px; }
 .tile--blank { border-color: var(--warn); color: var(--warn); background: #1a1533; }
 .tile--ghost { opacity: .45; }
 
-/* Options */
-.options { display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
-@media (max-width: 620px) { .options { grid-template-columns: 1fr; } }
+/* ---------- 8b. SCENES — moverse ES responder (v2) ----------
+   Cada casilla es un <button> real: foco, Tab y aria salen gratis.
+   El heroe es un sprite absoluto que se desplaza con `left`; con
+   prefers-reduced-motion la transicion se anula y APARECE en la casilla
+   en vez de caminar. Un nino con solo teclado juega el mismo juego.
+   Sin canvas: un heroe y <= 12 casillas no lo justifican.
+------------------------------------------------------------- */
+.scene-host { margin: 4px 0 2px; }
 
-.opt {
-  display: flex; align-items: center; gap: 12px;
-  padding: 16px 14px;
-  background: var(--bg-2);
+.scene__corridor {
+  position: relative;
+  padding: 16px 14px 0;
   border: var(--px) solid var(--line);
-  box-shadow: 0 var(--px) 0 0 #0a0e24;
+  background: linear-gradient(180deg, #070a1c 0%, #10163a 100%);
+  overflow: hidden;
+}
+
+.scene__row { display: flex; gap: 8px; align-items: flex-end; }
+
+/* Casilla de inicio del tramo: a donde vuelve el heroe al fallar. */
+.scene__start {
+  flex: 0 0 52px;
+  height: 96px;
+  display: grid; place-items: center;
+  border: var(--px) dashed var(--line);
+  border-bottom: none;
+  color: var(--ink-dim);
+}
+.scene__start-tag { font-family: var(--font-ui); font-size: 8px; letter-spacing: 1px; }
+.scene__start.is-here { border-color: var(--accent); color: var(--accent); }
+
+/* Puertas */
+.door {
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 0;
+  background: none;
+  border: 0;
   cursor: pointer;
-  font-size: 18px;
-  font-weight: 700;
-  text-align: left;
   color: var(--ink);
   font-family: var(--font-read);
-  transition: background .12s, transform .06s steps(2);
 }
-.opt:hover:not(:disabled) { background: var(--bg-3); }
-.opt:active:not(:disabled){ transform: translateY(var(--px)); box-shadow: none; }
-.opt:focus-visible { outline: var(--px) solid var(--warn); outline-offset: var(--px); }
-.opt__key {
+.door__key {
   font-family: var(--font-ui);
-  font-size: 11px;
-  width: 30px; height: 30px;
-  flex: none;
+  font-size: 10px;
+  width: 26px; height: 26px;
   display: grid; place-items: center;
   background: var(--bg-0);
   border: 2px solid var(--line);
   color: var(--accent);
 }
-.opt.is-right { background: var(--good-dark); border-color: var(--good); }
-.opt.is-right .opt__key { border-color: var(--good); color: var(--good); }
-.opt.is-wrong { background: var(--bad-dark); border-color: var(--bad); }
-.opt.is-wrong .opt__key { border-color: var(--bad); color: var(--bad); }
-.opt:disabled { cursor: default; }
+.door__frame {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  display: grid; place-items: center;
+  padding: 6px 14px 6px 6px;
+  background: var(--bg-2);
+  border: var(--px) solid var(--line);
+  border-bottom: none;
+  transition: background .12s;
+}
+.door__frame::after {                 /* pomo */
+  content: '';
+  position: absolute; right: 7px; top: 50%; margin-top: -3px;
+  width: 6px; height: 6px;
+  background: var(--warn);
+}
+.door__value {
+  font-size: 19px; font-weight: 700; line-height: 1.3;
+  text-align: center; overflow-wrap: anywhere;
+}
+.door:hover:not(:disabled) .door__frame { background: var(--bg-3); }
+.door:focus-visible { outline: none; }
+.door:focus-visible .door__frame { outline: var(--px) solid var(--warn); outline-offset: 2px; }
+.door:disabled { cursor: default; }
+
+.door.is-here .door__frame { background: var(--bg-3); border-color: var(--accent); }
+.door.is-here .door__key   { border-color: var(--accent); }
+.door.is-right .door__frame { background: var(--good-dark); border-color: var(--good); }
+.door.is-right .door__key   { border-color: var(--good); color: var(--good); }
+.door.is-wrong .door__frame { background: var(--bad-dark); border-color: var(--bad); }
+.door.is-wrong .door__key   { border-color: var(--bad); color: var(--bad); }
+
+/* Suelo del corredor y heroe */
+.scene__floor {
+  height: 78px;
+  border-top: var(--px) solid var(--line);
+  background: repeating-linear-gradient(90deg, #141a3f 0 14px, #0f1433 14px 28px);
+}
+.scene__hero {
+  position: absolute;
+  left: 0; bottom: 10px;
+  transform: translateX(-50%);
+  transition: left .22s steps(6);
+  pointer-events: none;
+}
+.scene__hero .avatar { width: 52px; height: 52px; }
+
+.scene__help {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+.scene__help b { color: var(--accent); font-family: var(--font-ui); font-size: 10px; }
+
+@media (max-width: 620px) {
+  .scene__corridor { padding: 12px 10px 0; }
+  .scene__row { gap: 6px; }
+  .scene__start { flex-basis: 32px; height: 78px; }
+  .scene__start-tag { writing-mode: vertical-rl; font-size: 7px; }
+  .door__frame { height: 78px; padding: 4px 11px 4px 4px; }
+  .door__value { font-size: 15px; }
+  .scene__floor { height: 64px; }
+  .scene__hero .avatar { width: 44px; height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* El heroe aparece en la casilla en vez de caminar hasta ella. */
+  .scene__hero { transition: none; }
+  .door__frame { transition: none; }
+}
+
+/* Solo para lectores de pantalla: anuncia la posicion del heroe. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 @keyframes shake {
   0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)}
@@ -544,6 +644,23 @@ window.GAME_UI = {
     badTitle:    '&#10007; NOT YET',
     badNote:     '<b>This challenge comes back later with different numbers</b> &mdash; so work out the method, not the answer.',
     confirmQuit: 'Leave this level? Progress in this level is not saved.'
+  },
+
+  /* ---------- ESCENAS (v2: moverse es responder) ----------
+     Textos de la capa de movimiento. `doors` es la escena canonica y
+     el fallback de cualquier familia sin `mech`. */
+  scene: {
+    groupLabel:  'Walk to your answer',
+    help:        '<b>&larr; &rarr;</b> move &nbsp;·&nbsp; <b>Enter</b> go through the door &nbsp;·&nbsp; or press <b>A B C D</b>',
+    helpTouch:   'Tap a door to walk through it.',
+    startLabel:  'START',
+    startAria:   'Start of the corridor',
+    doorAria:    'Door {key}: {value}',
+    sayStart:    'Back at the start of the corridor.',
+    sayOn:       'Standing at door {key}. It says {value}.',
+    sayNeedMove: 'Step onto a door first: use the left and right arrows.',
+    sayRight:    'Correct. The door opens.',
+    sayWrong:    'Wrong door. Back to the start.'
   },
 
   /* ---------- COMPANERO DE PANTALLA ----------

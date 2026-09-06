@@ -99,6 +99,23 @@ window.GAME_UI = {
     confirmQuit: 'Leave this level? Progress in this level is not saved.'
   },
 
+  /* ---------- ESCENAS (v2: moverse es responder) ----------
+     Textos de la capa de movimiento. `doors` es la escena canonica y
+     el fallback de cualquier familia sin `mech`. */
+  scene: {
+    groupLabel:  'Walk to your answer',
+    help:        '<b>&larr; &rarr;</b> move &nbsp;·&nbsp; <b>Enter</b> go through the door &nbsp;·&nbsp; or press <b>A B C D</b>',
+    helpTouch:   'Tap a door to walk through it.',
+    startLabel:  'START',
+    startAria:   'Start of the corridor',
+    doorAria:    'Door {key}: {value}',
+    sayStart:    'Back at the start of the corridor.',
+    sayOn:       'Standing at door {key}. It says {value}.',
+    sayNeedMove: 'Step onto a door first: use the left and right arrows.',
+    sayRight:    'Correct. The door opens.',
+    sayWrong:    'Wrong door. Back to the start.'
+  },
+
   /* ---------- COMPANERO DE PANTALLA ----------
      Genericos: nunca nombran a nadie. Una materia puede sustituirlos
      desde data.js con `meta.mate` o `ui.mate`. */

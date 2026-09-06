@@ -304,42 +304,142 @@ h3 { font-size: 12px; }
 .tile--blank { border-color: var(--warn); color: var(--warn); background: #1a1533; }
 .tile--ghost { opacity: .45; }
 
-/* Options */
-.options { display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
-@media (max-width: 620px) { .options { grid-template-columns: 1fr; } }
+/* ---------- 8b. SCENES — moverse ES responder (v2) ----------
+   Cada casilla es un <button> real: foco, Tab y aria salen gratis.
+   El heroe es un sprite absoluto que se desplaza con `left`; con
+   prefers-reduced-motion la transicion se anula y APARECE en la casilla
+   en vez de caminar. Un nino con solo teclado juega el mismo juego.
+   Sin canvas: un heroe y <= 12 casillas no lo justifican.
+------------------------------------------------------------- */
+.scene-host { margin: 4px 0 2px; }
 
-.opt {
-  display: flex; align-items: center; gap: 12px;
-  padding: 16px 14px;
-  background: var(--bg-2);
+.scene__corridor {
+  position: relative;
+  padding: 16px 14px 0;
   border: var(--px) solid var(--line);
-  box-shadow: 0 var(--px) 0 0 #0a0e24;
+  background: linear-gradient(180deg, #070a1c 0%, #10163a 100%);
+  overflow: hidden;
+}
+
+.scene__row { display: flex; gap: 8px; align-items: flex-end; }
+
+/* Casilla de inicio del tramo: a donde vuelve el heroe al fallar. */
+.scene__start {
+  flex: 0 0 52px;
+  height: 96px;
+  display: grid; place-items: center;
+  border: var(--px) dashed var(--line);
+  border-bottom: none;
+  color: var(--ink-dim);
+}
+.scene__start-tag { font-family: var(--font-ui); font-size: 8px; letter-spacing: 1px; }
+.scene__start.is-here { border-color: var(--accent); color: var(--accent); }
+
+/* Puertas */
+.door {
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 0;
+  background: none;
+  border: 0;
   cursor: pointer;
-  font-size: 18px;
-  font-weight: 700;
-  text-align: left;
   color: var(--ink);
   font-family: var(--font-read);
-  transition: background .12s, transform .06s steps(2);
 }
-.opt:hover:not(:disabled) { background: var(--bg-3); }
-.opt:active:not(:disabled){ transform: translateY(var(--px)); box-shadow: none; }
-.opt:focus-visible { outline: var(--px) solid var(--warn); outline-offset: var(--px); }
-.opt__key {
+.door__key {
   font-family: var(--font-ui);
-  font-size: 11px;
-  width: 30px; height: 30px;
-  flex: none;
+  font-size: 10px;
+  width: 26px; height: 26px;
   display: grid; place-items: center;
   background: var(--bg-0);
   border: 2px solid var(--line);
   color: var(--accent);
 }
-.opt.is-right { background: var(--good-dark); border-color: var(--good); }
-.opt.is-right .opt__key { border-color: var(--good); color: var(--good); }
-.opt.is-wrong { background: var(--bad-dark); border-color: var(--bad); }
-.opt.is-wrong .opt__key { border-color: var(--bad); color: var(--bad); }
-.opt:disabled { cursor: default; }
+.door__frame {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  display: grid; place-items: center;
+  padding: 6px 14px 6px 6px;
+  background: var(--bg-2);
+  border: var(--px) solid var(--line);
+  border-bottom: none;
+  transition: background .12s;
+}
+.door__frame::after {                 /* pomo */
+  content: '';
+  position: absolute; right: 7px; top: 50%; margin-top: -3px;
+  width: 6px; height: 6px;
+  background: var(--warn);
+}
+.door__value {
+  font-size: 19px; font-weight: 700; line-height: 1.3;
+  text-align: center; overflow-wrap: anywhere;
+}
+.door:hover:not(:disabled) .door__frame { background: var(--bg-3); }
+.door:focus-visible { outline: none; }
+.door:focus-visible .door__frame { outline: var(--px) solid var(--warn); outline-offset: 2px; }
+.door:disabled { cursor: default; }
+
+.door.is-here .door__frame { background: var(--bg-3); border-color: var(--accent); }
+.door.is-here .door__key   { border-color: var(--accent); }
+.door.is-right .door__frame { background: var(--good-dark); border-color: var(--good); }
+.door.is-right .door__key   { border-color: var(--good); color: var(--good); }
+.door.is-wrong .door__frame { background: var(--bad-dark); border-color: var(--bad); }
+.door.is-wrong .door__key   { border-color: var(--bad); color: var(--bad); }
+
+/* Suelo del corredor y heroe */
+.scene__floor {
+  height: 78px;
+  border-top: var(--px) solid var(--line);
+  background: repeating-linear-gradient(90deg, #141a3f 0 14px, #0f1433 14px 28px);
+}
+.scene__hero {
+  position: absolute;
+  left: 0; bottom: 10px;
+  transform: translateX(-50%);
+  transition: left .22s steps(6);
+  pointer-events: none;
+}
+.scene__hero .avatar { width: 52px; height: 52px; }
+
+.scene__help {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+.scene__help b { color: var(--accent); font-family: var(--font-ui); font-size: 10px; }
+
+@media (max-width: 620px) {
+  .scene__corridor { padding: 12px 10px 0; }
+  .scene__row { gap: 6px; }
+  .scene__start { flex-basis: 32px; height: 78px; }
+  .scene__start-tag { writing-mode: vertical-rl; font-size: 7px; }
+  .door__frame { height: 78px; padding: 4px 11px 4px 4px; }
+  .door__value { font-size: 15px; }
+  .scene__floor { height: 64px; }
+  .scene__hero .avatar { width: 44px; height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* El heroe aparece en la casilla en vez de caminar hasta ella. */
+  .scene__hero { transition: none; }
+  .door__frame { transition: none; }
+}
+
+/* Solo para lectores de pantalla: anuncia la posicion del heroe. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 @keyframes shake {
   0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)}
@@ -545,6 +645,23 @@ window.GAME_UI = {
     badTitle:    '&#10007; NOT YET',
     badNote:     '<b>This challenge comes back later with different numbers</b> &mdash; so work out the method, not the answer.',
     confirmQuit: 'Leave this level? Progress in this level is not saved.'
+  },
+
+  /* ---------- ESCENAS (v2: moverse es responder) ----------
+     Textos de la capa de movimiento. `doors` es la escena canonica y
+     el fallback de cualquier familia sin `mech`. */
+  scene: {
+    groupLabel:  'Walk to your answer',
+    help:        '<b>&larr; &rarr;</b> move &nbsp;·&nbsp; <b>Enter</b> go through the door &nbsp;·&nbsp; or press <b>A B C D</b>',
+    helpTouch:   'Tap a door to walk through it.',
+    startLabel:  'START',
+    startAria:   'Start of the corridor',
+    doorAria:    'Door {key}: {value}',
+    sayStart:    'Back at the start of the corridor.',
+    sayOn:       'Standing at door {key}. It says {value}.',
+    sayNeedMove: 'Step onto a door first: use the left and right arrows.',
+    sayRight:    'Correct. The door opens.',
+    sayWrong:    'Wrong door. Back to the start.'
   },
 
   /* ---------- COMPANERO DE PANTALLA ----------
@@ -8466,6 +8583,164 @@ window.QUIZ_DATA = {
 
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
 
+  /* ---------- SCENES: moverse ES responder ----------
+     Contrato (PLAN-V2 §3.3):
+
+       SCENES[mech]() -> {
+         mount(container, ctx), move(delta), jump(i),
+         confirm(), markResult(answerOrig, chosenOrig), destroy()
+       }
+       ctx = { variant, order, keys, pick(origIdx), say(text) }
+
+     La escena SOLO pinta las opciones y traduce el movimiento en una
+     eleccion. El Runner, la cola y `seen`/`lastVar`/`tries` no la conocen:
+     por eso la garantia anti-repeticion no se puede romper desde aqui.
+
+     `mech` es opcional por familia. Si falta, `doors`. Asi un data.js de v1
+     (y cualquier materia futura que no quiera escena propia) sigue valiendo.
+  ---------------------------------------------------- */
+  var SCENES = {};
+
+  SCENES.doors = function () {
+    var corridor = null, startPad = null, heroEl = null;
+    var slots = [];            // [{ node, orig }]
+    var cursor = -1;           // -1 = casilla de inicio; 0..n-1 = puertas
+    var ctx = null, dead = false, onResize = null;
+
+    function nodeAt(i) { return i < 0 ? startPad : slots[i].node; }
+
+    /* Coloca al heroe bajo la casilla actual. Con prefers-reduced-motion la
+       transicion CSS esta anulada, asi que aparece en vez de caminar (§0.4). */
+    function place() {
+      if (!heroEl || !corridor) return;
+      var t = nodeAt(cursor);
+      if (!t) return;
+      var x = t.offsetLeft + (t.offsetWidth / 2);
+      heroEl.style.left = x + 'px';
+      slots.forEach(function (s, i) { s.node.classList.toggle('is-here', i === cursor); });
+      if (startPad) startPad.classList.toggle('is-here', cursor === -1);
+    }
+
+    function announce() {
+      if (!ctx) return;
+      if (cursor < 0) { ctx.say(UI.scene.sayStart); return; }
+      ctx.say(fmt(UI.scene.sayOn, {
+        key: ctx.keys[cursor],
+        value: slots[cursor].node.getAttribute('data-value')
+      }));
+    }
+
+    return {
+      mount: function (container, context) {
+        ctx = context;
+        dead = false;
+        cursor = -1;
+
+        var v = ctx.variant;
+        var html =
+          '<div class="scene scene--doors">' +
+            '<div class="scene__corridor">' +
+              '<div class="scene__row">' +
+                '<div class="scene__start" aria-hidden="true">' +
+                  '<span class="scene__start-tag">' + UI.scene.startLabel + '</span>' +
+                '</div>';
+        ctx.order.forEach(function (orig, pos) {
+          var label = String(v.options[orig]);
+          html +=
+            '<button type="button" class="door" data-orig="' + orig + '" data-value="' + esc(label.replace(/<[^>]*>/g, '')) + '" ' +
+              'aria-label="' + esc(fmt(UI.scene.doorAria, { key: ctx.keys[pos], value: label.replace(/<[^>]*>/g, '') })) + '">' +
+              '<span class="door__key">' + ctx.keys[pos] + '</span>' +
+              '<span class="door__frame"><span class="door__value">' + label + '</span></span>' +
+            '</button>';
+        });
+        html +=
+              '</div>' +
+              '<div class="scene__floor"></div>' +
+              // El heroe cuelga del corredor, no del suelo: asi comparte
+              // offsetParent con las puertas y basta un offsetLeft para situarlo.
+              '<div class="scene__hero">' + heroSVG('idle') + '</div>' +
+            '</div>' +
+            '<p class="scene__help">' + UI.scene.help + '</p>' +
+          '</div>';
+        container.innerHTML = html;
+
+        corridor = container.querySelector('.scene__corridor');
+        startPad = container.querySelector('.scene__start');
+        heroEl   = container.querySelector('.scene__hero');
+        slots = Array.prototype.map.call(container.querySelectorAll('.door'), function (n) {
+          return { node: n, orig: parseInt(n.getAttribute('data-orig'), 10) };
+        });
+
+        var self = this;
+        slots.forEach(function (s, i) {
+          // Raton/touch: caminar hasta la puerta y cruzarla.
+          s.node.addEventListener('click', function () { self.jump(i); });
+          // Tab: el heroe sigue al foco para que vista y teclado no diverjan.
+          s.node.addEventListener('focus', function () {
+            if (dead) return;
+            cursor = i; place();
+          });
+        });
+
+        onResize = function () { place(); };
+        window.addEventListener('resize', onResize);
+        place();
+      },
+
+      move: function (delta) {
+        if (dead) return;
+        var next = Math.max(-1, Math.min(slots.length - 1, cursor + delta));
+        if (next === cursor) return;
+        cursor = next;
+        place();
+        if (cursor >= 0) slots[cursor].node.focus();
+        announce();
+      },
+
+      /* Salta a una puerta y la cruza: es el atajo A-D / 1-4 de v1 y el
+         camino del raton. Un nino que prefiera no caminar juega igual. */
+      jump: function (i) {
+        if (dead || i < 0 || i >= slots.length) return;
+        cursor = i;
+        place();
+        this.confirm();
+      },
+
+      confirm: function () {
+        if (dead) return null;
+        if (cursor < 0) { ctx.say(UI.scene.sayNeedMove); return null; }
+        dead = true;
+        var orig = slots[cursor].orig;
+        ctx.pick(orig);
+        return orig;
+      },
+
+      markResult: function (answerOrig, chosenOrig) {
+        slots.forEach(function (s) {
+          s.node.disabled = true;
+          if (s.orig === answerOrig) s.node.classList.add('is-right');
+        });
+        var correct = (answerOrig === chosenOrig);
+        if (!correct) {
+          slots.forEach(function (s) { if (s.orig === chosenOrig) s.node.classList.add('is-wrong', 'shake'); });
+          // El heroe vuelve al inicio del tramo.
+          cursor = -1;
+          place();
+          if (heroEl) { var a = heroEl.querySelector('.avatar'); if (a) a.classList.add('avatar--down'); }
+        } else {
+          if (heroEl) { var b = heroEl.querySelector('.avatar'); if (b) b.classList.add('avatar--cheer'); }
+        }
+        ctx.say(correct ? UI.scene.sayRight : UI.scene.sayWrong);
+      },
+
+      destroy: function () {
+        dead = true;
+        if (onResize) { window.removeEventListener('resize', onResize); onResize = null; }
+        slots = []; corridor = startPad = heroEl = null; ctx = null;
+      }
+    };
+  };
+
   /* Cambia la cara del companero en la pantalla de juego. */
   function setMate(mood, msg, cls) {
     var box = el('mateSprite');
@@ -8625,7 +8900,8 @@ window.QUIZ_DATA = {
           '<div id="qStem" class="q-stem"></div>' +
           '<div id="qSub" class="q-sub"></div>' +
           '<div id="qSeq" class="seq"></div>' +
-          '<div id="qOpts" class="options" role="group" aria-label="' + UI.play.optionsLabel + '"></div>' +
+          '<div id="qScene" class="scene-host" role="group" aria-label="' + UI.scene.groupLabel + '"></div>' +
+          '<p id="qSay" class="sr-only" role="status" aria-live="polite"></p>' +
           '<div id="qHint" class="hint" role="note"></div>' +
           '<div class="row mt">' +
             '<button class="btn btn--ghost" id="btnHint" type="button">' + UI.play.btnHint + '</button>' +
@@ -8716,7 +8992,27 @@ window.QUIZ_DATA = {
   el('briefGo').addEventListener('click', function () { SFX.click(); startLevel(currentIdx); });
 
   /* ---------- PLAY ---------- */
-  var q = null, locked = false;
+  var q = null, locked = false, scene = null;
+
+  function announce(text) {
+    var n = el('qSay');
+    if (n) n.textContent = text || '';
+  }
+
+  /* Monta la escena de la familia. `mech` ausente => `doors`, que es tambien
+     el fallback de cualquier mecanica no implementada todavia. */
+  function mountScene(mech, variant, order) {
+    if (scene) { scene.destroy(); scene = null; }
+    var factory = SCENES[mech] || SCENES.doors;
+    scene = factory();
+    scene.mount(el('qScene'), {
+      variant: variant,
+      order: order,
+      keys: KEYS,
+      pick: function (origIdx) { answer(origIdx); },
+      say: announce
+    });
+  }
 
   function startLevel(idx) {
     var lv = DATA.levels[idx];
@@ -8748,19 +9044,10 @@ window.QUIZ_DATA = {
       }).join('');
     } else { seqBox.style.display = 'none'; seqBox.innerHTML = ''; }
 
-    // options — shuffled every single time
+    // Escena: las opciones se barajan siempre y la escena las convierte en
+    // casillas por las que el heroe se mueve. Moverse ES responder.
     var order = shuffle(q.v.options.map(function (_, i) { return i; }));
-    var box = el('qOpts');
-    box.innerHTML = '';
-    order.forEach(function (origIdx, pos) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'opt';
-      b.setAttribute('data-orig', String(origIdx));
-      b.innerHTML = '<span class="opt__key">' + KEYS[pos] + '</span><span>' + q.v.options[origIdx] + '</span>';
-      b.addEventListener('click', function () { answer(origIdx, b); });
-      box.appendChild(b);
-    });
+    mountScene(q.family.mech, q.v, order);
 
     // Andamiaje: si ya fallo esta familia antes, la pista aparece sola.
     var retry = q.tries > 1;
@@ -8790,18 +9077,14 @@ window.QUIZ_DATA = {
     p.className = 'combo is-on';
   }
 
-  function answer(chosen, btn) {
+  function answer(chosen) {
     if (locked) return;
     locked = true;
     var correct = (chosen === q.v.answer);
-    var buttons = el('qOpts').querySelectorAll('.opt');
 
-    Array.prototype.forEach.call(buttons, function (b) {
-      b.disabled = true;
-      if (parseInt(b.getAttribute('data-orig'), 10) === q.v.answer) b.classList.add('is-right');
-    });
-    if (!correct) { btn.classList.add('is-wrong', 'shake'); }
-    else { btn.classList.add('pop'); }
+    // La escena pinta el resultado: ilumina la correcta, marca la elegida y
+    // devuelve al heroe al inicio del tramo si fallo.
+    if (scene) scene.markResult(q.v.answer, chosen);
 
     var fb = el('qFeed');
     if (correct) {
@@ -8837,16 +9120,30 @@ window.QUIZ_DATA = {
     if (window.confirm(UI.play.confirmQuit)) { renderMap(); show('map'); }
   });
 
-  // keyboard: A/B/C/D or 1-4
+  /* ---------- TECLADO ----------
+     Flechas mueven una casilla. Enter/Espacio cruza la casilla actual.
+     A-D / 1-4 saltan directo a una puerta y la cruzan (atajo de v1: sirve
+     para lectores de pantalla y para quien prefiera no caminar).
+     Nada se mantiene pulsado, nada depende de repeticion de tecla. */
   document.addEventListener('keydown', function (e) {
     if (!screens.play.classList.contains('is-on')) return;
-    if (e.key === 'Enter' && el('btnNext').style.display !== 'none') { el('btnNext').click(); return; }
+
+    var nextVisible = el('btnNext').style.display !== 'none';
+    if ((e.key === 'Enter' || e.key === ' ') && nextVisible) {
+      e.preventDefault(); el('btnNext').click(); return;
+    }
+    if (!scene || locked) return;
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); scene.move(1);  return; }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); scene.move(-1); return; }
+    if (e.key === 'Enter' || e.key === ' ')              { e.preventDefault(); scene.confirm(); return; }
+
     var k = e.key.toUpperCase();
     var idx = KEYS.indexOf(k);
     if (idx === -1 && /^[1-5]$/.test(k)) idx = parseInt(k, 10) - 1;
     if (idx === -1) return;
-    var btns = el('qOpts').querySelectorAll('.opt');
-    if (btns[idx] && !btns[idx].disabled) btns[idx].click();
+    e.preventDefault();
+    scene.jump(idx);
   });
 
   /* ---------- WIN ---------- */

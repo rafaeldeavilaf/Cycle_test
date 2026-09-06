@@ -91,10 +91,11 @@ function visible(doc, id) { const n = doc.getElementById(id); return !!n && n.cl
    ningun gancho de test dentro del motor. */
 function findVariant(win, doc) {
   const stem = html(doc, 'qStem');
-  const opts = Array.from(doc.querySelectorAll('#qOpts .opt'))
-    .map(b => ({ orig: parseInt(b.getAttribute('data-orig'), 10), node: b }));
+  // v2: las opciones son puertas de la escena, no botones de una lista.
+  const opts = Array.from(doc.querySelectorAll('#qScene .door'))
+    .map((b, pos) => ({ orig: parseInt(b.getAttribute('data-orig'), 10), pos, node: b }));
   const shown = new Array(opts.length);
-  opts.forEach(o => { shown[o.orig] = o.node.querySelector('span:last-child').innerHTML; });
+  opts.forEach(o => { shown[o.orig] = o.node.querySelector('.door__value').innerHTML; });
 
   const levels = win.QUIZ_DATA.levels;
   const hits = [];
@@ -117,11 +118,30 @@ function findVariant(win, doc) {
   return { hits, ambiguous: answers.size > 1, pick: hits[0], opts };
 }
 
+/* Raton/touch: un clic en la puerta = caminar hasta ella y cruzarla. */
 function clickOption(doc, origIdx) {
-  const b = doc.querySelector('#qOpts .opt[data-orig="' + origIdx + '"]');
-  if (!b) throw new Error('no encuentro la opcion ' + origIdx);
+  const b = doc.querySelector('#qScene .door[data-orig="' + origIdx + '"]');
+  if (!b) throw new Error('no encuentro la puerta ' + origIdx);
   b.click();
   return b;
+}
+
+function key(win, doc, k) {
+  doc.dispatchEvent(new win.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+}
+
+/* Solo teclado: el heroe arranca en la casilla de inicio (-1), camina con
+   la flecha derecha hasta la puerta elegida y la cruza con Enter.
+   Es el recorrido de un nino sin raton, y el de un lector de pantalla. */
+function walkAndConfirm(win, doc, origIdx) {
+  const doors = Array.from(doc.querySelectorAll('#qScene .door'));
+  const pos = doors.findIndex(d => parseInt(d.getAttribute('data-orig'), 10) === origIdx);
+  if (pos === -1) throw new Error('no encuentro la puerta ' + origIdx);
+  // Enter en la casilla de inicio no debe responder nada: se comprueba fuera.
+  for (let i = 0; i <= pos; i++) key(win, doc, 'ArrowRight');
+  const here = doc.querySelectorAll('#qScene .door.is-here');
+  key(win, doc, 'Enter');
+  return { pos, hereCount: here.length, hereOrig: here.length === 1 ? parseInt(here[0].getAttribute('data-orig'), 10) : null };
 }
 
 /* ============================================================
@@ -143,6 +163,8 @@ function playFullLevel(slug, levelIdx, plan) {
   let rightHighlightOk = true;
   let ambiguousSeen = false;
   let victim = null;          // modo 'focus': la familia que se machaca
+  let walkOk = true;          // la puerta pisada coincide con la elegida
+  let heroReturned = true;    // tras fallar, el heroe vuelve al inicio
 
   while (visible(doc, 'scrPlay') && steps < 2000) {
     steps++;
@@ -171,18 +193,27 @@ function playFullLevel(slug, levelIdx, plan) {
       fails[fi]++;
       wrongsDone++;
     }
-    clickOption(doc, choice);
+    if (plan.input === 'keyboard') {
+      const w = walkAndConfirm(win, doc, choice);
+      // Solo puede haber UNA casilla marcada como "aqui", y ha de ser la elegida.
+      if (w.hereCount !== 1 || w.hereOrig !== choice) walkOk = false;
+    } else {
+      clickOption(doc, choice);
+    }
 
-    // La opcion correcta debe iluminarse siempre, sea cual sea el orden barajado.
-    const lit = doc.querySelector('#qOpts .opt.is-right');
+    // La puerta correcta debe iluminarse siempre, sea cual sea el orden barajado.
+    const lit = doc.querySelector('#qScene .door.is-right');
     if (!lit || parseInt(lit.getAttribute('data-orig'), 10) !== answer) rightHighlightOk = false;
+    // Al fallar, el heroe vuelve al inicio del tramo y ninguna puerta queda "aqui".
+    if (goWrong && doc.querySelectorAll('#qScene .door.is-here').length !== 0) heroReturned = false;
 
     const next = doc.getElementById('btnNext');
     next.click();
     if (visible(doc, 'scrWin')) next.click();   // doble clic deliberado en la ultima
   }
 
-  return { dom, win, doc, served, problems, steps, rightHighlightOk, ambiguousSeen, wrongsDone, victim };
+  return { dom, win, doc, served, problems, steps, rightHighlightOk, ambiguousSeen,
+           wrongsDone, victim, walkOk, heroReturned };
 }
 
 /* Comprueba las dos garantias sobre la secuencia de variantes servidas
@@ -219,12 +250,68 @@ function main() {
 
   /* ---------- 1. Partida completa ---------- */
   section('1. Partida completa del nivel 1, con 4 fallos deliberados');
-  const r = playFullLevel(slug, 0, { mode: 'spread', n: 4 });
+  const r = playFullLevel(slug, 0, { mode: 'spread', n: 4, input: 'mouse' });
   check('la partida no se atasca', r.problems.length === 0, r.problems.join(' | '));
   check('el nivel termina y aparece la pantalla de victoria', visible(r.doc, 'scrWin'));
   check('se hicieron los 4 fallos previstos', r.wrongsDone === 4, 'fallos=' + r.wrongsDone);
-  check('la opcion correcta se ilumina tras barajar', r.rightHighlightOk);
+  check('la puerta correcta se ilumina tras barajar', r.rightHighlightOk);
+  check('tras fallar, el heroe vuelve al inicio del tramo', r.heroReturned);
   check('ninguna variante es ambigua (mismo texto, distinta respuesta)', !r.ambiguousSeen);
+
+  /* ---------- 1b. El mismo nivel SOLO con el teclado ---------- */
+  section('1b. Nivel completo solo con teclado (flechas + Enter)');
+  const rk = playFullLevel(slug, 0, { mode: 'spread', n: 3, input: 'keyboard' });
+  check('la partida no se atasca solo con teclado', rk.problems.length === 0, rk.problems.join(' | '));
+  check('el nivel termina solo con teclado', visible(rk.doc, 'scrWin'));
+  check('el heroe pisa siempre la puerta elegida', rk.walkOk);
+  check('la puerta correcta se ilumina', rk.rightHighlightOk);
+  check('tras fallar, el heroe vuelve al inicio', rk.heroReturned);
+  const savedK = JSON.parse(rk.win.localStorage.getItem('samuel-quest:' + slug));
+  check('la partida por teclado se guarda igual', savedK.levels[rk.win.QUIZ_DATA.levels[0].id].done === true);
+  rk.dom.window.close();
+
+  /* ---------- 1c. Reglas de la escena ---------- */
+  section('1c. Escena: accesibilidad y reglas de movimiento');
+  const ds = openGame(slug);
+  const dw = ds.window, dd = dw.document;
+  dd.querySelectorAll('#levelList .level-card')[0].dispatchEvent(new dw.MouseEvent('click', { bubbles: true }));
+  dd.getElementById('briefGo').click();
+
+  const doors = Array.from(dd.querySelectorAll('#qScene .door'));
+  check('la escena pinta 4 puertas', doors.length === 4, 'puertas=' + doors.length);
+  check('cada puerta es un <button> real', doors.every(d => d.tagName === 'BUTTON' && d.type === 'button'));
+  check('cada puerta lleva aria-label con su letra y su valor',
+        doors.every((d, i) => (d.getAttribute('aria-label') || '').indexOf('ABCD'[i]) !== -1));
+  check('el contenedor es un role=group con nombre', dd.getElementById('qScene').getAttribute('role') === 'group' &&
+        !!dd.getElementById('qScene').getAttribute('aria-label'));
+  check('existe la region aria-live de posicion', dd.getElementById('qSay').getAttribute('aria-live') === 'polite');
+
+  // El heroe arranca FUERA de las puertas: moverse es parte de responder.
+  check('el heroe arranca en la casilla de inicio, no sobre una puerta',
+        dd.querySelectorAll('#qScene .door.is-here').length === 0 &&
+        dd.querySelector('.scene__start').classList.contains('is-here'));
+  // Enter sin haberse movido no puede contestar.
+  key(dw, dd, 'Enter');
+  check('Enter en el inicio no responde nada', !doors.some(d => d.disabled));
+  check('...y avisa de que hay que moverse', (txt(dd, 'qSay') || '').length > 0, 'aria-live="' + txt(dd, 'qSay') + '"');
+
+  key(dw, dd, 'ArrowRight');
+  check('una flecha mueve exactamente una casilla', dd.querySelectorAll('#qScene .door.is-here').length === 1 &&
+        doors[0].classList.contains('is-here'));
+  check('la posicion se anuncia por aria-live', (txt(dd, 'qSay') || '').length > 0);
+  key(dw, dd, 'ArrowLeft'); key(dw, dd, 'ArrowLeft');
+  check('no se puede salir del corredor por la izquierda',
+        dd.querySelector('.scene__start').classList.contains('is-here'));
+  for (let i = 0; i < 9; i++) key(dw, dd, 'ArrowRight');
+  check('no se puede salir del corredor por la derecha',
+        doors[3].classList.contains('is-here'));
+  ds.window.close();
+
+  /* La reduced-motion de la escena es CSS puro: no hay rama JS que probar,
+     asi que se verifica que la regla exista en la hoja publicada. */
+  const cssPub = fs.readFileSync(path.join(ROOT, slug + '.html'), 'utf8');
+  check('con prefers-reduced-motion el heroe no camina, aparece',
+        /prefers-reduced-motion[\s\S]{0,400}\.scene__hero\s*\{\s*transition:\s*none/.test(cssPub));
 
   /* ---------- 2. Anti-repeticion ---------- */
   section('2. Anti-repeticion de variantes');
@@ -237,7 +324,7 @@ function main() {
 
   /* Caso duro: fallar SIEMPRE la misma familia hasta reiniciar su ciclo. */
   section('2b. Ciclo de variantes agotado: 7 fallos seguidos en la misma familia');
-  const rf = playFullLevel(slug, 0, { mode: 'focus', famFails: 7 });
+  const rf = playFullLevel(slug, 0, { mode: 'focus', famFails: 7, input: 'mouse' });
   const g2 = checkQueue(rf.served, rf.win.QUIZ_DATA.levels[0]);
   const victimSeq = rf.served[rf.victim] || [];
   const nVarsVictim = rf.win.QUIZ_DATA.levels[0].questions[rf.victim].variants.length;
