@@ -522,13 +522,15 @@ async function main() {
         Array.from(cards).every(c => c.getAttribute('role') === 'radio' && c.getAttribute('aria-label')));
   /* Si las dos siluetas se parecen, elegir deja de ser una eleccion. Se compara
      el path del pelo: es lo que las distingue en miniatura. */
+  /* El pelo es lo que distingue las dos siluetas en miniatura. Se localiza por
+     su color; si alguien lo cambia y no actualiza esto, el test falla en vez
+     de pasar en silencio. */
+  const HAIR = '#8a5a30';
+  const hairPaths = Array.from(cards).map(c => (c.querySelector('svg path[fill="' + HAIR + '"]') || {}).outerHTML || '');
+  check('el pelo del sprite se encuentra por su color (' + HAIR + ')',
+        hairPaths.every(p => p.length > 0), 'si cambio el color del pelo, actualizar HAIR en el harness');
   check('las dos siluetas se distinguen de verdad',
-        (function () {
-          const p = Array.from(cards).map(c => (c.querySelector('svg path[fill="#2b1a12"]') || {}).outerHTML || '');
-          if (p[0] === p[1]) return false;
-          // Diferencia real, no un pixel: al menos 20 caracteres de path distintos.
-          return Math.abs(p[0].length - p[1].length) >= 20;
-        })());
+        hairPaths[0] !== hairPaths[1] && Math.abs(hairPaths[0].length - hairPaths[1].length) >= 20);
   check('la logica no habla de genero: solo cuerpos a y b',
         !/\b(girl|boy|female|male|chica|chico)\b/i.test(fs.readFileSync(path.join(ROOT, 'assets', 'engine.js'), 'utf8')));
 

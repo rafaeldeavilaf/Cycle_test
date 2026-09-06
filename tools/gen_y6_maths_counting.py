@@ -2304,9 +2304,10 @@ for lid, name, subtitle, skill, mech, fams in SPEC:
 # Texto blanco #eaf0ff sobre `slot`: contraste verificado >= 8:1 en los cinco.
 ENVS = {
     1: {  # puente de piedra sobre el foso, de noche
-        "palette": {"sky": "#1a1420", "sky2": "#2b2030", "far": "#2a2030", "wall": "#4a3f4d",
-                    "floor": "#2f2733", "prop": "#5a3a1f", "prop2": "#7a6a80", "glow": "#ffb347",
-                    "glow2": "#ffe08a", "line": "#6b5c70", "slot": "#3a2a1f", "slotline": "#c98a4b"},
+        "palette": {"sky": "#4a3f6a", "sky2": "#6f5f8c", "far": "#3a3050",
+        "wall": "#8a7a9a", "floor": "#6a5f7e", "prop": "#6b4a2c",
+        "prop2": "#a898b8", "glow": "#ffb347", "glow2": "#ffe08a",
+        "line": "#2a2038", "slot": "#3a2a1f", "slotline": "#e0a45a"},
         # Donde va cada cosa (visto en vivo):
         #   far  -> se apoya en la linea alta del muro y asoma contra el cielo (64px)
         #   wall y:top top:0 -> franja alta de pared, ENCIMA de las puertas (34px)
@@ -2323,9 +2324,10 @@ ENVS = {
         "transition": "slide",
     },
     2: {  # adarve de la muralla, de dia
-        "palette": {"sky": "#4f86cf", "sky2": "#a9c8f0", "far": "#5c6f9c", "wall": "#8b8c9a",
-                    "floor": "#6d6e7c", "prop": "#6b4a2c", "prop2": "#9a9bb0", "glow": "#ffe08a",
-                    "glow2": "#ffffff", "line": "#4a4a66", "slot": "#3f3f52", "slotline": "#d0d0e0"},
+        "palette": {"sky": "#4f86cf", "sky2": "#a9c8f0", "far": "#5c6f9c",
+        "wall": "#b0b4c4", "floor": "#8f93a4", "prop": "#6b4a2c",
+        "prop2": "#c8ccd8", "glow": "#ffe08a", "glow2": "#ffffff",
+        "line": "#3f4a66", "slot": "#3f3f52", "slotline": "#d8dce8"},
         "materials": {"wall": "stone", "floor": "flag"},
         "far":  [{"prop": "tower", "x": 12, "scale": 0.5}, {"prop": "treefar", "x": 40, "scale": 0.6},
                  {"prop": "treefar", "x": 50, "scale": 0.8}, {"prop": "tower", "x": 72, "scale": 0.4}],
@@ -2336,9 +2338,10 @@ ENVS = {
         "transition": "slide",
     },
     3: {  # vado del rio en el bosque
-        "palette": {"sky": "#0e2a1c", "sky2": "#173d26", "far": "#123320", "wall": "#1f5a33",
-                    "floor": "#3d6b2a", "prop": "#4a2f1a", "prop2": "#2e7d3e", "glow": "#c8ff5c",
-                    "glow2": "#eaffb0", "line": "#5a8a3a", "slot": "#3b2412", "slotline": "#a4722f"},
+        "palette": {"sky": "#2f6a44", "sky2": "#5aa06a", "far": "#245c38",
+        "wall": "#4a8a58", "floor": "#6a9a52", "prop": "#6a4a2a",
+        "prop2": "#7ab86a", "glow": "#d8ff8c", "glow2": "#f2ffd0",
+        "line": "#2c5a38", "slot": "#3b2412", "slotline": "#c99a5b"},
         "materials": {"wall": "leaves", "floor": "grass"},
         "far":  [{"prop": "treefar", "x": 6, "scale": 0.9}, {"prop": "treefar", "x": 20, "scale": 0.7},
                  {"prop": "tree", "x": 32, "scale": 0.7}, {"prop": "treefar", "x": 64, "scale": 0.8},
@@ -2350,9 +2353,10 @@ ENVS = {
         "transition": "slide",
     },
     4: {  # mazmorra bajo la torre: roca, cristales, luz fria
-        "palette": {"sky": "#0b1018", "sky2": "#141c28", "far": "#1b2838", "wall": "#2b3a4a",
-                    "floor": "#1e2a36", "prop": "#3a4a5a", "prop2": "#4a5a6a", "glow": "#7ee8fa",
-                    "glow2": "#d8f6ff", "line": "#4a6a8a", "slot": "#1e2c3d", "slotline": "#9fe0ff"},
+        "palette": {"sky": "#38506a", "sky2": "#5f7f9e", "far": "#2c4358",
+        "wall": "#6a8298", "floor": "#56708a", "prop": "#5a6a7a",
+        "prop2": "#8aa2b8", "glow": "#7ee8fa", "glow2": "#d8f6ff",
+        "line": "#22303e", "slot": "#22303e", "slotline": "#9fe0ff"},
         "materials": {"wall": "rock", "floor": "rock"},
         "far":  [{"prop": "stalac", "repeat": 6, "y": "top", "top": 0}],
         "wall": [{"prop": "torch", "x": 50, "y": "top", "top": 0, "scale": 0.45}],
@@ -2362,9 +2366,10 @@ ENVS = {
         "transition": "slide",
     },
     5: {  # sala de compuertas de la presa: palancas en muro de piedra
-        "palette": {"sky": "#101c2a", "sky2": "#1b3348", "far": "#1a2c3e", "wall": "#5a6a72",
-                    "floor": "#3a4a52", "prop": "#4a3a2a", "prop2": "#7a8a92", "glow": "#7ee8fa",
-                    "glow2": "#d8f6ff", "line": "#6a7a86", "slot": "#2a3a44", "slotline": "#9fd0e0"},
+        "palette": {"sky": "#3a5f80", "sky2": "#6e93b0", "far": "#2e4c66",
+        "wall": "#8a9aa6", "floor": "#6e8290", "prop": "#5a4a3a",
+        "prop2": "#a8b6c0", "glow": "#9fe8ff", "glow2": "#e0f6ff",
+        "line": "#2a3a44", "slot": "#2a3a44", "slotline": "#9fd0e0"},
         "materials": {"wall": "stone", "floor": "metal"},
         "far":  [{"prop": "tower", "x": 14, "scale": 0.5}, {"prop": "tower", "x": 80, "scale": 0.45}],
         "wall": [{"prop": "lamp", "x": 20, "y": "top", "top": 0, "scale": 0.5},
@@ -2374,9 +2379,10 @@ ENVS = {
         "transition": "slide",
     },
     6: {  # taller de maquinas en lo alto de la torre
-        "palette": {"sky": "#2a1a08", "sky2": "#3e2c10", "far": "#4a3618", "wall": "#6a4a20",
-                    "floor": "#5a3d1a", "prop": "#3a2a10", "prop2": "#c48a2a", "glow": "#ffd93d",
-                    "glow2": "#fff2b0", "line": "#8a6a2a", "slot": "#3e2c10", "slotline": "#ffd93d"},
+        "palette": {"sky": "#6a4a20", "sky2": "#9a7038", "far": "#563a18",
+        "wall": "#b08a4a", "floor": "#8a6a3a", "prop": "#4a3418",
+        "prop2": "#d8a85a", "glow": "#ffd93d", "glow2": "#fff2b0",
+        "line": "#3e2c10", "slot": "#3e2c10", "slotline": "#ffd93d"},
         "materials": {"wall": "metal", "floor": "plank"},
         "far":  [{"prop": "gear", "x": 15, "y": "top", "top": 6, "scale": 1.2},
                  {"prop": "gear", "x": 78, "y": "top", "top": 2, "scale": 0.9}],
@@ -2387,9 +2393,10 @@ ENVS = {
         "transition": "slide",
     },
     7: {  # el MISMO taller, apagado y en rojo: la maquina al reves
-        "palette": {"sky": "#1a0a0a", "sky2": "#2e1212", "far": "#3a1a1a", "wall": "#4a2a2a",
-                    "floor": "#3a2018", "prop": "#2a1410", "prop2": "#8a4a3a", "glow": "#ff6a5c",
-                    "glow2": "#ffc0b0", "line": "#7a3a30", "slot": "#2e1a16", "slotline": "#ff8a70"},
+        "palette": {"sky": "#5a2a2a", "sky2": "#9a5a52", "far": "#4a2422",
+        "wall": "#a06058", "floor": "#7a4a42", "prop": "#3a221e",
+        "prop2": "#c08078", "glow": "#ff8a70", "glow2": "#ffc0b0",
+        "line": "#2e1a16", "slot": "#2e1a16", "slotline": "#ff9a80"},
         "materials": {"wall": "metal", "floor": "plank"},
         "far":  [{"prop": "gear", "x": 15, "y": "top", "top": 6, "scale": 1.2},
                  {"prop": "gear", "x": 78, "y": "top", "top": 2, "scale": 0.9}],

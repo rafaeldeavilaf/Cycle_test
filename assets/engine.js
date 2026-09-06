@@ -448,14 +448,18 @@
   var BODIES = {
     a: {
       hair:  'M4 1h9v2H4z M4 2h9v2H4z M3 2h1v3H3z M13 2h1v3h-1z',
+      hairdark: 'M4 1h9v1H4z M3 2h1v1H3z M13 2h1v1h-1z',
       torso: 'M5 12h7v6H5z',
+      shade: 'M10 12h2v6h-2z',
       boots: 'M5 18h3v2H5z M9 18h3v2H9z'
     },
     b: {
       hair:  'M4 1h9v2H4z M4 2h9v2H4z' +                 // corona
              ' M3 2h1v11H3z M13 2h1v11h-1z' +            // melena hasta el hombro
              ' M2 4h1v9H2z M14 4h1v9h-1z',               // segunda capa, mas ancha
+      hairdark: 'M4 1h9v1H4z M2 4h1v1H2z M14 4h1v1h-1z M3 12h1v1H3z M13 12h1v1h-1z',
       torso: 'M5 12h7v3H5z M6 15h5v3H6z',
+      shade: 'M10 12h2v3h-2z M9 15h2v3H9z',
       boots: 'M6 18h2v2H6z M9 18h2v2H9z'
     }
   };
@@ -508,7 +512,11 @@
 
     return '<svg class="avatar" viewBox="0 0 17 20" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">' +
       (EXTRAS[mood] || '') +
-      '<path fill="#2b1a12" d="' + B.hair + '"/>' +
+      // Pelo castano MEDIO, no casi negro: el #2b1a12 de v1 daba 1.03:1 contra
+      // los cielos oscuros y el personaje se quedaba sin cabeza. Un sprite
+      // tiene que leerse sobre cualquier fondo, no sobre uno.
+      '<path fill="#8a5a30" d="' + B.hair + '"/>' +
+      '<path fill="#3f2a18" d="' + B.hairdark + '"/>' +
       '<path fill="#e8b088" d="M4 4h9v8H4z"/>' +
       (F.brow ? '<path fill="#141a33" d="' + F.brow + '"/>' : '') +
       '<path fill="#141a33" d="' + F.eyes + '"/>' +
@@ -516,7 +524,10 @@
       '<path fill="var(--h-helm)"  d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/>' +
       '<path fill="var(--h-body)"  d="' + B.torso + ' ' + L.arms + '"/>' +
       '<path fill="var(--h-glove)" d="' + L.hands + '"/>' +
-      '<path fill="#fff" d="M8 14h1v3H8z M7 15h3v1H7z"/>' +
+      // Sin emblema en el pecho: la cruz blanca se leia como un simbolo
+      // (medico o religioso) que el juego no quiere decir. En su lugar, una
+      // sombra en el lado derecho del torso: da volumen sin significar nada.
+      '<path fill="rgba(0,0,0,.22)" d="' + B.shade + '"/>' +
       '<path fill="var(--h-boot)"  d="' + B.boots + '"/>' +
       (OVERLAYS[mood] || '') +
       '</svg>';

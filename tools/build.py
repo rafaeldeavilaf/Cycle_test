@@ -38,15 +38,20 @@ def write(name, text):
 FAVICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' "
            "viewBox='0 0 16 16'><text y='14' font-size='14'>%F0%9F%8E%AE</text></svg>")
 
+# Mismo sprite que dibuja engine.js: pelo castano medio (el casi negro
+# desaparecia sobre fondo oscuro), sin emblema en el pecho, y sombra lateral
+# para dar volumen. Si cambia el heroe en engine.js, cambia aqui tambien.
 SPRITE = """<svg class="avatar avatar--lg avatar--bob" viewBox="0 0 17 20" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">
-      <path fill="#2b1a12" d="M4 1h9v2H4z M3 2h1v4H3z M13 2h1v4h-1z M4 2h9v2H4z"/>
+      <path fill="#8a5a30" d="M4 1h9v2H4z M3 2h1v3H3z M13 2h1v3h-1z M4 2h9v2H4z"/>
+      <path fill="#3f2a18" d="M4 1h9v1H4z M3 2h1v1H3z M13 2h1v1h-1z"/>
       <path fill="#e8b088" d="M4 4h9v8H4z"/>
       <path fill="#141a33" d="M6 6h1v2H6z M10 6h1v2h-1z"/>
-      <path fill="#8c4a3a" d="M6 10h5v1H6z M5 9h1v1H5z M11 9h1v1h-1z"/>
+      <path fill="#8c4a3a" d="M7 10h3v1H7z"/>
       <path fill="var(--accent)" d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/>
-      <path fill="var(--accent-2)" d="M5 12h7v6H5z M3 13h2v4H3z M12 13h2v4h-2z"/>
-      <path fill="#fff" d="M8 14h1v3H8z M7 15h3v1H7z"/>
-      <path fill="#1c2555" d="M5 18h3v2H5z M9 18h3v2H9z"/>
+      <path fill="var(--accent-2)" d="M5 12h7v6H5z M3 13h2v2H3z M12 13h2v2h-2z"/>
+      <path fill="var(--accent-2)" d="M3 15h2v2H3z M12 15h2v2h-2z"/>
+      <path fill="rgba(0,0,0,.22)" d="M10 12h2v6h-2z"/>
+      <path fill="#5b8cff" d="M5 18h3v2H5z M9 18h3v2H9z"/>
     </svg>"""
 
 

@@ -174,11 +174,19 @@ h3 { font-size: 12px; }
 }
 
 /* ---------- 6. AVATAR ---------- */
+/* Contorno oscuro alrededor de TODO el sprite. Es lo que hacen los juegos de
+   8 bits para que el personaje se lea sobre cualquier fondo: sin el, el pelo
+   castano contra un cielo oscuro daba 1.03:1 y la cabeza desaparecia.
+   Cuatro drop-shadow de 2px = una linea de contorno; el quinto es la sombra
+   en el suelo que ya existia. */
 .avatar {
   width: 64px; height: 64px;
   image-rendering: pixelated;
   flex: none;
-  filter: drop-shadow(0 4px 0 rgba(0,0,0,.6));
+  filter:
+    drop-shadow( 2px 0 0 #120c18) drop-shadow(-2px 0 0 #120c18)
+    drop-shadow(0  2px 0 #120c18) drop-shadow(0 -2px 0 #120c18)
+    drop-shadow(0  4px 0 rgba(0,0,0,.45));
 }
 .avatar--sm { width: 40px; height: 40px; }
 .avatar--lg { width: 96px; height: 96px; }
@@ -197,21 +205,23 @@ h3 { font-size: 12px; }
 }
 .avatar--cheer { animation: cheer .5s steps(5) forwards; }
 
+/* Sin `filter` en el ultimo fotograma: sobreescribia el contorno del sprite y
+   la cabeza volvia a perderse justo al fallar, que es cuando mas se mira. */
 @keyframes slump {
   0%   { transform: translateY(0)   rotate(0deg); }
   25%  { transform: translateY(3px) rotate(-7deg); }
   55%  { transform: translateY(6px) rotate(5deg); }
-  100% { transform: translateY(7px) rotate(0deg); filter: grayscale(.5) drop-shadow(0 2px 0 rgba(0,0,0,.6)); }
+  100% { transform: translateY(7px) rotate(0deg); }
 }
 .avatar--down { animation: slump .55s steps(5) forwards; }
 
 /* ----- Invocar la calculadora magica (PLAN-V2 §6.2) -----
    1.1 s en cuatro fases, todo con steps() y sin `ease`:
    alzar (0-0.3) · destello (0.3-0.5) · aparicion (0.5-0.9) · sostener. */
+/* Solo brillo: el `filter` del sprite (su contorno) no se toca aqui. */
 @keyframes summonGlow {
-  0%, 25% { filter: drop-shadow(0 4px 0 rgba(0,0,0,.6)); }
-  40%     { filter: brightness(1.6) drop-shadow(0 4px 0 rgba(0,0,0,.6)); }
-  100%    { filter: drop-shadow(0 4px 0 rgba(0,0,0,.6)); }
+  0%, 25%, 100% { opacity: 1; }
+  40%           { opacity: .75; }
 }
 .avatar--summon { animation: summonGlow 1.1s steps(6) forwards; }
 
