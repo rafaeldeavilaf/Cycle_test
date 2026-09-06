@@ -197,15 +197,16 @@ h3 { font-size: 12px; }
 .avatar--bob { animation: bob 1.4s steps(4) infinite; }
 
 /* Reacciones a la respuesta */
+/* Playtest H3: el brinco con escalado se leia "de kinder" a los 10-11.
+   Ahora es un gesto contenido: brazos arriba (ya en el sprite) y un pequeno
+   rebote, sin escalar. */
 @keyframes cheer {
-  0%   { transform: translateY(0)     scale(1); }
-  20%  { transform: translateY(-16px) scale(1.1); }
-  40%  { transform: translateY(0)     scale(1); }
-  60%  { transform: translateY(-10px) scale(1.06); }
-  80%  { transform: translateY(0)     scale(1); }
-  100% { transform: translateY(-4px)  scale(1.02); }
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-6px); }
+  60%  { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
 }
-.avatar--cheer { animation: cheer .8s steps(8) forwards; }
+.avatar--cheer { animation: cheer .5s steps(5) forwards; }
 
 @keyframes slump {
   0%   { transform: translateY(0)   rotate(0deg); }
@@ -317,6 +318,10 @@ h3 { font-size: 12px; }
 .swatch:hover { border-color: var(--ink-dim); }
 .swatch:focus-visible { outline: var(--px) solid var(--warn); outline-offset: 2px; }
 .swatch.is-on { border-color: #fff; box-shadow: 0 0 0 var(--px) var(--bg-0) inset; }
+/* Bloqueado: se ve que existe, no se ve el color. Se gana dominando un nivel. */
+.swatch.is-locked { background: var(--bg-0) !important; cursor: not-allowed; opacity: .8; display: grid; place-items: center; }
+.swatch__lock { font-size: 14px; line-height: 1; }
+.swatch--inline { display: inline-block; width: 16px; height: 16px; vertical-align: middle; border-width: 2px; }
 
 .armoury__preview {
   display: grid; justify-items: center; gap: 10px;
@@ -667,6 +672,81 @@ h3 { font-size: 12px; }
   .door__frame { transition: none; }
 }
 
+/* ---------- 8c. LUGARES (ENV) y CAMINO DE TRAMOS ----------
+   Cinco capas detras de la escena: cielo, lejano, pared, suelo, primer plano.
+   Props en SVG inline (assets/props.js) y materiales como patron SVG tintado.
+   Todo decorativo va aria-hidden y sin pointer-events: la escena esta encima.
+   Regla R1 del panel: nada decorativo junto a las casillas. ------------------ */
+.world { position: relative; --env-floor-h: 78px; }
+.world .scene-host { position: relative; z-index: 1; }
+.world.is-stacked { --env-floor-h: 18px; }
+
+/* Con lugar, el corredor de la escena se vuelve transparente y las
+   casillas se visten del material del lugar. */
+.has-env .scene__corridor { background: transparent; border-color: transparent; }
+.has-env .scene__floor    { background: transparent; border-top-color: transparent; }
+.has-env .door__frame  { background: var(--env-slot); border-color: var(--env-slotline); }
+.has-env .door__key    { border-color: var(--env-slotline); color: var(--env-glow); }
+.has-env .scene__start { border-color: var(--env-slotline); color: var(--env-slotline); }
+.has-env .door.is-here .door__frame { border-color: var(--env-glow); }
+.has-env .scene--stacked .scene__corridor::before { background: repeating-linear-gradient(180deg, var(--env-slotline) 0 8px, transparent 8px 16px); }
+
+.env { position: absolute; inset: 0; overflow: hidden; z-index: 0; border: var(--px) solid var(--env-line); }
+.env__layer { position: absolute; left: 0; right: 0; }
+.env__props { position: absolute; inset: 0; }
+.env__sky   { top: 0; bottom: 0; background: linear-gradient(180deg, var(--env-sky), var(--env-sky2)); }
+.env__far   { top: 0; bottom: var(--env-floor-h); }
+.env__wall  { top: 0; bottom: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
+              background-position: calc(var(--hx, 0) * -48px) 0; transition: background-position .22s steps(6); }
+.env__floor { bottom: 0; height: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
+              border-top: var(--px) solid var(--env-line);
+              background-position: calc(var(--hx, 0) * -72px) 0; transition: background-position .22s steps(6); }
+.env__fg    { bottom: 0; height: var(--env-floor-h); }
+
+/* Parallax: una variable. Lo lejano se mueve menos que lo cercano. */
+.env__far  .env__props { transform: translateX(calc(var(--hx, 0) * -3%)); transition: transform .22s steps(6); }
+.env__wall .env__props { transform: translateX(calc(var(--hx, 0) * -6%)); transition: transform .22s steps(6); }
+
+.prop { position: absolute; transform: translateX(-50%); image-rendering: pixelated; }
+.env__gate { transform: translateX(-50%) scale(var(--gs, .45)); transform-origin: bottom center; transition: transform .35s steps(5); }
+
+/* Llamas / luces: dos cuadros alternos con steps. En aula quedan quietas. */
+.prop .f1 { animation: flick 1s steps(1, end) infinite; }
+.prop .f2 { opacity: 0; animation: flick 1s steps(1, end) infinite reverse; }
+@keyframes flick { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+/* Deslizamiento de tramo al pulsar NEXT: el lugar LLEGA desde la derecha y
+   se asienta. Un solo disparo por clase; sin temporizadores. */
+.env.is-shift .env__far  .env__props { animation: envArriveFar .24s steps(6); }
+.env.is-shift .env__wall .env__props { animation: envArrive .24s steps(6); }
+.env.is-shift .env__wall, .env.is-shift .env__floor { animation: envArriveBg .24s steps(6); }
+@keyframes envArriveFar { from { transform: translateX(3%); } to { transform: translateX(calc(var(--hx, 0) * -3%)); } }
+@keyframes envArrive    { from { transform: translateX(8%); } to { transform: translateX(calc(var(--hx, 0) * -6%)); } }
+@keyframes envArriveBg  { from { background-position: 64px 0; } to { background-position: 0 0; } }
+
+/* La escena anterior sale por la izquierda; la nueva entra por la derecha.
+   Nada bloquea: el heroe nuevo responde desde el primer frame. */
+.scene-slot { position: relative; }
+.scene-slot.is-in  { animation: sceneIn .24s steps(6); }
+.scene-slot.is-out { position: absolute; inset: 0; z-index: 0; pointer-events: none; animation: sceneOut .24s steps(6) forwards; }
+@keyframes sceneIn  { from { transform: translateX(28%); opacity: .3; } to { transform: none; opacity: 1; } }
+@keyframes sceneOut { from { transform: none; opacity: 1; } to { transform: translateX(-28%); opacity: 0; } }
+
+/* El camino del HUD: un tramo por familia. */
+.bar.path { display: flex; gap: 3px; padding: 2px; height: 16px; }
+.bar.path i { flex: 1; background: var(--bg-2); }
+.bar.path i.on  { background: var(--good); }
+.bar.path i.now { background: var(--warn); }
+
+@media (max-width: 700px) { .world { --env-floor-h: 64px; } }
+
+/* Modo aula y reduced-motion: el lugar se queda quieto, la transicion es un
+   corte seco, las llamas no titilan. El lugar sigue ahi; solo no se mueve. */
+@media (prefers-reduced-motion: reduce) {
+  .env, .env *, .scene-slot { animation: none !important; transition: none !important; }
+}
+.is-aula .env, .is-aula .env *, .is-aula .scene-slot { animation: none !important; transition: none !important; }
+
 /* Solo para lectores de pantalla: anuncia la posicion del heroe. */
 .sr-only {
   position: absolute;
@@ -846,6 +926,8 @@ window.GAME_UI = {
     btnSoundOn:  'SOUND: ON',
     btnSoundOff: 'SOUND: OFF',
     btnReset:    'RESET',
+    btnAulaOn:   'CLASSROOM MODE: ON',
+    btnAulaOff:  'CLASSROOM MODE: OFF',
     intro:       'Clear a level to unlock the next one. Play as many as you want, whenever you want.',
     cardMeta:    'LEVEL {n} &middot; {count} challenges',
     cardBest:    ' &middot; best {xp} XP',
@@ -888,25 +970,19 @@ window.GAME_UI = {
      El motor solo conoce cuerpos 'a' y 'b'. Como se llamen y como se
      describan se decide aqui. Las etiquetas describen el PELO, no un genero:
      es lo que de verdad cambia entre las dos siluetas. */
+  /* El personaje NO tiene nombre: ni real ni alias. Es un avatar neutro que el
+     nino viste. Todo el contenido le habla de "you". */
   hero: {
     title:        'CHOOSE YOUR HERO',
     intro:        'Pick a look. You can change it any time, and it follows you into every game.',
     bodyA:        'SHORT HAIR',
     bodyB:        'LONG HAIR',
     pickAria:     'Choose the {name} hero',
-    aliasTitle:   'HERO NAME',
-    aliasHelp:    'Optional. Up to 12 characters. Use a made-up name, not your real one &mdash; it stays in this browser and is never sent anywhere.',
-    aliasLabel:   'Your hero name',
-    aliasDice:    'SURPRISE ME',
-    defaultAlias: 'HERO',
+    you:          'you',
     btnStart:     'START &gt;',
     btnArmoury:   'ARMOURY',
     btnHero:      'HERO',
-    btnBack:      '&lt; MAP',
-    /* Sugerencias generadas: el nino elige de una lista, nunca escribe su
-       nombre real por inercia. Se combinan adjetivo + animal. */
-    aliasWordsA:  ['PIXEL', 'TURBO', 'NEON', 'IRON', 'STORM', 'LUCKY', 'SHADOW', 'COSMIC', 'RAPID', 'BRAVE'],
-    aliasWordsB:  ['FOX', 'OWL', 'WOLF', 'CROW', 'LYNX', 'HAWK', 'BEAR', 'MOTH', 'RAY', 'CUB']
+    btnBack:      '&lt; MAP'
   },
 
   armoury: {
@@ -919,6 +995,12 @@ window.GAME_UI = {
     pieceGlove: 'GLOVES',
     pieceBoot:  'BOOTS',
     swatchAria: '{piece}: {colour}',
+    /* Recompensa por dominio (PLAN-AMBIENTES §8.4): 4 colores de salida y
+       uno mas por cada nivel superado con 2+ estrellas. Coleccionar ligado a
+       dominar, no a compararse con nadie. */
+    lockedAria: '{piece}: {colour} — locked. Clear {n} more level{s} with 2+ stars to unlock.',
+    unlockLine: '{have} of {total} colours unlocked. Clear a level with 2 or more stars to unlock the next.',
+    unlockAll:  'All {total} colours unlocked.',
     preview:    'PREVIEW',
     btnDone:    'DONE &gt;',
     /* Ocho colores fijos. Todos verificados con contraste >= 5:1 sobre
@@ -990,6 +1072,7 @@ window.GAME_UI = {
     firstPlay:  'First time through this level.',
     medalsNew:  'NEW MEDALS',
     medalsMore: '+{n} more',
+    colourNew:  '&#127912; NEW ARMOUR COLOUR UNLOCKED: {colour}',
     unlocked:   '&#128275; UNLOCKED: LEVEL {n} &mdash; {name}',
     btnReplay:  'REPLAY',
     btnMap:     'BACK TO MAP &gt;'
@@ -1021,6 +1104,176 @@ window.GAME_UI = {
 
 </script>
 <script>
+/* ============================================================
+   SAMU: A LINK TO THE MATH — PROPS.JS
+   Biblioteca de escenografia pixel-art. SVG inline, sin imagenes.
+
+   Cada prop es una lista de capas [color, path]. Los colores son
+   variables --env-* que cada nivel define en su data.js: la misma
+   antorcha es de castillo o de cueva segun la paleta. Rejilla entera,
+   comandos h/v relativos, como el heroe (M4 1h9v2H4z).
+
+   Los MATERIALES son patrones repetibles en gris neutro (claro/oscuro)
+   que el motor tinta con el color del nivel (multiply). Van como
+   data-URI SVG: texto, sin peticion externa, editable. No es un PNG.
+
+   REGLA: aqui NO hay nombres de lugares. "castle" no existe. Un nivel
+   es una combinacion de props + materiales + paleta, declarada en
+   data.js. Asi una materia futura usa lo mismo sin dibujar nada.
+
+   Tokens que un prop puede usar:
+     --env-prop   madera, tronco, metal oscuro
+     --env-prop2  piedra, follaje, cuerpo secundario
+     --env-far    siluetas lejanas
+     --env-glow   luz, fuego, cristal encendido
+     --env-glow2  nucleo de la luz
+     --env-line   bordes
+   ============================================================ */
+window.GAME_PROPS = {
+
+  props: {
+    /* Antorcha en la pared. La llama tiene dos cuadros (.f1/.f2) que el CSS
+       alterna con steps(2); en modo aula / reduced-motion queda el primero. */
+    torch: { vb: '0 0 10 28', w: 10, h: 28, layers: [
+      ['var(--env-prop)',  'M4 10h2v18H4z'],
+      ['var(--env-prop2)', 'M3 9h4v2H3z M2 11h6v1H2z'],
+      ['var(--env-glow)',  'M3 4h4v5H3z', 'f1'],
+      ['var(--env-glow2)', 'M4 6h2v3H4z M4 2h2v2H4z', 'f1'],
+      ['var(--env-glow)',  'M2 5h6v4H2z', 'f2'],
+      ['var(--env-glow2)', 'M4 5h2v4H4z M3 3h2v2H3z M6 1h1v3H6z', 'f2']
+    ]},
+
+    /* Ventana con luz dentro. */
+    window: { vb: '0 0 14 20', w: 14, h: 20, layers: [
+      ['var(--env-line)',  'M0 0h14v20H0z'],
+      ['var(--env-glow2)', 'M2 2h10v16H2z'],
+      ['var(--env-line)',  'M6 2h2v16H6z M2 9h10v2H2z']
+    ]},
+
+    /* Almena de muralla (se repite en la parte alta de la pared). */
+    merlon: { vb: '0 0 16 8', w: 16, h: 8, layers: [
+      ['var(--env-prop2)', 'M0 2h4v6H0z M6 0h4v8H6z M12 2h4v6h-4z'],
+      ['var(--env-line)',  'M0 7h16v1H0z']
+    ]},
+
+    /* Torre lejana con dos ventanas encendidas. */
+    tower: { vb: '0 0 18 32', w: 18, h: 32, layers: [
+      ['var(--env-far)',   'M3 6h12v26H3z'],
+      ['var(--env-far)',   'M2 4h2v3H2z M6 4h2v3H6z M10 4h2v3h-2z M14 4h2v3h-2z'],
+      ['var(--env-glow2)', 'M8 12h2v3H8z M8 20h2v3H8z']
+    ]},
+
+    /* Puerta del jefe: se ve al fondo desde el primer tramo y se acerca. */
+    gate: { vb: '0 0 40 44', w: 40, h: 44, layers: [
+      ['var(--env-far)',   'M0 8h40v36H0z'],
+      ['var(--env-prop2)', 'M0 4h4v4H0z M8 4h4v4H8z M16 4h4v4h-4z M24 4h4v4h-4z M32 4h4v4h-4z'],
+      ['#0a0710',          'M10 16h20v28H10z'],
+      ['var(--env-prop)',  'M12 18h16v26H12z'],
+      ['var(--env-line)',  'M12 24h16v2H12z M12 34h16v2H12z M19 18h2v26h-2z'],
+      ['var(--bad)',       'M14 12h2v2h-2z M24 12h2v2h-2z']
+    ]},
+
+    /* Arbol: tronco + tres capas de copa. */
+    tree: { vb: '0 0 20 32', w: 20, h: 32, layers: [
+      ['var(--env-prop)',  'M8 20h4v12H8z'],
+      ['var(--env-prop2)', 'M2 14h16v8H2z M4 8h12v8H4z M7 3h6v6H7z'],
+      ['var(--env-glow)',  'M6 10h2v2H6z M12 15h2v2h-2z M9 5h1v1H9z']
+    ]},
+
+    /* Arbol lejano, solo silueta. */
+    treefar: { vb: '0 0 12 24', w: 12, h: 24, layers: [
+      ['var(--env-far)', 'M5 16h2v8H5z M1 10h10v7H1z M2 5h8v6H2z M4 1h4v5H4z']
+    ]},
+
+    /* Arbusto de primer plano. */
+    bush: { vb: '0 0 18 10', w: 18, h: 10, layers: [
+      ['var(--env-prop2)', 'M0 5h18v5H0z M3 2h12v4H3z M7 0h5v3H7z'],
+      ['var(--env-glow)',  'M5 4h1v1H5z M12 6h1v1h-1z']
+    ]},
+
+    /* Juncos / hierba alta. */
+    reeds: { vb: '0 0 12 14', w: 12, h: 14, layers: [
+      ['var(--env-prop2)', 'M1 6h1v8H1z M4 2h1v12H4z M7 4h1v10H7z M10 1h1v13h-1z'],
+      ['var(--env-glow)',  'M4 2h1v2H4z M10 1h1v2h-1z']
+    ]},
+
+    /* Cristal de cueva, encendido. */
+    crystal: { vb: '0 0 12 16', w: 12, h: 16, layers: [
+      ['var(--env-glow)',  'M4 6h4v10H4z M2 10h2v6H2z M8 8h2v8H8z'],
+      ['var(--env-glow2)', 'M5 2h2v6H5z M5 8h1v5H5z'],
+      ['var(--env-line)',  'M3 15h7v1H3z']
+    ]},
+
+    /* Engranaje. */
+    gear: { vb: '0 0 16 16', w: 16, h: 16, layers: [
+      ['var(--env-prop)',  'M6 0h4v3H6z M6 13h4v3H6z M0 6h3v4H0z M13 6h3v4h-3z M2 2h2v2H2z M12 2h2v2h-2z M2 12h2v2H2z M12 12h2v2h-2z'],
+      ['var(--env-prop2)', 'M3 3h10v10H3z'],
+      ['var(--env-prop)',  'M6 6h4v4H6z']
+    ]},
+
+    /* Lampara colgante de taller. */
+    lamp: { vb: '0 0 12 22', w: 12, h: 22, layers: [
+      ['var(--env-line)',  'M5 0h2v8H5z'],
+      ['var(--env-prop)',  'M1 8h10v3H1z M3 11h6v4H3z'],
+      ['var(--env-glow2)', 'M4 15h4v3H4z'],
+      ['var(--env-glow)',  'M2 18h8v1H2z M3 19h6v1H3z', 'f1'],
+      ['var(--env-glow)',  'M1 18h10v1H1z M2 19h8v2H2z', 'f2']
+    ]},
+
+    /* Estalactita / roca colgante. */
+    stalac: { vb: '0 0 10 14', w: 10, h: 14, layers: [
+      ['var(--env-far)', 'M0 0h10v3H0z M2 3h6v4H2z M3 7h4v4H3z M4 11h2v3H4z']
+    ]}
+  },
+
+  /* Patrones repetibles en gris. El motor los tinta con --env-wall / --env-floor.
+     Claro = #cfcfcf, oscuro = #8a8a8a, junta = #5a5a5a. */
+  materials: {
+    brick: { w: 32, h: 16, svg:
+      "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'>" +
+      "<rect width='32' height='16' fill='#b9b9b9'/>" +
+      "<path fill='#6e6e6e' d='M0 7h32v1H0zM0 15h32v1H0zM15 0h1v7h-1zM31 8h1v7h-1z'/>" +
+      "<path fill='#d6d6d6' d='M1 1h13v1H1zM17 9h13v1H17z'/></svg>" },
+    stone: { w: 48, h: 24, svg:
+      "<svg xmlns='http://www.w3.org/2000/svg' width='48' height='24' shape-rendering='crispEdges'>" +
+      "<rect width='48' height='24' fill='#b0b0b0'/>" +
+      "<path fill='#6a6a6a' d='M0 11h48v1H0zM0 23h48v1H0zM23 0h1v11h-1zM39 12h1v11h-1zM11 12h1v11h-1z'/>" +
+      "<path fill='#cdcdcd' d='M1 1h21v1H1zM25 1h22v1H25zM1 13h9v1H1zM13 13h25v1H13z'/></svg>" },
+    flag: { w: 24, h: 24, svg:
+      "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'>" +
+      "<rect width='24' height='24' fill='#a8a8a8'/>" +
+      "<path fill='#5e5e5e' d='M0 11h24v1H0zM0 23h24v1H0zM11 0h1v11h-1zM23 12h1v11h-1z'/>" +
+      "<path fill='#c4c4c4' d='M1 1h9v1H1zM13 13h9v1h-9z'/></svg>" },
+    plank: { w: 48, h: 12, svg:
+      "<svg xmlns='http://www.w3.org/2000/svg' width='48' height='12' shape-rendering='crispEdges'>" +
+      "<rect width='48' height='12' fill='#b8b8b8'/>" +
+      "<path fill='#6b6b6b' d='M0 5h48v1H0zM0 11h48v1H0zM19 0h1v5h-1zM35 6h1v5h-1z'/>" +
+      "<path fill='#d0d0d0' d='M2 2h6v1H2zM26 2h9v1h-9zM8 8h11v1H8z'/></svg>" },
+    grass: { w: 24, h: 12, svg:
+      "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='12' shape-rendering='crispEdges'>" +
+      "<rect width='24' height='12' fill='#a6a6a6'/>" +
+      "<path fill='#d2d2d2' d='M2 2h1v3H2zM7 0h1v4H7zM13 3h1v3h-1zM19 1h1v4h-1z'/>" +
+      "<path fill='#707070' d='M4 8h2v1H4zM16 9h3v1h-3zM10 6h1v1h-1z'/></svg>" },
+    leaves: { w: 24, h: 24, svg:
+      "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'>" +
+      "<rect width='24' height='24' fill='#9a9a9a'/>" +
+      "<path fill='#c8c8c8' d='M2 3h4v3H2zM14 1h5v4h-5zM7 12h5v4H7zM17 14h4v4h-4zM3 18h3v3H3z'/>" +
+      "<path fill='#5f5f5f' d='M9 6h3v2H9zM20 8h2v3h-2zM1 10h3v2H1zM12 20h4v2h-4z'/></svg>" },
+    rock: { w: 32, h: 32, svg:
+      "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges'>" +
+      "<rect width='32' height='32' fill='#8f8f8f'/>" +
+      "<path fill='#5a5a5a' d='M0 9h13v1H0zM13 3h1v7h-1zM18 0h1v12h-1zM18 12h14v1H18zM0 22h20v1H0zM20 16h1v7h-1zM26 20h1v12h-1z'/>" +
+      "<path fill='#b3b3b3' d='M2 2h7v1H2zM21 3h8v1h-8zM3 13h10v1H3zM23 25h6v1h-6z'/></svg>" },
+    metal: { w: 32, h: 32, svg:
+      "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges'>" +
+      "<rect width='32' height='32' fill='#a0a0a0'/>" +
+      "<path fill='#5c5c5c' d='M0 15h32v2H0zM15 0h2v32h-2z'/>" +
+      "<path fill='#cfcfcf' d='M2 2h2v2H2zM11 2h2v2h-2zM2 11h2v2H2zM11 11h2v2h-2zM19 19h2v2h-2zM28 19h2v2h-2zM19 28h2v2h-2zM28 28h2v2h-2z'/></svg>" }
+  }
+};
+
+</script>
+<script>
 /* AUTO-GENERATED by tools/gen_y6_maths_counting.py - do not hand-edit */
 window.QUIZ_DATA = {
  "meta": {
@@ -1037,7 +1290,7 @@ window.QUIZ_DATA = {
    "name": "WHOLE NUMBER WAY",
    "subtitle": "Counting on and back with whole numbers",
    "briefing": [
-    "<p>Welcome, {hero}. Before anything else you need the basic move: <b>the step</b>.</p>",
+    "<p>Welcome. Before anything else you need the basic move: <b>the step</b>.</p>",
     "<p>A sequence is just numbers that follow a rule. To find the rule, look at the jump between two numbers next to each other.</p>",
     "<div class='example'>4, 11, 18, 25<br>11 - 4 = 7<br>18 - 11 = 7<br>Rule: count on in steps of 7</div>",
     "<ul><li><b>Count on</b> = numbers get bigger. Add the step.</li><li><b>Count back</b> = numbers get smaller. Subtract the step.</li><li>Always check <i>two</i> jumps, not one, so you don't guess.</li></ul>",
@@ -2606,7 +2859,72 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#1a1420",
+     "sky2": "#2b2030",
+     "far": "#2a2030",
+     "wall": "#4a3f4d",
+     "floor": "#2f2733",
+     "prop": "#5a3a1f",
+     "prop2": "#7a6a80",
+     "glow": "#ffb347",
+     "glow2": "#ffe08a",
+     "line": "#6b5c70",
+     "slot": "#3a2a1f",
+     "slotline": "#c98a4b"
+    },
+    "materials": {
+     "wall": "brick",
+     "floor": "flag"
+    },
+    "far": [
+     {
+      "prop": "tower",
+      "x": 8,
+      "scale": 1.1
+     },
+     {
+      "prop": "tower",
+      "x": 34,
+      "scale": 0.8
+     },
+     {
+      "prop": "tower",
+      "x": 60,
+      "scale": 0.95
+     }
+    ],
+    "wall": [
+     {
+      "prop": "merlon",
+      "repeat": 8,
+      "y": "top",
+      "top": 0
+     },
+     {
+      "prop": "torch",
+      "x": 14,
+      "y": "top",
+      "top": 16
+     },
+     {
+      "prop": "window",
+      "x": 48,
+      "y": "top",
+      "top": 14
+     },
+     {
+      "prop": "torch",
+      "x": 84,
+      "y": "top",
+      "top": 16
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   },
   {
    "id": 2,
@@ -3445,7 +3763,7 @@ window.QUIZ_DATA = {
      "skill": "decimal word problem",
      "variants": [
       {
-       "stem": "{hero} has &pound;12.5 and spends &pound;1.75 each week. How much after 3 weeks?",
+       "stem": "You have &pound;12.5 and spend &pound;1.75 each week. How much after 3 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -3459,7 +3777,7 @@ window.QUIZ_DATA = {
        "explain": "<code>3 x 1.75 = 5.25</code>, so the answer is <code>7.25</code>."
       },
       {
-       "stem": "{hero} has &pound;2 and saves &pound;0.45 each week. How much after 4 weeks?",
+       "stem": "You have &pound;2 and save &pound;0.45 each week. How much after 4 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -3473,7 +3791,7 @@ window.QUIZ_DATA = {
        "explain": "<code>4 x 0.45 = 1.8</code>, so the answer is <code>3.8</code>."
       },
       {
-       "stem": "{hero} has &pound;30 and spends &pound;2.5 each week. How much after 5 weeks?",
+       "stem": "You have &pound;30 and spend &pound;2.5 each week. How much after 5 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -3487,7 +3805,7 @@ window.QUIZ_DATA = {
        "explain": "<code>5 x 2.5 = 12.5</code>, so the answer is <code>17.5</code>."
       },
       {
-       "stem": "{hero} has &pound;20.5 and spends &pound;2.5 each week. How much after 4 weeks?",
+       "stem": "You have &pound;20.5 and spend &pound;2.5 each week. How much after 4 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -3501,7 +3819,7 @@ window.QUIZ_DATA = {
        "explain": "<code>4 x 2.5 = 10</code>, so the answer is <code>10.5</code>."
       },
       {
-       "stem": "{hero} has &pound;5 and saves &pound;1.25 each week. How much after 3 weeks?",
+       "stem": "You have &pound;5 and save &pound;1.25 each week. How much after 3 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -4153,7 +4471,71 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#4f86cf",
+     "sky2": "#a9c8f0",
+     "far": "#5c6f9c",
+     "wall": "#8b8c9a",
+     "floor": "#6d6e7c",
+     "prop": "#6b4a2c",
+     "prop2": "#9a9bb0",
+     "glow": "#ffe08a",
+     "glow2": "#ffffff",
+     "line": "#4a4a66",
+     "slot": "#3f3f52",
+     "slotline": "#d0d0e0"
+    },
+    "materials": {
+     "wall": "stone",
+     "floor": "flag"
+    },
+    "far": [
+     {
+      "prop": "tower",
+      "x": 12,
+      "scale": 0.9
+     },
+     {
+      "prop": "treefar",
+      "x": 40,
+      "scale": 0.7
+     },
+     {
+      "prop": "treefar",
+      "x": 50,
+      "scale": 0.9
+     },
+     {
+      "prop": "tower",
+      "x": 72,
+      "scale": 0.7
+     }
+    ],
+    "wall": [
+     {
+      "prop": "merlon",
+      "repeat": 9,
+      "y": "top",
+      "top": 0
+     },
+     {
+      "prop": "window",
+      "x": 30,
+      "y": "top",
+      "top": 14
+     },
+     {
+      "prop": "window",
+      "x": 70,
+      "y": "top",
+      "top": 14
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   },
   {
    "id": 3,
@@ -5644,7 +6026,87 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#0e2a1c",
+     "sky2": "#173d26",
+     "far": "#123320",
+     "wall": "#1f5a33",
+     "floor": "#3d6b2a",
+     "prop": "#4a2f1a",
+     "prop2": "#2e7d3e",
+     "glow": "#c8ff5c",
+     "glow2": "#eaffb0",
+     "line": "#5a8a3a",
+     "slot": "#3b2412",
+     "slotline": "#a4722f"
+    },
+    "materials": {
+     "wall": "leaves",
+     "floor": "grass"
+    },
+    "far": [
+     {
+      "prop": "treefar",
+      "x": 6,
+      "scale": 1.2
+     },
+     {
+      "prop": "treefar",
+      "x": 18,
+      "scale": 0.9
+     },
+     {
+      "prop": "treefar",
+      "x": 30,
+      "scale": 1.1
+     },
+     {
+      "prop": "treefar",
+      "x": 70,
+      "scale": 1.0
+     },
+     {
+      "prop": "treefar",
+      "x": 82,
+      "scale": 1.2
+     }
+    ],
+    "wall": [
+     {
+      "prop": "tree",
+      "x": 9,
+      "scale": 1.3
+     },
+     {
+      "prop": "reeds",
+      "x": 40
+     },
+     {
+      "prop": "reeds",
+      "x": 62
+     },
+     {
+      "prop": "tree",
+      "x": 92,
+      "scale": 1.15
+     }
+    ],
+    "fg": [
+     {
+      "prop": "bush",
+      "x": 5
+     },
+     {
+      "prop": "bush",
+      "x": 94,
+      "scale": 0.9
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   },
   {
    "id": 4,
@@ -7112,7 +7574,59 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#0b1018",
+     "sky2": "#141c28",
+     "far": "#1b2838",
+     "wall": "#2b3a4a",
+     "floor": "#1e2a36",
+     "prop": "#3a4a5a",
+     "prop2": "#4a5a6a",
+     "glow": "#7ee8fa",
+     "glow2": "#d8f6ff",
+     "line": "#4a6a8a",
+     "slot": "#1e2c3d",
+     "slotline": "#9fe0ff"
+    },
+    "materials": {
+     "wall": "rock",
+     "floor": "rock"
+    },
+    "far": [
+     {
+      "prop": "stalac",
+      "repeat": 6,
+      "y": "top",
+      "top": 0
+     }
+    ],
+    "wall": [
+     {
+      "prop": "crystal",
+      "x": 12
+     },
+     {
+      "prop": "torch",
+      "x": 32,
+      "y": "top",
+      "top": 18
+     },
+     {
+      "prop": "crystal",
+      "x": 52,
+      "scale": 0.8
+     },
+     {
+      "prop": "crystal",
+      "x": 86,
+      "scale": 1.1
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   },
   {
    "id": 5,
@@ -8562,7 +9076,64 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#2a1a08",
+     "sky2": "#3e2c10",
+     "far": "#4a3618",
+     "wall": "#6a4a20",
+     "floor": "#5a3d1a",
+     "prop": "#3a2a10",
+     "prop2": "#c48a2a",
+     "glow": "#ffd93d",
+     "glow2": "#fff2b0",
+     "line": "#8a6a2a",
+     "slot": "#3e2c10",
+     "slotline": "#ffd93d"
+    },
+    "materials": {
+     "wall": "metal",
+     "floor": "plank"
+    },
+    "far": [
+     {
+      "prop": "gear",
+      "x": 15,
+      "y": "top",
+      "top": 8,
+      "scale": 1.8
+     },
+     {
+      "prop": "gear",
+      "x": 78,
+      "y": "top",
+      "top": 4,
+      "scale": 1.3
+     }
+    ],
+    "wall": [
+     {
+      "prop": "lamp",
+      "x": 25,
+      "y": "top",
+      "top": 0
+     },
+     {
+      "prop": "lamp",
+      "x": 75,
+      "y": "top",
+      "top": 0
+     },
+     {
+      "prop": "gear",
+      "x": 50,
+      "scale": 1.4
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   }
  ]
 };
@@ -8649,7 +9220,7 @@ window.QUIZ_DATA = {
   function blankSave() {
     return {
       version: SAVE_VERSION,
-      levels: {}, totalXP: 0, sound: true, music: true,
+      levels: {}, totalXP: 0, sound: true, music: true, aula: false,
       skills: {}, bestComboEver: 0
     };
   }
@@ -8657,6 +9228,7 @@ window.QUIZ_DATA = {
     if (typeof s.totalXP !== 'number' || s.totalXP < 0) s.totalXP = 0;
     if (typeof s.music !== 'boolean') s.music = true;
     if (typeof s.sound !== 'boolean') s.sound = true;
+    if (typeof s.aula !== 'boolean') s.aula = false;   // modo aula: sin decoracion ni animacion
     if (!s.skills || typeof s.skills !== 'object' || s.skills instanceof Array) s.skills = {};
     if (typeof s.bestComboEver !== 'number' || s.bestComboEver < 0) s.bestComboEver = 0;
     Object.keys(s.levels).forEach(function (id) { s.levels[id] = normalizeLevel(s.levels[id]); });
@@ -8682,16 +9254,16 @@ window.QUIZ_DATA = {
      `samuel-quest:<slug>` el nino tendria que reconfigurar su personaje en
      cada materia. Ninguna clave existente se renombra ni se toca.
 
-     Aqui NUNCA se guarda el nombre real: solo un alias elegido por el nino,
-     de 12 caracteres, que no sale del navegador. */
+     El personaje NO tiene nombre. Decision de Rafael: un nombre (el real o un
+     alias) es la via mas facil de atribuirle genero, y el heroe es un avatar
+     neutro que el nino viste, no un personaje con identidad propia. Por eso
+     aqui no se guarda ningun texto libre: solo silueta y colores. */
   var HERO_KEY = 'samuel-quest:hero';
-  var ALIAS_MAX = 12;
 
   function blankHero() {
     return {
       v: 1,
       body: 'a',
-      alias: '',
       chosen: false,
       /* Valores concretos de la paleta, NO `var(--accent)`.
          Dos razones:
@@ -8719,7 +9291,7 @@ window.QUIZ_DATA = {
       var s = JSON.parse(raw);
       if (!s || typeof s !== 'object') return h;
       if (s.body === 'a' || s.body === 'b') h.body = s.body;
-      if (typeof s.alias === 'string') h.alias = s.alias.slice(0, ALIAS_MAX);
+      // Un `alias` de una version anterior se ignora y desaparece al guardar.
       h.chosen = !!s.chosen;
       if (s.colors && typeof s.colors === 'object') {
         ['helm', 'body', 'glove', 'boot'].forEach(function (k) {
@@ -8746,13 +9318,12 @@ window.QUIZ_DATA = {
     paintHero(document.documentElement);
   }
 
-  /* Sustituye {hero} por el alias en cualquier texto de contenido. Si el nino
-     no puso alias, se usa el generico de ui.js: nunca queda un hueco raro ni
-     el nombre de nadie. */
+  /* El contenido va en segunda persona y no lleva nombres. Si un data.js viejo
+     trae el token {hero}, se sustituye por "you" para que nunca quede un hueco;
+     el harness ademas falla si el token existe en el contenido publicado. */
   function heroText(s) {
     if (s == null) return '';
-    var name = HERO.alias || UI.hero.defaultAlias;
-    return String(s).replace(/\{hero\}/g, name);
+    return String(s).replace(/\{hero\}/g, UI.hero.you);
   }
 
   /* ---------- AUDIO (no assets, pure WebAudio) ---------- */
@@ -9147,6 +9718,8 @@ window.QUIZ_DATA = {
       }
       slots.forEach(function (s, i) { s.node.classList.toggle('is-here', i === cursor); });
       if (startPad) startPad.classList.toggle('is-here', cursor === -1);
+      // Parallax: el lugar sabe donde esta el heroe dentro del tramo (0..1).
+      if (ctx && ctx.onStep) ctx.onStep(cursor < 0 ? 0 : (cursor + 1) / (slots.length + 1));
     }
 
     function announce() {
@@ -9190,9 +9763,9 @@ window.QUIZ_DATA = {
               // offsetParent con las puertas y basta un offsetLeft para situarlo.
               '<div class="scene__hero">' + heroSVG('idle') + '</div>' +
             '</div>' +
-            '<p class="scene__help">' + (stacked ? UI.scene.helpStacked : UI.scene.help) + '</p>' +
           '</div>';
         container.innerHTML = html;
+        if (ctx.help) ctx.help(stacked ? UI.scene.helpStacked : UI.scene.help, stacked);
 
         corridor = container.querySelector('.scene__corridor');
         startPad = container.querySelector('.scene__start');
@@ -9267,9 +9840,9 @@ window.QUIZ_DATA = {
         var correct = (answerOrig === chosenOrig);
         if (!correct) {
           slots.forEach(function (s) { if (s.orig === chosenOrig) s.node.classList.add('is-wrong', 'shake'); });
-          // El heroe vuelve al inicio del tramo. La cara la pone setMate().
-          cursor = -1;
-          place();
+          // Playtest H2: el heroe SE QUEDA en la puerta roja. Volver al inicio se
+          // leia como castigo (Tomas, el jugador mas fragil) y era puramente
+          // cosmetico: la pregunta ya esta resuelta. La cara la pone setMate().
         }
         ctx.say(correct ? UI.scene.sayRight : UI.scene.sayWrong);
       },
@@ -9289,6 +9862,119 @@ window.QUIZ_DATA = {
     if (m) { m.textContent = msg || ''; m.className = 'mate__msg' + (cls ? ' ' + cls : ''); }
     if (scene && scene.setMood) scene.setMood(mood);
   }
+
+  /* ---------- ENV: el LUGAR detras de la escena ----------
+     Hermano de SCENES, no parte de el: la escena pinta opciones y no sabe
+     que lugar hay detras; ENV pinta el lugar y no sabe que mecanica hay
+     encima. Un nivel declara `env` en data.js:
+
+       env: { palette:{...}, materials:{wall,floor}, far:[...], wall:[...],
+              fg:[...], gate:'gate', transition:'slide' }
+
+     Los props vienen de assets/props.js (window.GAME_PROPS) por id. Aqui
+     NO hay nombres de lugares: el lugar es la combinacion. Sin `env`, el
+     nivel se ve como antes: cualquier data.js existente sigue valiendo.
+  ---------------------------------------------------- */
+  var ENV = (function () {
+    var LIB   = window.GAME_PROPS || { props: {}, materials: {} };
+    var host = null, node = null, gateEl = null, active = false;
+
+    /* Comillas SIMPLES: este url() va dentro de un atributo style="..." con
+       comillas dobles. Con dobles, el atributo se cortaba en `url(` y ningun
+       material se pintaba. Lo encontro el harness. Las simples del SVG van
+       codificadas como %27, asi que dentro no queda ninguna. */
+    function uri(svg) {
+      return "url('data:image/svg+xml," + encodeURIComponent(svg).replace(/'/g, '%27') + "')";
+    }
+    function propSVG(id, o, xOverride) {
+      var p = LIB.props[id];
+      if (!p) return '';
+      var body = p.layers.map(function (L) {
+        return '<path fill="' + L[0] + '"' + (L[2] ? ' class="' + L[2] + '"' : '') + ' d="' + L[1] + '"/>';
+      }).join('');
+      var sc = o.scale || 1;
+      var x = xOverride != null ? xOverride : (o.x != null ? o.x : 50);
+      var style = 'left:' + x + '%;width:' + Math.round(p.w * 3 * sc) + 'px;height:' + Math.round(p.h * 3 * sc) + 'px;' +
+        (o.y === 'top' ? 'top:' + (o.top != null ? o.top : 4) + '%;' : 'bottom:' + (o.bottom != null ? o.bottom : 0) + '%;');
+      return '<svg class="prop prop--' + id + '" viewBox="' + p.vb + '" shape-rendering="crispEdges" aria-hidden="true" style="' + style + '">' + body + '</svg>';
+    }
+    function layer(cls, items, style) {
+      var out = '';
+      (items || []).forEach(function (o) {
+        if (o.repeat > 1) {
+          // N copias repartidas a lo ancho (almenas, estalactitas).
+          for (var i = 0; i < o.repeat; i++) out += propSVG(o.prop, o, Math.round((i + 0.5) * 100 / o.repeat));
+        } else out += propSVG(o.prop, o);
+      });
+      // Los props van en un contenedor interior: es el que se desplaza (parallax);
+      // el material queda en la capa y se desplaza por background-position.
+      return '<div class="env__layer ' + cls + '"' + (style ? ' style="' + style + '"' : '') + '>' +
+               '<div class="env__props">' + out + '</div></div>';
+    }
+    function material(which, id) {
+      var m = LIB.materials[id];
+      if (!m) return '';
+      return 'background-image:linear-gradient(var(--env-' + which + '),var(--env-' + which + ')),' + uri(m.svg) +
+             ';background-size:auto,' + (m.w * 2) + 'px ' + (m.h * 2) + 'px;';
+    }
+
+    return {
+      mount: function (hostEl, env) {
+        this.destroy();
+        host = hostEl;
+        if (!env || !host) { active = false; return; }
+        active = true;
+        var pal = env.palette || {};
+        // Las variables van en el HOST, no en .env: las puertas de la escena
+        // (hermana de .env) tambien las necesitan para vestirse del lugar.
+        host.style.cssText = Object.keys(pal).map(function (k) { return '--env-' + k + ':' + pal[k]; }).join(';');
+        var mats = env.materials || {};
+        node = document.createElement('div');
+        node.className = 'env';
+        node.setAttribute('aria-hidden', 'true');
+        node.innerHTML =
+          '<div class="env__layer env__sky"></div>' +
+          layer('env__far', env.far) +
+          layer('env__wall', env.wall, material('wall', mats.wall)) +
+          '<div class="env__layer env__floor" style="' + material('floor', mats.floor) + '"></div>' +
+          layer('env__fg', env.fg);
+        if (env.gate) {
+          var far = node.querySelector('.env__far .env__props');
+          far.insertAdjacentHTML('beforeend', propSVG(env.gate, { x: 90, scale: 1 }));
+          gateEl = far.lastElementChild;
+          gateEl.classList.add('env__gate');
+        }
+        host.insertBefore(node, host.firstChild);
+        host.classList.add('has-env');
+      },
+      /* Desliza el lugar un tramo: la animacion es CSS por cambio de clase.
+         Se re-dispara quitando y poniendo la clase. Sin temporizadores. */
+      shift: function () {
+        if (!node) return;
+        node.classList.remove('is-shift');
+        void node.offsetWidth;
+        node.classList.add('is-shift');
+      },
+      /* 0..1: donde esta el heroe dentro del tramo. Las capas lejanas se
+         mueven menos que las cercanas: profundidad con una sola variable. */
+      parallax: function (f) {
+        if (node) node.style.setProperty('--hx', String(Math.max(0, Math.min(1, f))));
+      },
+      /* 0..1: tramos superados. La puerta del jefe se acerca. */
+      progress: function (f) {
+        if (gateEl) gateEl.style.setProperty('--gs', String((0.45 + 0.55 * Math.max(0, Math.min(1, f))).toFixed(3)));
+      },
+      stacked: function (on) {
+        if (host) host.classList.toggle('is-stacked', !!on);
+      },
+      isActive: function () { return active; },
+      destroy: function () {
+        if (node && node.parentNode) node.parentNode.removeChild(node);
+        if (host) { host.classList.remove('has-env', 'is-stacked'); host.style.cssText = ''; }
+        node = null; gateEl = null; active = false;
+      }
+    };
+  })();
 
   /* ---------- QUESTION QUEUE ----------
      Regla anti-repeticion: cada pregunta es una FAMILIA con varias variantes.
@@ -9419,6 +10105,7 @@ window.QUIZ_DATA = {
             '<button class="btn btn--ghost" id="btnArm" type="button">' + UI.hero.btnArmoury + '</button>' +
             '<button class="btn btn--ghost" id="btnMusic" type="button"></button>' +
             '<button class="btn btn--ghost" id="btnSound" type="button"></button>' +
+            '<button class="btn btn--ghost" id="btnAula" type="button"></button>' +
             '<button class="btn btn--ghost" id="btnReset" type="button">' + UI.map.btnReset + '</button>' +
           '</div>' +
         '</div>' +
@@ -9434,14 +10121,6 @@ window.QUIZ_DATA = {
           '<h2>' + UI.hero.title + '</h2>' +
           '<p class="text-dim" style="font-size:15px">' + UI.hero.intro + '</p>' +
           '<div class="hero-pick" id="heroPick" role="radiogroup" aria-label="' + UI.hero.title + '"></div>' +
-          '<h3 class="mt-lg">' + UI.hero.aliasTitle + '</h3>' +
-          '<p class="text-dim" style="font-size:14px">' + UI.hero.aliasHelp + '</p>' +
-          '<div class="row mt">' +
-            '<label class="sr-only" for="heroAlias">' + UI.hero.aliasLabel + '</label>' +
-            '<input id="heroAlias" class="field" type="text" maxlength="' + ALIAS_MAX + '" ' +
-              'autocomplete="off" autocorrect="off" spellcheck="false">' +
-            '<button class="btn btn--ghost" id="heroDice" type="button">' + UI.hero.aliasDice + '</button>' +
-          '</div>' +
           '<div class="row row--end mt-lg">' +
             '<button class="btn btn--ghost" id="heroArm" type="button">' + UI.hero.btnArmoury + '</button>' +
             '<button class="btn btn--primary" id="heroGo" type="button">' + UI.hero.btnStart + '</button>' +
@@ -9454,6 +10133,7 @@ window.QUIZ_DATA = {
         '<div class="pixel-box brief">' +
           '<h2>' + UI.armoury.title + '</h2>' +
           '<p class="text-dim" style="font-size:15px">' + UI.armoury.intro + '</p>' +
+          '<p class="text-accent" id="armUnlock" style="font-size:14px"></p>' +
           '<div class="armoury">' +
             '<div id="armRows"></div>' +
             '<div class="armoury__preview">' +
@@ -9493,7 +10173,8 @@ window.QUIZ_DATA = {
           '<div class="mate"><div class="mate__msg" id="mateMsg"></div></div>' +
           '<div class="hud__group" style="flex:1">' +
             '<span class="hud__stat" id="hudLvl"></span>' +
-            '<div class="bar"><div class="bar__fill" id="hudBar"></div></div>' +
+            // El propio camino es la barra: un tramo por familia.
+            '<div class="bar path" id="hudPath" aria-hidden="true"></div>' +
             '<span class="hud__stat" id="hudCount">0/0</span>' +
           '</div>' +
           '<div class="hud__group">' +
@@ -9506,7 +10187,11 @@ window.QUIZ_DATA = {
           '<div id="qStem" class="q-stem"></div>' +
           '<div id="qSub" class="q-sub"></div>' +
           '<div id="qSeq" class="seq"></div>' +
-          '<div id="qScene" class="scene-host" role="group" aria-label="' + UI.scene.groupLabel + '"></div>' +
+          // qWorld: el lugar (ENV) detras; qScene: la escena delante.
+          '<div id="qWorld" class="world">' +
+            '<div id="qScene" class="scene-host" role="group" aria-label="' + UI.scene.groupLabel + '"></div>' +
+          '</div>' +
+          '<p id="qHelp" class="scene__help"></p>' +
           '<p id="qSay" class="sr-only" role="status" aria-live="polite"></p>' +
           '<div id="qHint" class="hint" role="note"></div>' +
           '<div class="row mt">' +
@@ -9602,6 +10287,7 @@ window.QUIZ_DATA = {
     el('mapProgress').innerHTML = progressBox();
     el('btnSound').textContent = STATE.sound ? UI.map.btnSoundOn : UI.map.btnSoundOff;
     el('btnMusic').textContent = STATE.music ? UI.map.btnMusicOn : UI.map.btnMusicOff;
+    el('btnAula').textContent  = STATE.aula ? UI.map.btnAulaOn : UI.map.btnAulaOff;
     el('allDone').innerHTML = (done === DATA.levels.length)
       ? '<div class="pixel-box victory mt-lg"><h2>' + UI.map.allDone + '</h2>' +
         '<p>' + fmt(UI.map.allDoneBody, { test: esc(DATA.meta.test) }) + '</p></div>'
@@ -9645,6 +10331,18 @@ window.QUIZ_DATA = {
     { key: 'boot',  label: UI.armoury.pieceBoot }
   ];
 
+  /* Colores desbloqueados: 4 de salida + 1 por nivel superado con 2+ estrellas.
+     Se calcula, no se guarda: si el nino mejora un nivel, aparece solo. */
+  var BASE_COLOURS = 4;
+  function masteredLevels() {
+    var n = 0;
+    DATA.levels.forEach(function (lv) { if (levelSave(lv.id).stars >= 2) n++; });
+    return n;
+  }
+  function unlockedColours() {
+    return Math.min(UI.armoury.colours.length, BASE_COLOURS + masteredLevels());
+  }
+
   function updateArmPreview() {
     var p = el('armPreview');
     if (p) p.innerHTML = heroSVG('idle').replace('class="avatar"', 'class="avatar avatar--lg avatar--bob"');
@@ -9653,6 +10351,10 @@ window.QUIZ_DATA = {
   function renderArmoury(focusRow, focusCol) {
     var rows = el('armRows');
     rows.innerHTML = '';
+    var have = unlockedColours(), total = UI.armoury.colours.length;
+    var line = el('armUnlock');
+    if (line) line.innerHTML = have >= total ? fmt(UI.armoury.unlockAll, { total: total })
+                                             : fmt(UI.armoury.unlockLine, { have: have, total: total });
     PIECES.forEach(function (p, ri) {
       var row = document.createElement('div');
       row.className = 'arm-row';
@@ -9663,19 +10365,28 @@ window.QUIZ_DATA = {
       strip.className = 'arm-row__strip';
       UI.armoury.colours.forEach(function (c, ci) {
         var on = HERO.colors[p.key] === c.value;
+        // Un color ya elegido (en otra materia, quiza) nunca se bloquea.
+        var locked = ci >= have && !on;
         var b = document.createElement('button');
         b.type = 'button';
-        b.className = 'swatch' + (on ? ' is-on' : '');
+        b.className = 'swatch' + (on ? ' is-on' : '') + (locked ? ' is-locked' : '');
         b.style.background = c.value;
         b.setAttribute('data-piece', p.key);
         b.setAttribute('data-row', String(ri));
         b.setAttribute('data-col', String(ci));
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
-        b.setAttribute('aria-label', fmt(UI.armoury.swatchAria, { piece: p.label, colour: c.name }));
-        b.addEventListener('click', function () {
-          HERO.colors[p.key] = c.value; saveHero(); SFX.click();
-          renderArmoury(ri, ci); refreshSprites();
-        });
+        if (locked) {
+          var need = ci - have + 1;
+          b.disabled = true;
+          b.setAttribute('aria-label', fmt(UI.armoury.lockedAria, { piece: p.label, colour: c.name, n: need, s: need === 1 ? '' : 's' }));
+          b.innerHTML = '<span class="swatch__lock" aria-hidden="true">&#128274;</span>';
+        } else {
+          b.setAttribute('aria-label', fmt(UI.armoury.swatchAria, { piece: p.label, colour: c.name }));
+          b.addEventListener('click', function () {
+            HERO.colors[p.key] = c.value; saveHero(); SFX.click();
+            renderArmoury(ri, ci); refreshSprites();
+          });
+        }
         strip.appendChild(b);
       });
       row.appendChild(lab);
@@ -9759,7 +10470,6 @@ window.QUIZ_DATA = {
   }
 
   function openHero() {
-    el('heroAlias').value = HERO.alias || '';
     renderHeroPick();
     show('hero');
   }
@@ -9769,13 +10479,7 @@ window.QUIZ_DATA = {
     show('arm');
   }
 
-  el('heroDice').addEventListener('click', function () {
-    SFX.click();
-    el('heroAlias').value = (pick(UI.hero.aliasWordsA) + ' ' + pick(UI.hero.aliasWordsB)).slice(0, ALIAS_MAX);
-  });
   el('heroGo').addEventListener('click', function () {
-    // Solo se guarda el alias que el nino escribio. Nunca sale del navegador.
-    HERO.alias = String(el('heroAlias').value || '').trim().slice(0, ALIAS_MAX);
     HERO.chosen = true;
     saveHero(); SFX.click();
     refreshSprites(); renderMap(); show('map');
@@ -9817,23 +10521,75 @@ window.QUIZ_DATA = {
 
   /* Monta la escena de la familia. `mech` ausente => `doors`, que es tambien
      el fallback de cualquier mecanica no implementada todavia. */
+  /* ¿Hay que animar? No con reduced-motion ni en modo aula. */
+  function motionOff() {
+    if (STATE.aula) return true;
+    try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+    catch (e) { return false; }
+  }
+
   function mountScene(mech, variant, order) {
     if (scene) { scene.destroy(); scene = null; }
+    var hostEl = el('qScene');
+
+    /* Camino de tramos: la escena anterior SALE por la izquierda mientras la
+       nueva ENTRA por la derecha. Es CSS por clase; nada bloquea la respuesta:
+       el nino puede mover al heroe en el primer frame. La vieja se retira al
+       terminar su animacion (o al instante si no hay animacion). */
+    var old = hostEl.querySelector('.scene-slot:not(.is-out)');
+    var still = motionOff();
+    if (old) {
+      if (still) { hostEl.removeChild(old); }
+      else {
+        old.classList.add('is-out');
+        old.setAttribute('aria-hidden', 'true');
+        var gone = false;
+        var drop = function () { if (!gone && old.parentNode) { gone = true; old.parentNode.removeChild(old); } };
+        old.addEventListener('animationend', drop);
+        setTimeout(drop, 600);   // red de seguridad, no un reloj de juego
+      }
+      Array.prototype.forEach.call(hostEl.querySelectorAll('.scene-slot.is-out'), function (n) {
+        if (n !== old) n.parentNode.removeChild(n);
+      });
+    }
+
+    var slot = document.createElement('div');
+    slot.className = 'scene-slot' + (old && !still ? ' is-in' : '');
+    hostEl.appendChild(slot);
+
     var factory = SCENES[mech] || SCENES.doors;
     scene = factory();
-    scene.mount(el('qScene'), {
+    scene.mount(slot, {
       variant: variant,
       order: order,
       keys: KEYS,
       pick: function (origIdx) { answer(origIdx); },
-      say: announce
+      say: announce,
+      onStep: function (f) { ENV.parallax(f); },
+      help: function (html, stacked) {
+        var h = el('qHelp'); if (h) h.innerHTML = html;
+        ENV.stacked(stacked);
+      }
     });
+  }
+
+  /* El camino del HUD: un tramo por familia. */
+  function buildPath(total) {
+    var p = el('hudPath');
+    if (!p) return;
+    var s = '';
+    for (var i = 0; i < total; i++) s += '<i></i>';
+    p.innerHTML = s;
   }
 
   function startLevel(idx) {
     var lv = DATA.levels[idx];
     run = new Runner(lv);
+    q = null;
     el('hudLvl').textContent = fmt(UI.play.levelTag, { n: lv.id });
+    el('qScene').innerHTML = '';
+    ENV.mount(el('qWorld'), lv.env);      // sin env, no pinta nada: se ve como antes
+    buildPath(run.total);
     setMate('idle', UI.mate.start);
     if (STATE.music) MUSIC.start();
     show('play');
@@ -9842,8 +10598,10 @@ window.QUIZ_DATA = {
 
   function nextQuestion() {
     if (!run.queue.length) return winLevel();
+    var first = !q;
     q = run.current();
     locked = false;
+    if (!first && !motionOff()) ENV.shift();   // el lugar se desliza un tramo
 
     el('qTag').textContent = q.family.skill.toUpperCase().replace(/-/g, ' ');
     el('qStem').innerHTML = heroText(q.v.stem);
@@ -9887,12 +10645,7 @@ window.QUIZ_DATA = {
   function summonHint() {
     var panel = el('qHint');
     if (!panel) return;
-    var reduced = false;
-    try {
-      reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    } catch (e) { /* navegador viejo */ }
-
-    if (!scene || !scene.setMood || reduced) { panel.classList.add('is-on'); return; }
+    if (!scene || !scene.setMood || motionOff()) { panel.classList.add('is-on'); return; }
 
     SFX.summon();
     MUSIC.duck(1200);
@@ -9902,7 +10655,11 @@ window.QUIZ_DATA = {
   }
 
   function updateHUD() {
-    el('hudBar').style.width = Math.round(run.progress() * 100) + '%';
+    var segs = el('hudPath') ? el('hudPath').children : [];
+    for (var i = 0; i < segs.length; i++) {
+      segs[i].className = i < run.cleared ? 'on' : (i === run.cleared ? 'now' : '');
+    }
+    ENV.progress(run.progress());
     el('hudCount').textContent = run.cleared + '/' + run.total;
     el('hudXP').textContent = run.xp;
     el('hudCombo').textContent = run.combo;
@@ -9956,7 +10713,7 @@ window.QUIZ_DATA = {
   el('btnNext').addEventListener('click', function () { SFX.click(); nextQuestion(); });
   el('btnHint').addEventListener('click', function () { SFX.click(); summonHint(); });
   el('btnQuit').addEventListener('click', function () {
-    if (window.confirm(UI.play.confirmQuit)) { renderMap(); show('map'); }
+    if (window.confirm(UI.play.confirmQuit)) { ENV.destroy(); renderMap(); show('map'); }
   });
 
   /* ---------- TECLADO ----------
@@ -9966,6 +10723,9 @@ window.QUIZ_DATA = {
      Nada se mantiene pulsado, nada depende de repeticion de tecla. */
   document.addEventListener('keydown', function (e) {
     if (!screens.play.classList.contains('is-on')) return;
+    // Playtest H1: en los teclados viejos del colegio la flecha mantenida repite y
+    // el heroe se pasaba de largo dos casillas. Nada depende de la repeticion.
+    if (e.repeat) { e.preventDefault(); return; }
 
     var nextVisible = el('btnNext').style.display !== 'none';
     if ((e.key === 'Enter' || e.key === ' ') && nextVisible) {
@@ -9997,6 +10757,7 @@ window.QUIZ_DATA = {
     // Se leen ANTES de actualizar: son las marcas contra las que se compara.
     var prevBest = ls.best;
     var prevRun  = ls.history.length ? ls.history[ls.history.length - 1] : null;
+    var coloursBefore = unlockedColours();
 
     /* Medallas. `hits` y `firstHits` suben como mucho UNA vez por partida,
        aqui y no en cada respuesta: es lo que hace que plata exija 3 partidas
@@ -10018,6 +10779,11 @@ window.QUIZ_DATA = {
     if (ls.history.length > 5) ls.history = ls.history.slice(-5);
     if (run.bestCombo > (STATE.bestComboEver || 0)) STATE.bestComboEver = run.bestCombo;
     save();
+
+    // Recompensa por dominio: un color de armadura nuevo si este nivel acaba
+    // de llegar a 2+ estrellas por primera vez.
+    var coloursAfter = unlockedColours();
+    var newColour = coloursAfter > coloursBefore ? UI.armoury.colours[coloursAfter - 1] : null;
 
     /* Competir contra uno mismo: cuanto sobre el record, y cuanto sobre la
        partida anterior. Son cosas distintas y el nino ve las dos. */
@@ -10063,6 +10829,10 @@ window.QUIZ_DATA = {
           (rest > 0 ? '<span class="medal">' + fmt(UI.win.medalsMore, { n: rest }) + '</span>' : '') +
           '</div>';
       })() +
+      (newColour
+        ? '<p class="score-best"><span class="swatch swatch--inline" style="background:' + newColour.value + '" aria-hidden="true"></span> ' +
+          fmt(UI.win.colourNew, { colour: newColour.name }) + '</p>'
+        : '') +
       '<p class="text-dim" style="font-size:15px">' +
         (stars === 3 ? UI.win.verdict3
          : run.stuck() ? UI.win.verdictStuck
@@ -10099,6 +10869,19 @@ window.QUIZ_DATA = {
   }
   el('btnMusic').addEventListener('click', toggleMusic);
   el('btnMusic2').addEventListener('click', toggleMusic);
+
+  /* Modo aula (PLAN-AMBIENTES R6): apaga animacion ambiental, parallax,
+     transicion y particulas. Para TDAH y para proyectores de colegio. Se
+     recuerda. La clase en <html> la lee el CSS; motionOff() la lee el JS. */
+  function applyAula() {
+    document.documentElement.classList.toggle('is-aula', !!STATE.aula);
+  }
+  el('btnAula').addEventListener('click', function () {
+    STATE.aula = !STATE.aula; save(); SFX.click();
+    applyAula();
+    el('btnAula').textContent = STATE.aula ? UI.map.btnAulaOn : UI.map.btnAulaOff;
+  });
+  applyAula();
   el('btnMusic2').textContent = fmt(UI.play.btnMusic, { state: onOff(STATE.music) });
 
   // Los navegadores solo permiten audio tras una interaccion del usuario.

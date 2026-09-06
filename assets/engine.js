@@ -78,7 +78,7 @@
   function blankSave() {
     return {
       version: SAVE_VERSION,
-      levels: {}, totalXP: 0, sound: true, music: true,
+      levels: {}, totalXP: 0, sound: true, music: true, aula: false,
       skills: {}, bestComboEver: 0
     };
   }
@@ -86,6 +86,7 @@
     if (typeof s.totalXP !== 'number' || s.totalXP < 0) s.totalXP = 0;
     if (typeof s.music !== 'boolean') s.music = true;
     if (typeof s.sound !== 'boolean') s.sound = true;
+    if (typeof s.aula !== 'boolean') s.aula = false;   // modo aula: sin decoracion ni animacion
     if (!s.skills || typeof s.skills !== 'object' || s.skills instanceof Array) s.skills = {};
     if (typeof s.bestComboEver !== 'number' || s.bestComboEver < 0) s.bestComboEver = 0;
     Object.keys(s.levels).forEach(function (id) { s.levels[id] = normalizeLevel(s.levels[id]); });
@@ -111,16 +112,16 @@
      `samuel-quest:<slug>` el nino tendria que reconfigurar su personaje en
      cada materia. Ninguna clave existente se renombra ni se toca.
 
-     Aqui NUNCA se guarda el nombre real: solo un alias elegido por el nino,
-     de 12 caracteres, que no sale del navegador. */
+     El personaje NO tiene nombre. Decision de Rafael: un nombre (el real o un
+     alias) es la via mas facil de atribuirle genero, y el heroe es un avatar
+     neutro que el nino viste, no un personaje con identidad propia. Por eso
+     aqui no se guarda ningun texto libre: solo silueta y colores. */
   var HERO_KEY = 'samuel-quest:hero';
-  var ALIAS_MAX = 12;
 
   function blankHero() {
     return {
       v: 1,
       body: 'a',
-      alias: '',
       chosen: false,
       /* Valores concretos de la paleta, NO `var(--accent)`.
          Dos razones:
@@ -148,7 +149,7 @@
       var s = JSON.parse(raw);
       if (!s || typeof s !== 'object') return h;
       if (s.body === 'a' || s.body === 'b') h.body = s.body;
-      if (typeof s.alias === 'string') h.alias = s.alias.slice(0, ALIAS_MAX);
+      // Un `alias` de una version anterior se ignora y desaparece al guardar.
       h.chosen = !!s.chosen;
       if (s.colors && typeof s.colors === 'object') {
         ['helm', 'body', 'glove', 'boot'].forEach(function (k) {
@@ -175,13 +176,12 @@
     paintHero(document.documentElement);
   }
 
-  /* Sustituye {hero} por el alias en cualquier texto de contenido. Si el nino
-     no puso alias, se usa el generico de ui.js: nunca queda un hueco raro ni
-     el nombre de nadie. */
+  /* El contenido va en segunda persona y no lleva nombres. Si un data.js viejo
+     trae el token {hero}, se sustituye por "you" para que nunca quede un hueco;
+     el harness ademas falla si el token existe en el contenido publicado. */
   function heroText(s) {
     if (s == null) return '';
-    var name = HERO.alias || UI.hero.defaultAlias;
-    return String(s).replace(/\{hero\}/g, name);
+    return String(s).replace(/\{hero\}/g, UI.hero.you);
   }
 
   /* ---------- AUDIO (no assets, pure WebAudio) ---------- */
@@ -576,6 +576,8 @@
       }
       slots.forEach(function (s, i) { s.node.classList.toggle('is-here', i === cursor); });
       if (startPad) startPad.classList.toggle('is-here', cursor === -1);
+      // Parallax: el lugar sabe donde esta el heroe dentro del tramo (0..1).
+      if (ctx && ctx.onStep) ctx.onStep(cursor < 0 ? 0 : (cursor + 1) / (slots.length + 1));
     }
 
     function announce() {
@@ -619,9 +621,9 @@
               // offsetParent con las puertas y basta un offsetLeft para situarlo.
               '<div class="scene__hero">' + heroSVG('idle') + '</div>' +
             '</div>' +
-            '<p class="scene__help">' + (stacked ? UI.scene.helpStacked : UI.scene.help) + '</p>' +
           '</div>';
         container.innerHTML = html;
+        if (ctx.help) ctx.help(stacked ? UI.scene.helpStacked : UI.scene.help, stacked);
 
         corridor = container.querySelector('.scene__corridor');
         startPad = container.querySelector('.scene__start');
@@ -696,9 +698,9 @@
         var correct = (answerOrig === chosenOrig);
         if (!correct) {
           slots.forEach(function (s) { if (s.orig === chosenOrig) s.node.classList.add('is-wrong', 'shake'); });
-          // El heroe vuelve al inicio del tramo. La cara la pone setMate().
-          cursor = -1;
-          place();
+          // Playtest H2: el heroe SE QUEDA en la puerta roja. Volver al inicio se
+          // leia como castigo (Tomas, el jugador mas fragil) y era puramente
+          // cosmetico: la pregunta ya esta resuelta. La cara la pone setMate().
         }
         ctx.say(correct ? UI.scene.sayRight : UI.scene.sayWrong);
       },
@@ -718,6 +720,119 @@
     if (m) { m.textContent = msg || ''; m.className = 'mate__msg' + (cls ? ' ' + cls : ''); }
     if (scene && scene.setMood) scene.setMood(mood);
   }
+
+  /* ---------- ENV: el LUGAR detras de la escena ----------
+     Hermano de SCENES, no parte de el: la escena pinta opciones y no sabe
+     que lugar hay detras; ENV pinta el lugar y no sabe que mecanica hay
+     encima. Un nivel declara `env` en data.js:
+
+       env: { palette:{...}, materials:{wall,floor}, far:[...], wall:[...],
+              fg:[...], gate:'gate', transition:'slide' }
+
+     Los props vienen de assets/props.js (window.GAME_PROPS) por id. Aqui
+     NO hay nombres de lugares: el lugar es la combinacion. Sin `env`, el
+     nivel se ve como antes: cualquier data.js existente sigue valiendo.
+  ---------------------------------------------------- */
+  var ENV = (function () {
+    var LIB   = window.GAME_PROPS || { props: {}, materials: {} };
+    var host = null, node = null, gateEl = null, active = false;
+
+    /* Comillas SIMPLES: este url() va dentro de un atributo style="..." con
+       comillas dobles. Con dobles, el atributo se cortaba en `url(` y ningun
+       material se pintaba. Lo encontro el harness. Las simples del SVG van
+       codificadas como %27, asi que dentro no queda ninguna. */
+    function uri(svg) {
+      return "url('data:image/svg+xml," + encodeURIComponent(svg).replace(/'/g, '%27') + "')";
+    }
+    function propSVG(id, o, xOverride) {
+      var p = LIB.props[id];
+      if (!p) return '';
+      var body = p.layers.map(function (L) {
+        return '<path fill="' + L[0] + '"' + (L[2] ? ' class="' + L[2] + '"' : '') + ' d="' + L[1] + '"/>';
+      }).join('');
+      var sc = o.scale || 1;
+      var x = xOverride != null ? xOverride : (o.x != null ? o.x : 50);
+      var style = 'left:' + x + '%;width:' + Math.round(p.w * 3 * sc) + 'px;height:' + Math.round(p.h * 3 * sc) + 'px;' +
+        (o.y === 'top' ? 'top:' + (o.top != null ? o.top : 4) + '%;' : 'bottom:' + (o.bottom != null ? o.bottom : 0) + '%;');
+      return '<svg class="prop prop--' + id + '" viewBox="' + p.vb + '" shape-rendering="crispEdges" aria-hidden="true" style="' + style + '">' + body + '</svg>';
+    }
+    function layer(cls, items, style) {
+      var out = '';
+      (items || []).forEach(function (o) {
+        if (o.repeat > 1) {
+          // N copias repartidas a lo ancho (almenas, estalactitas).
+          for (var i = 0; i < o.repeat; i++) out += propSVG(o.prop, o, Math.round((i + 0.5) * 100 / o.repeat));
+        } else out += propSVG(o.prop, o);
+      });
+      // Los props van en un contenedor interior: es el que se desplaza (parallax);
+      // el material queda en la capa y se desplaza por background-position.
+      return '<div class="env__layer ' + cls + '"' + (style ? ' style="' + style + '"' : '') + '>' +
+               '<div class="env__props">' + out + '</div></div>';
+    }
+    function material(which, id) {
+      var m = LIB.materials[id];
+      if (!m) return '';
+      return 'background-image:linear-gradient(var(--env-' + which + '),var(--env-' + which + ')),' + uri(m.svg) +
+             ';background-size:auto,' + (m.w * 2) + 'px ' + (m.h * 2) + 'px;';
+    }
+
+    return {
+      mount: function (hostEl, env) {
+        this.destroy();
+        host = hostEl;
+        if (!env || !host) { active = false; return; }
+        active = true;
+        var pal = env.palette || {};
+        // Las variables van en el HOST, no en .env: las puertas de la escena
+        // (hermana de .env) tambien las necesitan para vestirse del lugar.
+        host.style.cssText = Object.keys(pal).map(function (k) { return '--env-' + k + ':' + pal[k]; }).join(';');
+        var mats = env.materials || {};
+        node = document.createElement('div');
+        node.className = 'env';
+        node.setAttribute('aria-hidden', 'true');
+        node.innerHTML =
+          '<div class="env__layer env__sky"></div>' +
+          layer('env__far', env.far) +
+          layer('env__wall', env.wall, material('wall', mats.wall)) +
+          '<div class="env__layer env__floor" style="' + material('floor', mats.floor) + '"></div>' +
+          layer('env__fg', env.fg);
+        if (env.gate) {
+          var far = node.querySelector('.env__far .env__props');
+          far.insertAdjacentHTML('beforeend', propSVG(env.gate, { x: 90, scale: 1 }));
+          gateEl = far.lastElementChild;
+          gateEl.classList.add('env__gate');
+        }
+        host.insertBefore(node, host.firstChild);
+        host.classList.add('has-env');
+      },
+      /* Desliza el lugar un tramo: la animacion es CSS por cambio de clase.
+         Se re-dispara quitando y poniendo la clase. Sin temporizadores. */
+      shift: function () {
+        if (!node) return;
+        node.classList.remove('is-shift');
+        void node.offsetWidth;
+        node.classList.add('is-shift');
+      },
+      /* 0..1: donde esta el heroe dentro del tramo. Las capas lejanas se
+         mueven menos que las cercanas: profundidad con una sola variable. */
+      parallax: function (f) {
+        if (node) node.style.setProperty('--hx', String(Math.max(0, Math.min(1, f))));
+      },
+      /* 0..1: tramos superados. La puerta del jefe se acerca. */
+      progress: function (f) {
+        if (gateEl) gateEl.style.setProperty('--gs', String((0.45 + 0.55 * Math.max(0, Math.min(1, f))).toFixed(3)));
+      },
+      stacked: function (on) {
+        if (host) host.classList.toggle('is-stacked', !!on);
+      },
+      isActive: function () { return active; },
+      destroy: function () {
+        if (node && node.parentNode) node.parentNode.removeChild(node);
+        if (host) { host.classList.remove('has-env', 'is-stacked'); host.style.cssText = ''; }
+        node = null; gateEl = null; active = false;
+      }
+    };
+  })();
 
   /* ---------- QUESTION QUEUE ----------
      Regla anti-repeticion: cada pregunta es una FAMILIA con varias variantes.
@@ -848,6 +963,7 @@
             '<button class="btn btn--ghost" id="btnArm" type="button">' + UI.hero.btnArmoury + '</button>' +
             '<button class="btn btn--ghost" id="btnMusic" type="button"></button>' +
             '<button class="btn btn--ghost" id="btnSound" type="button"></button>' +
+            '<button class="btn btn--ghost" id="btnAula" type="button"></button>' +
             '<button class="btn btn--ghost" id="btnReset" type="button">' + UI.map.btnReset + '</button>' +
           '</div>' +
         '</div>' +
@@ -863,14 +979,6 @@
           '<h2>' + UI.hero.title + '</h2>' +
           '<p class="text-dim" style="font-size:15px">' + UI.hero.intro + '</p>' +
           '<div class="hero-pick" id="heroPick" role="radiogroup" aria-label="' + UI.hero.title + '"></div>' +
-          '<h3 class="mt-lg">' + UI.hero.aliasTitle + '</h3>' +
-          '<p class="text-dim" style="font-size:14px">' + UI.hero.aliasHelp + '</p>' +
-          '<div class="row mt">' +
-            '<label class="sr-only" for="heroAlias">' + UI.hero.aliasLabel + '</label>' +
-            '<input id="heroAlias" class="field" type="text" maxlength="' + ALIAS_MAX + '" ' +
-              'autocomplete="off" autocorrect="off" spellcheck="false">' +
-            '<button class="btn btn--ghost" id="heroDice" type="button">' + UI.hero.aliasDice + '</button>' +
-          '</div>' +
           '<div class="row row--end mt-lg">' +
             '<button class="btn btn--ghost" id="heroArm" type="button">' + UI.hero.btnArmoury + '</button>' +
             '<button class="btn btn--primary" id="heroGo" type="button">' + UI.hero.btnStart + '</button>' +
@@ -883,6 +991,7 @@
         '<div class="pixel-box brief">' +
           '<h2>' + UI.armoury.title + '</h2>' +
           '<p class="text-dim" style="font-size:15px">' + UI.armoury.intro + '</p>' +
+          '<p class="text-accent" id="armUnlock" style="font-size:14px"></p>' +
           '<div class="armoury">' +
             '<div id="armRows"></div>' +
             '<div class="armoury__preview">' +
@@ -922,7 +1031,8 @@
           '<div class="mate"><div class="mate__msg" id="mateMsg"></div></div>' +
           '<div class="hud__group" style="flex:1">' +
             '<span class="hud__stat" id="hudLvl"></span>' +
-            '<div class="bar"><div class="bar__fill" id="hudBar"></div></div>' +
+            // El propio camino es la barra: un tramo por familia.
+            '<div class="bar path" id="hudPath" aria-hidden="true"></div>' +
             '<span class="hud__stat" id="hudCount">0/0</span>' +
           '</div>' +
           '<div class="hud__group">' +
@@ -935,7 +1045,11 @@
           '<div id="qStem" class="q-stem"></div>' +
           '<div id="qSub" class="q-sub"></div>' +
           '<div id="qSeq" class="seq"></div>' +
-          '<div id="qScene" class="scene-host" role="group" aria-label="' + UI.scene.groupLabel + '"></div>' +
+          // qWorld: el lugar (ENV) detras; qScene: la escena delante.
+          '<div id="qWorld" class="world">' +
+            '<div id="qScene" class="scene-host" role="group" aria-label="' + UI.scene.groupLabel + '"></div>' +
+          '</div>' +
+          '<p id="qHelp" class="scene__help"></p>' +
           '<p id="qSay" class="sr-only" role="status" aria-live="polite"></p>' +
           '<div id="qHint" class="hint" role="note"></div>' +
           '<div class="row mt">' +
@@ -1031,6 +1145,7 @@
     el('mapProgress').innerHTML = progressBox();
     el('btnSound').textContent = STATE.sound ? UI.map.btnSoundOn : UI.map.btnSoundOff;
     el('btnMusic').textContent = STATE.music ? UI.map.btnMusicOn : UI.map.btnMusicOff;
+    el('btnAula').textContent  = STATE.aula ? UI.map.btnAulaOn : UI.map.btnAulaOff;
     el('allDone').innerHTML = (done === DATA.levels.length)
       ? '<div class="pixel-box victory mt-lg"><h2>' + UI.map.allDone + '</h2>' +
         '<p>' + fmt(UI.map.allDoneBody, { test: esc(DATA.meta.test) }) + '</p></div>'
@@ -1074,6 +1189,18 @@
     { key: 'boot',  label: UI.armoury.pieceBoot }
   ];
 
+  /* Colores desbloqueados: 4 de salida + 1 por nivel superado con 2+ estrellas.
+     Se calcula, no se guarda: si el nino mejora un nivel, aparece solo. */
+  var BASE_COLOURS = 4;
+  function masteredLevels() {
+    var n = 0;
+    DATA.levels.forEach(function (lv) { if (levelSave(lv.id).stars >= 2) n++; });
+    return n;
+  }
+  function unlockedColours() {
+    return Math.min(UI.armoury.colours.length, BASE_COLOURS + masteredLevels());
+  }
+
   function updateArmPreview() {
     var p = el('armPreview');
     if (p) p.innerHTML = heroSVG('idle').replace('class="avatar"', 'class="avatar avatar--lg avatar--bob"');
@@ -1082,6 +1209,10 @@
   function renderArmoury(focusRow, focusCol) {
     var rows = el('armRows');
     rows.innerHTML = '';
+    var have = unlockedColours(), total = UI.armoury.colours.length;
+    var line = el('armUnlock');
+    if (line) line.innerHTML = have >= total ? fmt(UI.armoury.unlockAll, { total: total })
+                                             : fmt(UI.armoury.unlockLine, { have: have, total: total });
     PIECES.forEach(function (p, ri) {
       var row = document.createElement('div');
       row.className = 'arm-row';
@@ -1092,19 +1223,28 @@
       strip.className = 'arm-row__strip';
       UI.armoury.colours.forEach(function (c, ci) {
         var on = HERO.colors[p.key] === c.value;
+        // Un color ya elegido (en otra materia, quiza) nunca se bloquea.
+        var locked = ci >= have && !on;
         var b = document.createElement('button');
         b.type = 'button';
-        b.className = 'swatch' + (on ? ' is-on' : '');
+        b.className = 'swatch' + (on ? ' is-on' : '') + (locked ? ' is-locked' : '');
         b.style.background = c.value;
         b.setAttribute('data-piece', p.key);
         b.setAttribute('data-row', String(ri));
         b.setAttribute('data-col', String(ci));
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
-        b.setAttribute('aria-label', fmt(UI.armoury.swatchAria, { piece: p.label, colour: c.name }));
-        b.addEventListener('click', function () {
-          HERO.colors[p.key] = c.value; saveHero(); SFX.click();
-          renderArmoury(ri, ci); refreshSprites();
-        });
+        if (locked) {
+          var need = ci - have + 1;
+          b.disabled = true;
+          b.setAttribute('aria-label', fmt(UI.armoury.lockedAria, { piece: p.label, colour: c.name, n: need, s: need === 1 ? '' : 's' }));
+          b.innerHTML = '<span class="swatch__lock" aria-hidden="true">&#128274;</span>';
+        } else {
+          b.setAttribute('aria-label', fmt(UI.armoury.swatchAria, { piece: p.label, colour: c.name }));
+          b.addEventListener('click', function () {
+            HERO.colors[p.key] = c.value; saveHero(); SFX.click();
+            renderArmoury(ri, ci); refreshSprites();
+          });
+        }
         strip.appendChild(b);
       });
       row.appendChild(lab);
@@ -1188,7 +1328,6 @@
   }
 
   function openHero() {
-    el('heroAlias').value = HERO.alias || '';
     renderHeroPick();
     show('hero');
   }
@@ -1198,13 +1337,7 @@
     show('arm');
   }
 
-  el('heroDice').addEventListener('click', function () {
-    SFX.click();
-    el('heroAlias').value = (pick(UI.hero.aliasWordsA) + ' ' + pick(UI.hero.aliasWordsB)).slice(0, ALIAS_MAX);
-  });
   el('heroGo').addEventListener('click', function () {
-    // Solo se guarda el alias que el nino escribio. Nunca sale del navegador.
-    HERO.alias = String(el('heroAlias').value || '').trim().slice(0, ALIAS_MAX);
     HERO.chosen = true;
     saveHero(); SFX.click();
     refreshSprites(); renderMap(); show('map');
@@ -1246,23 +1379,75 @@
 
   /* Monta la escena de la familia. `mech` ausente => `doors`, que es tambien
      el fallback de cualquier mecanica no implementada todavia. */
+  /* ¿Hay que animar? No con reduced-motion ni en modo aula. */
+  function motionOff() {
+    if (STATE.aula) return true;
+    try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+    catch (e) { return false; }
+  }
+
   function mountScene(mech, variant, order) {
     if (scene) { scene.destroy(); scene = null; }
+    var hostEl = el('qScene');
+
+    /* Camino de tramos: la escena anterior SALE por la izquierda mientras la
+       nueva ENTRA por la derecha. Es CSS por clase; nada bloquea la respuesta:
+       el nino puede mover al heroe en el primer frame. La vieja se retira al
+       terminar su animacion (o al instante si no hay animacion). */
+    var old = hostEl.querySelector('.scene-slot:not(.is-out)');
+    var still = motionOff();
+    if (old) {
+      if (still) { hostEl.removeChild(old); }
+      else {
+        old.classList.add('is-out');
+        old.setAttribute('aria-hidden', 'true');
+        var gone = false;
+        var drop = function () { if (!gone && old.parentNode) { gone = true; old.parentNode.removeChild(old); } };
+        old.addEventListener('animationend', drop);
+        setTimeout(drop, 600);   // red de seguridad, no un reloj de juego
+      }
+      Array.prototype.forEach.call(hostEl.querySelectorAll('.scene-slot.is-out'), function (n) {
+        if (n !== old) n.parentNode.removeChild(n);
+      });
+    }
+
+    var slot = document.createElement('div');
+    slot.className = 'scene-slot' + (old && !still ? ' is-in' : '');
+    hostEl.appendChild(slot);
+
     var factory = SCENES[mech] || SCENES.doors;
     scene = factory();
-    scene.mount(el('qScene'), {
+    scene.mount(slot, {
       variant: variant,
       order: order,
       keys: KEYS,
       pick: function (origIdx) { answer(origIdx); },
-      say: announce
+      say: announce,
+      onStep: function (f) { ENV.parallax(f); },
+      help: function (html, stacked) {
+        var h = el('qHelp'); if (h) h.innerHTML = html;
+        ENV.stacked(stacked);
+      }
     });
+  }
+
+  /* El camino del HUD: un tramo por familia. */
+  function buildPath(total) {
+    var p = el('hudPath');
+    if (!p) return;
+    var s = '';
+    for (var i = 0; i < total; i++) s += '<i></i>';
+    p.innerHTML = s;
   }
 
   function startLevel(idx) {
     var lv = DATA.levels[idx];
     run = new Runner(lv);
+    q = null;
     el('hudLvl').textContent = fmt(UI.play.levelTag, { n: lv.id });
+    el('qScene').innerHTML = '';
+    ENV.mount(el('qWorld'), lv.env);      // sin env, no pinta nada: se ve como antes
+    buildPath(run.total);
     setMate('idle', UI.mate.start);
     if (STATE.music) MUSIC.start();
     show('play');
@@ -1271,8 +1456,10 @@
 
   function nextQuestion() {
     if (!run.queue.length) return winLevel();
+    var first = !q;
     q = run.current();
     locked = false;
+    if (!first && !motionOff()) ENV.shift();   // el lugar se desliza un tramo
 
     el('qTag').textContent = q.family.skill.toUpperCase().replace(/-/g, ' ');
     el('qStem').innerHTML = heroText(q.v.stem);
@@ -1316,12 +1503,7 @@
   function summonHint() {
     var panel = el('qHint');
     if (!panel) return;
-    var reduced = false;
-    try {
-      reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    } catch (e) { /* navegador viejo */ }
-
-    if (!scene || !scene.setMood || reduced) { panel.classList.add('is-on'); return; }
+    if (!scene || !scene.setMood || motionOff()) { panel.classList.add('is-on'); return; }
 
     SFX.summon();
     MUSIC.duck(1200);
@@ -1331,7 +1513,11 @@
   }
 
   function updateHUD() {
-    el('hudBar').style.width = Math.round(run.progress() * 100) + '%';
+    var segs = el('hudPath') ? el('hudPath').children : [];
+    for (var i = 0; i < segs.length; i++) {
+      segs[i].className = i < run.cleared ? 'on' : (i === run.cleared ? 'now' : '');
+    }
+    ENV.progress(run.progress());
     el('hudCount').textContent = run.cleared + '/' + run.total;
     el('hudXP').textContent = run.xp;
     el('hudCombo').textContent = run.combo;
@@ -1385,7 +1571,7 @@
   el('btnNext').addEventListener('click', function () { SFX.click(); nextQuestion(); });
   el('btnHint').addEventListener('click', function () { SFX.click(); summonHint(); });
   el('btnQuit').addEventListener('click', function () {
-    if (window.confirm(UI.play.confirmQuit)) { renderMap(); show('map'); }
+    if (window.confirm(UI.play.confirmQuit)) { ENV.destroy(); renderMap(); show('map'); }
   });
 
   /* ---------- TECLADO ----------
@@ -1395,6 +1581,9 @@
      Nada se mantiene pulsado, nada depende de repeticion de tecla. */
   document.addEventListener('keydown', function (e) {
     if (!screens.play.classList.contains('is-on')) return;
+    // Playtest H1: en los teclados viejos del colegio la flecha mantenida repite y
+    // el heroe se pasaba de largo dos casillas. Nada depende de la repeticion.
+    if (e.repeat) { e.preventDefault(); return; }
 
     var nextVisible = el('btnNext').style.display !== 'none';
     if ((e.key === 'Enter' || e.key === ' ') && nextVisible) {
@@ -1426,6 +1615,7 @@
     // Se leen ANTES de actualizar: son las marcas contra las que se compara.
     var prevBest = ls.best;
     var prevRun  = ls.history.length ? ls.history[ls.history.length - 1] : null;
+    var coloursBefore = unlockedColours();
 
     /* Medallas. `hits` y `firstHits` suben como mucho UNA vez por partida,
        aqui y no en cada respuesta: es lo que hace que plata exija 3 partidas
@@ -1447,6 +1637,11 @@
     if (ls.history.length > 5) ls.history = ls.history.slice(-5);
     if (run.bestCombo > (STATE.bestComboEver || 0)) STATE.bestComboEver = run.bestCombo;
     save();
+
+    // Recompensa por dominio: un color de armadura nuevo si este nivel acaba
+    // de llegar a 2+ estrellas por primera vez.
+    var coloursAfter = unlockedColours();
+    var newColour = coloursAfter > coloursBefore ? UI.armoury.colours[coloursAfter - 1] : null;
 
     /* Competir contra uno mismo: cuanto sobre el record, y cuanto sobre la
        partida anterior. Son cosas distintas y el nino ve las dos. */
@@ -1492,6 +1687,10 @@
           (rest > 0 ? '<span class="medal">' + fmt(UI.win.medalsMore, { n: rest }) + '</span>' : '') +
           '</div>';
       })() +
+      (newColour
+        ? '<p class="score-best"><span class="swatch swatch--inline" style="background:' + newColour.value + '" aria-hidden="true"></span> ' +
+          fmt(UI.win.colourNew, { colour: newColour.name }) + '</p>'
+        : '') +
       '<p class="text-dim" style="font-size:15px">' +
         (stars === 3 ? UI.win.verdict3
          : run.stuck() ? UI.win.verdictStuck
@@ -1528,6 +1727,19 @@
   }
   el('btnMusic').addEventListener('click', toggleMusic);
   el('btnMusic2').addEventListener('click', toggleMusic);
+
+  /* Modo aula (PLAN-AMBIENTES R6): apaga animacion ambiental, parallax,
+     transicion y particulas. Para TDAH y para proyectores de colegio. Se
+     recuerda. La clase en <html> la lee el CSS; motionOff() la lee el JS. */
+  function applyAula() {
+    document.documentElement.classList.toggle('is-aula', !!STATE.aula);
+  }
+  el('btnAula').addEventListener('click', function () {
+    STATE.aula = !STATE.aula; save(); SFX.click();
+    applyAula();
+    el('btnAula').textContent = STATE.aula ? UI.map.btnAulaOn : UI.map.btnAulaOff;
+  });
+  applyAula();
   el('btnMusic2').textContent = fmt(UI.play.btnMusic, { state: onOff(STATE.music) });
 
   // Los navegadores solo permiten audio tras una interaccion del usuario.

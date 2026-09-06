@@ -336,7 +336,7 @@ LEVELS.append({
     "name": "WHOLE NUMBER WAY",
     "subtitle": "Counting on and back with whole numbers",
     "briefing": [
-        "<p>Welcome, {hero}. Before anything else you need the basic move: <b>the step</b>.</p>",
+        "<p>Welcome. Before anything else you need the basic move: <b>the step</b>.</p>",
         "<p>A sequence is just numbers that follow a rule. To find the rule, look at the jump between two numbers next to each other.</p>",
         "<div class='example'>4, 11, 18, 25<br>11 - 4 = 7<br>18 - 11 = 7<br>Rule: count on in steps of 7</div>",
         "<ul>"
@@ -477,11 +477,11 @@ v = []
 for start, step, weeks in [(F(1250,100), F(-175,100), 3), (F(2,1), F(45,100), 4), (F(30,1), F(-25,10), 5), (F(2050,100), F(-250,100), 4), (F(5,1), F(125,100), 3)]:
     f = FMT["dec"]
     end = start + weeks * step
-    word = "spends" if step < 0 else "saves"
+    word = "spend" if step < 0 else "save"
     v.append(mk(
-        # {hero} lo sustituye el motor por el alias que eligio el nino. Nunca
-        # se escribe aqui el nombre de nadie: el juego lo usan 25 companeros.
-        f"{{hero}} has &pound;{f(start)} and {word} &pound;{f(abs(step))} each week. How much after {weeks} weeks?",
+        # Segunda persona: el personaje no tiene nombre ni genero, y el juego
+        # lo usan 25 companeros. Nunca se escribe aqui el nombre de nadie.
+        f"You have &pound;{f(start)} and {word} &pound;{f(abs(step))} each week. How much after {weeks} weeks?",
         "£" + f(end),
         ["£" + f(end + step), "£" + f(end - step), "£" + f(start + step)],
         f"That is {weeks} equal steps of {f(abs(step))}.",
@@ -1405,6 +1405,81 @@ LEVELS.append({
     ],
     "questions": L5,
 })
+
+# ---------------------------------------------------------------- lugares
+# Cada nivel es un LUGAR (PLAN-AMBIENTES.md). Aqui se declara con props de
+# assets/props.js, materiales y una paleta. El motor no conoce "castillo" ni
+# "bosque": solo pinta lo que este bloque dice. Un solo mundo coherente:
+# puente del castillo -> muralla -> vado del bosque -> mazmorra -> taller.
+#
+# Tokens: sky/sky2 cielo, far siluetas, wall/floor tinte de material,
+# prop/prop2 cuerpos, glow/glow2 luz, line bordes, slot/slotline casillas.
+# Texto blanco #eaf0ff sobre `slot`: contraste verificado >= 8:1 en los cinco.
+ENVS = {
+    1: {  # puente de piedra sobre el foso, de noche
+        "palette": {"sky": "#1a1420", "sky2": "#2b2030", "far": "#2a2030", "wall": "#4a3f4d",
+                    "floor": "#2f2733", "prop": "#5a3a1f", "prop2": "#7a6a80", "glow": "#ffb347",
+                    "glow2": "#ffe08a", "line": "#6b5c70", "slot": "#3a2a1f", "slotline": "#c98a4b"},
+        "materials": {"wall": "brick", "floor": "flag"},
+        "far":  [{"prop": "tower", "x": 8, "scale": 1.1}, {"prop": "tower", "x": 34, "scale": 0.8},
+                 {"prop": "tower", "x": 60, "scale": 0.95}],
+        "wall": [{"prop": "merlon", "repeat": 8, "y": "top", "top": 0},
+                 {"prop": "torch", "x": 14, "y": "top", "top": 16}, {"prop": "window", "x": 48, "y": "top", "top": 14},
+                 {"prop": "torch", "x": 84, "y": "top", "top": 16}],
+        "gate": "gate",
+        "transition": "slide",
+    },
+    2: {  # adarve de la muralla, de dia
+        "palette": {"sky": "#4f86cf", "sky2": "#a9c8f0", "far": "#5c6f9c", "wall": "#8b8c9a",
+                    "floor": "#6d6e7c", "prop": "#6b4a2c", "prop2": "#9a9bb0", "glow": "#ffe08a",
+                    "glow2": "#ffffff", "line": "#4a4a66", "slot": "#3f3f52", "slotline": "#d0d0e0"},
+        "materials": {"wall": "stone", "floor": "flag"},
+        "far":  [{"prop": "tower", "x": 12, "scale": 0.9}, {"prop": "treefar", "x": 40, "scale": 0.7},
+                 {"prop": "treefar", "x": 50, "scale": 0.9}, {"prop": "tower", "x": 72, "scale": 0.7}],
+        "wall": [{"prop": "merlon", "repeat": 9, "y": "top", "top": 0},
+                 {"prop": "window", "x": 30, "y": "top", "top": 14}, {"prop": "window", "x": 70, "y": "top", "top": 14}],
+        "gate": "gate",
+        "transition": "slide",
+    },
+    3: {  # vado del rio en el bosque
+        "palette": {"sky": "#0e2a1c", "sky2": "#173d26", "far": "#123320", "wall": "#1f5a33",
+                    "floor": "#3d6b2a", "prop": "#4a2f1a", "prop2": "#2e7d3e", "glow": "#c8ff5c",
+                    "glow2": "#eaffb0", "line": "#5a8a3a", "slot": "#3b2412", "slotline": "#a4722f"},
+        "materials": {"wall": "leaves", "floor": "grass"},
+        "far":  [{"prop": "treefar", "x": 6, "scale": 1.2}, {"prop": "treefar", "x": 18, "scale": 0.9},
+                 {"prop": "treefar", "x": 30, "scale": 1.1}, {"prop": "treefar", "x": 70, "scale": 1.0},
+                 {"prop": "treefar", "x": 82, "scale": 1.2}],
+        "wall": [{"prop": "tree", "x": 9, "scale": 1.3}, {"prop": "reeds", "x": 40}, {"prop": "reeds", "x": 62},
+                 {"prop": "tree", "x": 92, "scale": 1.15}],
+        "fg":   [{"prop": "bush", "x": 5}, {"prop": "bush", "x": 94, "scale": 0.9}],
+        "gate": "gate",
+        "transition": "slide",
+    },
+    4: {  # mazmorra bajo la torre: roca, cristales, luz fria
+        "palette": {"sky": "#0b1018", "sky2": "#141c28", "far": "#1b2838", "wall": "#2b3a4a",
+                    "floor": "#1e2a36", "prop": "#3a4a5a", "prop2": "#4a5a6a", "glow": "#7ee8fa",
+                    "glow2": "#d8f6ff", "line": "#4a6a8a", "slot": "#1e2c3d", "slotline": "#9fe0ff"},
+        "materials": {"wall": "rock", "floor": "rock"},
+        "far":  [{"prop": "stalac", "repeat": 6, "y": "top", "top": 0}],
+        "wall": [{"prop": "crystal", "x": 12}, {"prop": "torch", "x": 32, "y": "top", "top": 18},
+                 {"prop": "crystal", "x": 52, "scale": 0.8}, {"prop": "crystal", "x": 86, "scale": 1.1}],
+        "gate": "gate",
+        "transition": "slide",
+    },
+    5: {  # taller de maquinas en lo alto de la torre
+        "palette": {"sky": "#2a1a08", "sky2": "#3e2c10", "far": "#4a3618", "wall": "#6a4a20",
+                    "floor": "#5a3d1a", "prop": "#3a2a10", "prop2": "#c48a2a", "glow": "#ffd93d",
+                    "glow2": "#fff2b0", "line": "#8a6a2a", "slot": "#3e2c10", "slotline": "#ffd93d"},
+        "materials": {"wall": "metal", "floor": "plank"},
+        "far":  [{"prop": "gear", "x": 15, "y": "top", "top": 8, "scale": 1.8}, {"prop": "gear", "x": 78, "y": "top", "top": 4, "scale": 1.3}],
+        "wall": [{"prop": "lamp", "x": 25, "y": "top", "top": 0}, {"prop": "lamp", "x": 75, "y": "top", "top": 0},
+                 {"prop": "gear", "x": 50, "scale": 1.4}],
+        "gate": "gate",
+        "transition": "slide",
+    },
+}
+for _lv in LEVELS:
+    _lv["env"] = ENVS[_lv["id"]]
 
 # ---------------------------------------------------------------- output
 DATA = {

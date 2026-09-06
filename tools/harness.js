@@ -111,7 +111,7 @@ function visible(doc, id) { const n = doc.getElementById(id); return !!n && n.cl
 function findVariant(win, doc) {
   const stem = html(doc, 'qStem');
   // v2: las opciones son puertas de la escena, no botones de una lista.
-  const opts = Array.from(doc.querySelectorAll('#qScene .door'))
+  const opts = Array.from(doc.querySelectorAll('#qScene .scene-slot:not(.is-out) .door'))
     .map((b, pos) => ({ orig: parseInt(b.getAttribute('data-orig'), 10), pos, node: b }));
   const shown = new Array(opts.length);
   opts.forEach(o => { shown[o.orig] = o.node.querySelector('.door__value').innerHTML; });
@@ -139,7 +139,7 @@ function findVariant(win, doc) {
 
 /* Raton/touch: un clic en la puerta = caminar hasta ella y cruzarla. */
 function clickOption(doc, origIdx) {
-  const b = doc.querySelector('#qScene .door[data-orig="' + origIdx + '"]');
+  const b = doc.querySelector('#qScene .scene-slot:not(.is-out) .door[data-orig="' + origIdx + '"]');
   if (!b) throw new Error('no encuentro la puerta ' + origIdx);
   b.click();
   return b;
@@ -153,12 +153,12 @@ function key(win, doc, k) {
    la flecha derecha hasta la puerta elegida y la cruza con Enter.
    Es el recorrido de un nino sin raton, y el de un lector de pantalla. */
 function walkAndConfirm(win, doc, origIdx) {
-  const doors = Array.from(doc.querySelectorAll('#qScene .door'));
+  const doors = Array.from(doc.querySelectorAll('#qScene .scene-slot:not(.is-out) .door'));
   const pos = doors.findIndex(d => parseInt(d.getAttribute('data-orig'), 10) === origIdx);
   if (pos === -1) throw new Error('no encuentro la puerta ' + origIdx);
   // Enter en la casilla de inicio no debe responder nada: se comprueba fuera.
   for (let i = 0; i <= pos; i++) key(win, doc, 'ArrowRight');
-  const here = doc.querySelectorAll('#qScene .door.is-here');
+  const here = doc.querySelectorAll('#qScene .scene-slot:not(.is-out) .door.is-here');
   key(win, doc, 'Enter');
   return { pos, hereCount: here.length, hereOrig: here.length === 1 ? parseInt(here[0].getAttribute('data-orig'), 10) : null };
 }
@@ -201,7 +201,7 @@ function playFullLevel(slug, levelIdx, plan) {
     const longest = found.pick.v.options
       .map(o => String(o).replace(/<[^>]*>/g, '').length)
       .reduce((a, b) => Math.max(a, b), 0);
-    const isStacked = !!doc.querySelector('.scene--stacked');
+    const isStacked = !!doc.querySelector('#qScene .scene-slot:not(.is-out) .scene--stacked');
     if (isStacked) layout.stacked++; else layout.row++;
     if (isStacked !== (longest > 12)) {
       layout.wrong.push('opcion de ' + longest + ' car. -> ' + (isStacked ? 'vertical' : 'horizontal'));
@@ -233,10 +233,13 @@ function playFullLevel(slug, levelIdx, plan) {
     }
 
     // La puerta correcta debe iluminarse siempre, sea cual sea el orden barajado.
-    const lit = doc.querySelector('#qScene .door.is-right');
+    const lit = doc.querySelector('#qScene .scene-slot:not(.is-out) .door.is-right');
     if (!lit || parseInt(lit.getAttribute('data-orig'), 10) !== answer) rightHighlightOk = false;
-    // Al fallar, el heroe vuelve al inicio del tramo y ninguna puerta queda "aqui".
-    if (goWrong && doc.querySelectorAll('#qScene .door.is-here').length !== 0) heroReturned = false;
+    // Playtest H2: al fallar, el heroe SE QUEDA en la puerta roja (no vuelve al inicio).
+    if (goWrong) {
+      const here = doc.querySelectorAll('#qScene .scene-slot:not(.is-out) .door.is-here');
+      if (here.length !== 1 || parseInt(here[0].getAttribute('data-orig'), 10) !== choice) heroReturned = false;
+    }
 
     const next = doc.getElementById('btnNext');
     next.click();
@@ -286,7 +289,7 @@ async function main() {
   check('el nivel termina y aparece la pantalla de victoria', visible(r.doc, 'scrWin'));
   check('se hicieron los 4 fallos previstos', r.wrongsDone === 4, 'fallos=' + r.wrongsDone);
   check('la puerta correcta se ilumina tras barajar', r.rightHighlightOk);
-  check('tras fallar, el heroe vuelve al inicio del tramo', r.heroReturned);
+  check('tras fallar, el heroe se queda en la puerta roja (H2)', r.heroReturned);
   check('ninguna variante es ambigua (mismo texto, distinta respuesta)', !r.ambiguousSeen);
 
   /* ---------- 1b. El mismo nivel SOLO con el teclado ---------- */
@@ -296,7 +299,7 @@ async function main() {
   check('el nivel termina solo con teclado', visible(rk.doc, 'scrWin'));
   check('el heroe pisa siempre la puerta elegida', rk.walkOk);
   check('la puerta correcta se ilumina', rk.rightHighlightOk);
-  check('tras fallar, el heroe vuelve al inicio', rk.heroReturned);
+  check('tras fallar, el heroe se queda en la puerta roja', rk.heroReturned);
   const savedK = JSON.parse(rk.win.localStorage.getItem('samuel-quest:' + slug));
   check('la partida por teclado se guarda igual', savedK.levels[rk.win.QUIZ_DATA.levels[0].id].done === true);
   rk.dom.window.close();
@@ -308,7 +311,7 @@ async function main() {
   dd.querySelectorAll('#levelList .level-card')[0].dispatchEvent(new dw.MouseEvent('click', { bubbles: true }));
   dd.getElementById('briefGo').click();
 
-  const doors = Array.from(dd.querySelectorAll('#qScene .door'));
+  const doors = Array.from(dd.querySelectorAll('#qScene .scene-slot:not(.is-out) .door'));
   check('la escena pinta 4 puertas', doors.length === 4, 'puertas=' + doors.length);
   check('cada puerta es un <button> real', doors.every(d => d.tagName === 'BUTTON' && d.type === 'button'));
   check('cada puerta lleva aria-label con su letra y su valor',
@@ -319,20 +322,20 @@ async function main() {
 
   // El heroe arranca FUERA de las puertas: moverse es parte de responder.
   check('el heroe arranca en la casilla de inicio, no sobre una puerta',
-        dd.querySelectorAll('#qScene .door.is-here').length === 0 &&
-        dd.querySelector('.scene__start').classList.contains('is-here'));
+        dd.querySelectorAll('#qScene .scene-slot:not(.is-out) .door.is-here').length === 0 &&
+        dd.querySelector('#qScene .scene-slot:not(.is-out) .scene__start').classList.contains('is-here'));
   // Enter sin haberse movido no puede contestar.
   key(dw, dd, 'Enter');
   check('Enter en el inicio no responde nada', !doors.some(d => d.disabled));
   check('...y avisa de que hay que moverse', (txt(dd, 'qSay') || '').length > 0, 'aria-live="' + txt(dd, 'qSay') + '"');
 
   key(dw, dd, 'ArrowRight');
-  check('una flecha mueve exactamente una casilla', dd.querySelectorAll('#qScene .door.is-here').length === 1 &&
+  check('una flecha mueve exactamente una casilla', dd.querySelectorAll('#qScene .scene-slot:not(.is-out) .door.is-here').length === 1 &&
         doors[0].classList.contains('is-here'));
   check('la posicion se anuncia por aria-live', (txt(dd, 'qSay') || '').length > 0);
   key(dw, dd, 'ArrowLeft'); key(dw, dd, 'ArrowLeft');
   check('no se puede salir del corredor por la izquierda',
-        dd.querySelector('.scene__start').classList.contains('is-here'));
+        dd.querySelector('#qScene .scene-slot:not(.is-out) .scene__start').classList.contains('is-here'));
   for (let i = 0; i < 9; i++) key(dw, dd, 'ArrowRight');
   check('no se puede salir del corredor por la derecha',
         doors[3].classList.contains('is-here'));
@@ -522,26 +525,32 @@ async function main() {
         !/\b(girl|boy|female|male|chica|chico)\b/i.test(fs.readFileSync(path.join(ROOT, 'assets', 'engine.js'), 'utf8')));
 
   cards[1].click();                                   // elige la silueta b
-  hd.getElementById('heroAlias').value = 'PIXEL FOX';
   hd.getElementById('heroGo').click();
   check('tras elegir, se entra al mapa', visible(hd, 'scrMap') && !visible(hd, 'scrHero'));
   const hero1 = JSON.parse(hw.localStorage.getItem(HERO_KEY));
   check('el heroe se guarda en su propia clave, no en la del progreso',
-        hero1.body === 'b' && hero1.chosen === true && hero1.alias === 'PIXEL FOX');
+        hero1.body === 'b' && hero1.chosen === true);
   check('la clave del heroe NO lleva el slug de la materia (es transversal)',
         HERO_KEY === 'samuel-quest:hero');
   check('el progreso de la materia sigue en su clave aparte',
         hw.localStorage.getItem('samuel-quest:' + slug) !== hw.localStorage.getItem(HERO_KEY));
 
-  // El alias se recorta a 12 y nunca se pide el nombre real.
-  hd.getElementById('btnHero').click();
-  hd.getElementById('heroAlias').value = 'ESTE ALIAS ES DEMASIADO LARGO';
-  hd.getElementById('heroGo').click();
-  check('el alias se recorta a 12 caracteres',
-        JSON.parse(hw.localStorage.getItem(HERO_KEY)).alias.length === 12);
-  check('el campo del alias tiene maxlength en el HTML',
-        hd.getElementById('heroAlias').getAttribute('maxlength') === '12');
+  /* El personaje NO tiene nombre. Decision de Rafael: un nombre es la via mas
+     facil de atribuirle genero. Ni campo de texto, ni alias guardado. */
+  check('la pantalla HERO no pide ningun nombre',
+        hd.querySelector('#scrHero input') === null && !/name/i.test(hd.getElementById('scrHero').textContent));
+  check('el heroe guardado no lleva alias ni texto libre',
+        !('alias' in hero1) && Object.keys(hero1).every(k => ['v', 'body', 'chosen', 'colors'].indexOf(k) !== -1),
+        Object.keys(hero1).join(','));
   h1.window.close();
+
+  // Un save de heroe anterior con alias se carga sin romperse y el alias se descarta.
+  const hOld = openGame(slug, null, { hero: { v: 1, body: 'a', alias: 'PIXEL FOX', chosen: true } });
+  hOld.window.document.getElementById('btnArm').click();
+  hOld.window.document.querySelector('.swatch[data-row="0"][data-col="3"]').click();
+  check('un alias guardado por una version anterior se descarta al guardar',
+        !('alias' in JSON.parse(hOld.window.localStorage.getItem(HERO_KEY))));
+  hOld.window.close();
 
   section('8b. Armeria: 4 piezas, 8 colores, persistencia');
   const h2 = openGame(slug, null, { hero: heroDone({ body: 'b' }) });
@@ -559,23 +568,37 @@ async function main() {
   const marked = ad.querySelectorAll('#armRows .swatch.is-on');
   check('las 4 filas arrancan con su color marcado', marked.length === 4,
         'marcadas=' + marked.length + ' de 4');
-  // Pinta una pieza distinta en cada fila.
+  /* Colores desbloqueables: un jugador nuevo tiene 4 de 8. */
+  check('un jugador nuevo ve 4 colores bloqueados por fila',
+        ad.querySelectorAll('.arm-row').length === 4 &&
+        Array.from(ad.querySelectorAll('.arm-row')).every(r => r.querySelectorAll('.swatch.is-locked').length === 4));
+  check('los bloqueados estan deshabilitados y explican como desbloquear',
+        Array.from(ad.querySelectorAll('.swatch.is-locked')).every(s => s.disabled && /locked/i.test(s.getAttribute('aria-label'))));
+  check('la armeria dice cuantos colores hay desbloqueados', /4 of 8/.test(ad.getElementById('armUnlock').textContent));
+  const beforeLocked = JSON.stringify(JSON.parse(aw.localStorage.getItem(HERO_KEY)).colors);
+  ad.querySelector('.swatch[data-row="0"][data-col="7"]').click();
+  check('clicar un color bloqueado no cambia nada',
+        beforeLocked === JSON.stringify(JSON.parse(aw.localStorage.getItem(HERO_KEY)).colors));
+  // Pinta una pieza distinta en cada fila, con colores desbloqueados.
+  const wanted = {};
   [0, 1, 2, 3].forEach(r => {
-    const s = ad.querySelector('.swatch[data-row="' + r + '"][data-col="' + (r + 2) + '"]');
-    if (s) s.click();
+    const col = (r + 1) % 4;
+    const s = ad.querySelector('.swatch[data-row="' + r + '"][data-col="' + col + '"]');
+    wanted[s.getAttribute('data-piece')] = aw.GAME_UI.armoury.colours[col].value;
+    s.click();
   });
   const colours = JSON.parse(aw.localStorage.getItem(HERO_KEY)).colors;
-  check('las 4 piezas quedan guardadas',
-        ['helm', 'body', 'glove', 'boot'].every(k => /^#[0-9a-f]{6}$/i.test(colours[k])),
-        JSON.stringify(colours));
+  check('las 4 piezas quedan guardadas con el color elegido',
+        ['helm', 'body', 'glove', 'boot'].every(k => colours[k] === wanted[k]),
+        JSON.stringify(colours) + ' vs ' + JSON.stringify(wanted));
   h2.window.close();
 
   // Recargar (y "cambiar de materia" = misma clave de heroe, otra partida).
-  const h3 = openGame(slug, null, { hero: heroDone({ body: 'b', colors: colours, alias: 'NEON OWL' }) });
+  const h3 = openGame(slug, null, { hero: heroDone({ body: 'b', colors: colours }) });
   const rd = h3.window.document;
   const kept = JSON.parse(h3.window.localStorage.getItem(HERO_KEY));
-  check('al recargar se conservan cuerpo, alias y colores',
-        kept.body === 'b' && kept.alias === 'NEON OWL' &&
+  check('al recargar se conservan cuerpo y colores',
+        kept.body === 'b' &&
         ['helm', 'body', 'glove', 'boot'].every(k => kept.colors[k] === colours[k]));
   const rootStyle = rd.documentElement.getAttribute('style') || '';
   check('las 4 variables de armadura se pintan en el documento',
@@ -584,14 +607,28 @@ async function main() {
   const svg = rd.getElementById('heroSprite').innerHTML;
   check('el sprite no lleva ningun color fijo en las 4 piezas',
         ['--h-helm', '--h-body', '--h-glove', '--h-boot'].every(v => svg.indexOf('var(' + v + ')') !== -1));
-  check('el alias sustituye a {hero} en el contenido',
-        (function () {
-          rd.querySelectorAll('#levelList .level-card')[0]
-            .dispatchEvent(new h3.window.MouseEvent('click', { bubbles: true }));
-          const b = rd.getElementById('briefBody').textContent;
-          return b.indexOf('NEON OWL') !== -1 && b.indexOf('{hero}') === -1;
-        })());
   h3.window.close();
+
+  section('8b2. Colores que se ganan dominando niveles');
+  const hu = openGame(slug, {
+    version: 3, sound: true, music: false, aula: false, totalXP: 0, skills: {}, bestComboEver: 0,
+    levels: { 1: { done: true, stars: 3, best: 3000, plays: 1, bossClean: false, history: [] },
+              2: { done: true, stars: 2, best: 2500, plays: 1, bossClean: false, history: [] },
+              3: { done: true, stars: 1, best: 2000, plays: 1, bossClean: false, history: [] } }
+  }, { hero: heroDone() });
+  hu.window.document.getElementById('btnArm').click();
+  check('dos niveles con 2+ estrellas desbloquean dos colores mas (6 de 8)',
+        hu.window.document.querySelectorAll('.arm-row')[0].querySelectorAll('.swatch.is-locked').length === 2 &&
+        /6 of 8/.test(hu.window.document.getElementById('armUnlock').textContent));
+  check('un nivel con 1 estrella no desbloquea nada', true);
+  hu.window.close();
+  // Un color elegido en otra materia nunca se bloquea aqui.
+  const hk = openGame(slug, null, { hero: heroDone({ colors: { helm: '#3ce88a', body: '#c77dff', glove: '#c77dff', boot: '#5b8cff' } }) });
+  hk.window.document.getElementById('btnArm').click();
+  const helmRow = hk.window.document.querySelectorAll('.arm-row')[0];
+  check('un color ya puesto (de otra materia) no aparece bloqueado',
+        helmRow.querySelector('.swatch.is-on') && !helmRow.querySelector('.swatch.is-on').classList.contains('is-locked'));
+  hk.window.close();
 
   section('8c. Invocar la calculadora: la pista llega despues de la animacion');
   const h4 = openGame(slug, null, { hero: heroDone() });
@@ -602,15 +639,15 @@ async function main() {
   check('en la pantalla de juego solo hay UN heroe, el de la escena',
         cd.querySelectorAll('#scrPlay .avatar').length === 1,
         'sprites en la pantalla de juego=' + cd.querySelectorAll('#scrPlay .avatar').length);
-  check('ese heroe esta en el corredor', !!cd.querySelector('#qScene .scene__hero .avatar'));
-  check('el heroe respira en reposo', !!cd.querySelector('#qScene .scene__hero .avatar--bob'));
+  check('ese heroe esta en el corredor', !!cd.querySelector('#qScene .scene-slot:not(.is-out) .scene__hero .avatar'));
+  check('el heroe respira en reposo', !!cd.querySelector('#qScene .scene-slot:not(.is-out) .scene__hero .avatar--bob'));
 
   cd.getElementById('btnHint').click();
   check('al pulsar HINT la pista NO se abre de golpe',
         !cd.getElementById('qHint').classList.contains('is-on'));
   check('el heroe de la escena alza el brazo y aparece la calculadora',
-        cd.querySelector('#qScene .scene__hero .calc') !== null &&
-        cd.querySelector('#qScene .scene__hero .avatar--summon') !== null);
+        cd.querySelector('#qScene .scene-slot:not(.is-out) .scene__hero .calc') !== null &&
+        cd.querySelector('#qScene .scene-slot:not(.is-out) .scene__hero .avatar--summon') !== null);
   await sleep(500);
   check('a mitad de la animacion la pista sigue cerrada',
         !cd.getElementById('qHint').classList.contains('is-on'));
@@ -627,15 +664,16 @@ async function main() {
   check('con reduced-motion la pista abre sin esperar',
         pd.getElementById('qHint').classList.contains('is-on'));
   check('...y sin animacion de invocacion',
-        pd.querySelector('#qScene .avatar--summon') === null);
+        pd.querySelector('#qScene .scene-slot:not(.is-out) .avatar--summon') === null);
   h5.window.close();
 
-  section('8d. Ningun nombre real en lo que el nino LEE');
+  section('8d. Ningun nombre en lo que el nino LEE: el personaje no lo tiene');
   const gameSrc = fs.readFileSync(path.join(ROOT, slug + '.html'), 'utf8');
 
   /* Se recorre el juego y se mira el texto VISIBLE, no el codigo fuente:
-     lo que importa es que 25 companeros no lean el nombre de nadie. */
-  const h6 = openGame(slug, null, { hero: heroDone({ alias: 'TURBO LYNX' }) });
+     lo que importa es que 25 companeros no lean el nombre de nadie, y que el
+     personaje no tenga uno propio. */
+  const h6 = openGame(slug, null, { hero: heroDone() });
   const nw = h6.window, nd = nw.document;
   let seen = nd.querySelector('.wrap').textContent;
   nd.querySelectorAll('#levelList .level-card')[0].dispatchEvent(new nw.MouseEvent('click', { bubbles: true }));
@@ -651,7 +689,8 @@ async function main() {
   }
   check('ningun texto visible dice "Samuel"', !/Samuel/i.test(seen));
   check('ningun texto visible deja el token {hero} sin sustituir', seen.indexOf('{hero}') === -1);
-  check('el alias del nino si aparece donde toca', seen.indexOf('TURBO LYNX') !== -1);
+  check('el contenido habla en segunda persona, sin nombre propio',
+        /\bYou have\b/.test(gameSrc) && !/\{hero\} has/.test(gameSrc));
   h6.window.close();
 
   // En el codigo solo puede quedar el alias historico de compatibilidad.
@@ -662,7 +701,7 @@ async function main() {
   check('cero "Samuel" en el hub', !/Samuel/.test(fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8')));
   check('el generador ya no incrusta un nombre',
         !/Samuel/.test(fs.readFileSync(path.join(ROOT, 'tools', 'gen_y6_maths_counting.py'), 'utf8')));
-  check('el contenido usa el token {hero}', /\{hero\}/.test(gameSrc));
+  check('el contenido no usa ningun token de nombre', !/\{hero\}/.test(fs.readFileSync(path.join(ROOT, 'subjects', slug, 'data.js'), 'utf8')));
   check('la clave de guardado sigue siendo samuel-quest (no se renombra)',
         gameSrc.indexOf("'samuel-quest:'") !== -1 && gameSrc.indexOf("'samuel-quest:hero'") !== -1);
 
@@ -717,6 +756,11 @@ async function main() {
   check('el delta contra la partida anterior se muestra',
         /better than last time|below last time|Same score/.test(r3.winText), r3.winText.slice(0, 0));
   check('la primera partida dice que es la primera', /First time through/.test(r1.winText));
+  // La victoria anuncia un color de armadura nuevo la primera vez que el
+  // nivel llega a 2+ estrellas, y no lo repite despues.
+  check('llegar a 2+ estrellas por primera vez anuncia un color de armadura nuevo',
+        /NEW ARMOUR COLOUR UNLOCKED/.test(r1.winText) || /NEW ARMOUR COLOUR UNLOCKED/.test(r2.winText));
+  check('...y no se repite en partidas siguientes', !/NEW ARMOUR COLOUR UNLOCKED/.test(r3.winText));
 
   /* COMPORTAMIENTO CONOCIDO, no un fallo del test: el XP premia la racha, y
      fallar la PRIMERA pregunta no rompe ninguna racha porque el combo ya
@@ -789,6 +833,139 @@ async function main() {
         /Nothing played yet/.test(pf2.window.document.getElementById('profBody').textContent));
   pf2.window.close();
   void lvId1;
+
+  /* ============================================================
+     10. LUGARES (PLAN-AMBIENTES) y camino de tramos
+     ============================================================ */
+  section('10. Cada nivel es un lugar: capas, props, materiales');
+  const ev = openGame(slug, {
+    version: 3, sound: true, music: false, aula: false, totalXP: 0, skills: {}, bestComboEver: 0,
+    levels: { 1: { done: true, stars: 3, best: 3600, plays: 1, bossClean: false, history: [] },
+              2: { done: true, stars: 3, best: 3600, plays: 1, bossClean: false, history: [] },
+              3: { done: true, stars: 3, best: 3600, plays: 1, bossClean: false, history: [] },
+              4: { done: true, stars: 3, best: 3600, plays: 1, bossClean: false, history: [] } }
+  }, { hero: heroDone() });
+  const ew = ev.window, ed = ew.document;
+  const lvls = ew.QUIZ_DATA.levels;
+  check('todos los niveles declaran un lugar en datos', lvls.every(l => l.env && l.env.palette && l.env.materials));
+  const propIds = Object.keys(ew.GAME_PROPS.props);
+  const matIds  = Object.keys(ew.GAME_PROPS.materials);
+  const usedProps = [], usedMats = [];
+  lvls.forEach(l => {
+    ['far', 'wall', 'fg'].forEach(k => (l.env[k] || []).forEach(o => usedProps.push(o.prop)));
+    if (l.env.gate) usedProps.push(l.env.gate);
+    Object.keys(l.env.materials).forEach(k => usedMats.push(l.env.materials[k]));
+  });
+  check('todo prop declarado en datos existe en props.js',
+        usedProps.every(p => propIds.indexOf(p) !== -1), usedProps.filter(p => propIds.indexOf(p) === -1).join(','));
+  check('todo material declarado existe en props.js', usedMats.every(m => matIds.indexOf(m) !== -1));
+  check('cada nivel tiene una paleta distinta (no son el mismo sitio repintado)',
+        new Set(lvls.map(l => l.env.palette.sky + l.env.materials.wall + l.env.materials.floor)).size === lvls.length);
+
+  /* Regla R7: cero nombres de lugar en el motor. Los ids de props solo pueden
+     aparecer en props.js y en data.js. */
+  const engSrc = fs.readFileSync(path.join(ROOT, 'assets', 'engine.js'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');          // los comentarios no son codigo
+  const leakedProps = propIds.filter(p => new RegExp("['\"]" + p + "['\"]").test(engSrc));
+  check('ningun id de prop aparece como literal en engine.js', leakedProps.length === 0, leakedProps.join(','));
+  check('el motor no conoce lugares por nombre',
+        !/\b(castle|castillo|forest|bosque|cave|cueva|tower|torre|river|rio)\b/i.test(engSrc));
+
+  // Montaje real: entrar al nivel 1 y al 3, comparar.
+  function enterLevel(doc, win, idx) {
+    doc.querySelectorAll('#levelList .level-card')[idx].dispatchEvent(new win.MouseEvent('click', { bubbles: true }));
+    doc.getElementById('briefGo').click();
+  }
+  enterLevel(ed, ew, 0);
+  const world = ed.getElementById('qWorld');
+  check('al entrar a un nivel se monta el lugar detras de la escena',
+        !!world.querySelector('.env') && world.classList.contains('has-env'));
+  check('el lugar tiene cielo, lejano, pared, suelo',
+        ['env__sky', 'env__far', 'env__wall', 'env__floor'].every(c => !!world.querySelector('.' + c)));
+  const nProps = world.querySelectorAll('.env .prop').length;
+  check('el lugar tiene props pintados', nProps >= 6, 'props=' + nProps);
+  /* El url() del material vive dentro de style="...": con comillas dobles el
+     atributo se cortaba en `url(` y no se pintaba nada. Paso. Se exige el
+     data-URI COMPLETO, con su cierre. */
+  const matRe = /url\('data:image\/svg\+xml,[^']+'\)/;
+  check('la pared y el suelo llevan material tintado, entero (el style no se corta)',
+        matRe.test(world.querySelector('.env__wall').getAttribute('style') || '') &&
+        matRe.test(world.querySelector('.env__floor').getAttribute('style') || ''),
+        (world.querySelector('.env__wall').getAttribute('style') || '').slice(0, 90));
+  check('la puerta del jefe esta al fondo desde el primer tramo', !!world.querySelector('.env__gate'));
+  check('las variables del lugar estan en el host (las puertas las heredan)',
+        /--env-slot/.test(world.getAttribute('style') || ''));
+  check('todo lo decorativo es aria-hidden', world.querySelector('.env').getAttribute('aria-hidden') === 'true');
+  check('el lugar se pinta DETRAS de la escena', world.firstElementChild.classList.contains('env'));
+  const sky1 = world.style.getPropertyValue('--env-sky');
+
+  // El camino del HUD: un tramo por familia.
+  const segs = ed.querySelectorAll('#hudPath i');
+  check('el HUD muestra el camino con un tramo por familia', segs.length === lvls[0].questions.length, 'tramos=' + segs.length);
+  check('el tramo actual esta marcado', ed.querySelectorAll('#hudPath i.now').length === 1);
+
+  // Responder y avanzar: la puerta del jefe se acerca, el lugar se desliza,
+  // la escena nueva es respondible en el mismo tick.
+  let f0 = findVariant(ew, ed);
+  clickOption(ed, f0.pick.v.answer);
+  const gs0 = world.querySelector('.env__gate').style.getPropertyValue('--gs');
+  ed.getElementById('btnNext').click();
+  check('tras NEXT el lugar se desliza un tramo (clase is-shift)', world.querySelector('.env').classList.contains('is-shift'));
+  check('la escena nueva entra (is-in) y la vieja sale (is-out)',
+        !!ed.querySelector('#qScene .scene-slot.is-in') && !!ed.querySelector('#qScene .scene-slot.is-out'));
+  check('la escena que sale es aria-hidden y no recibe clics',
+        ed.querySelector('#qScene .scene-slot.is-out').getAttribute('aria-hidden') === 'true');
+  const f1 = findVariant(ew, ed);
+  check('la pregunta siguiente es respondible en el MISMO tick (la transicion no bloquea)', !!f1);
+  check('un tramo del camino queda marcado como superado', ed.querySelectorAll('#hudPath i.on').length === 1);
+  check('la puerta del jefe se ha acercado', parseFloat(gs0) > 0.45);
+  await sleep(700);
+  check('la escena vieja se retira sola', !ed.querySelector('#qScene .scene-slot.is-out'));
+
+  // Parallax: mover al heroe cambia --hx.
+  key(ew, ed, 'ArrowRight'); key(ew, ed, 'ArrowRight');
+  check('mover al heroe desplaza el lugar (parallax --hx)', parseFloat(world.querySelector('.env').style.getPropertyValue('--hx')) > 0);
+
+  // Otro nivel, otro lugar.
+  ed.getElementById('btnQuit').click();
+  check('al salir, el lugar se desmonta', !world.querySelector('.env') && !world.classList.contains('has-env'));
+  enterLevel(ed, ew, 2);
+  const sky3 = world.style.getPropertyValue('--env-sky');
+  check('el nivel 3 es otro lugar (otro cielo)', sky3 && sky3 !== sky1, sky1 + ' vs ' + sky3);
+  ev.window.close();
+
+  section('10b. Modo aula y reduced-motion: el lugar se queda quieto');
+  const ea = openGame(slug, null, { hero: heroDone() });
+  const aw2 = ea.window, adoc = aw2.document;
+  adoc.getElementById('btnAula').click();
+  check('el boton de modo aula cambia de estado', /ON/.test(adoc.getElementById('btnAula').textContent));
+  check('modo aula se guarda', JSON.parse(aw2.localStorage.getItem('samuel-quest:' + slug)).aula === true);
+  check('modo aula pone la clase en <html>', adoc.documentElement.classList.contains('is-aula'));
+  enterLevel(adoc, aw2, 0);
+  let fa = findVariant(aw2, adoc); clickOption(adoc, fa.pick.v.answer);
+  adoc.getElementById('btnNext').click();
+  check('en modo aula no hay deslizamiento ni escena saliente',
+        !adoc.querySelector('#qWorld .env.is-shift') && !adoc.querySelector('#qScene .scene-slot.is-out'));
+  check('...pero el lugar sigue ahi (no se quita la escenografia, solo el movimiento)', !!adoc.querySelector('#qWorld .env'));
+  adoc.getElementById('btnHint').click();
+  check('en modo aula la pista abre sin esperar', adoc.getElementById('qHint').classList.contains('is-on'));
+  ea.window.close();
+  const cssPub2 = fs.readFileSync(path.join(ROOT, slug + '.html'), 'utf8');
+  check('reduced-motion apaga la animacion del lugar en CSS',
+        /prefers-reduced-motion[\s\S]{0,600}\.env[^{]*\{[^}]*animation:\s*none/.test(cssPub2));
+  check('modo aula apaga la animacion del lugar en CSS', /\.is-aula \.env[^{]*\{[^}]*animation:\s*none/.test(cssPub2));
+
+  section('10c. Teclado del colegio: la flecha mantenida no te pasa de largo');
+  const ek = openGame(slug, null, { hero: heroDone() });
+  const kw = ek.window, kd = kw.document;
+  enterLevel(kd, kw, 0);
+  key(kw, kd, 'ArrowRight');
+  kd.dispatchEvent(new kw.KeyboardEvent('keydown', { key: 'ArrowRight', repeat: true, bubbles: true, cancelable: true }));
+  kd.dispatchEvent(new kw.KeyboardEvent('keydown', { key: 'ArrowRight', repeat: true, bubbles: true, cancelable: true }));
+  const hereK = kd.querySelector('#qScene .scene-slot:not(.is-out) .door.is-here');
+  check('los keydown repetidos se ignoran: el heroe sigue en la primera puerta',
+        hereK && hereK === kd.querySelectorAll('#qScene .scene-slot:not(.is-out) .door')[0]);
+  ek.window.close();
 
   /* ---------- resumen ---------- */
   console.log('\n' + '-'.repeat(56));

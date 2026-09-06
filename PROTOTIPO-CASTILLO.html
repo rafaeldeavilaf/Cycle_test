@@ -1,11 +1,15 @@
-/* ============================================================
+<!DOCTYPE html><html lang="es" data-accent="maths"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prototipo — el puente del castillo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap">
+<style>/* ============================================================
    SAMUEL QUEST — ENGINE.CSS
    Shared pixel-gaming design system.
    DO NOT fork this file per subject. Subjects only override
    --accent / --accent-2 via the [data-accent] attribute.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap');
+
 
 /* ---------- 1. TOKENS ---------- */
 :root {
@@ -186,16 +190,15 @@ h3 { font-size: 12px; }
 .avatar--bob { animation: bob 1.4s steps(4) infinite; }
 
 /* Reacciones a la respuesta */
-/* Playtest H3: el brinco con escalado se leia "de kinder" a los 10-11.
-   Ahora es un gesto contenido: brazos arriba (ya en el sprite) y un pequeno
-   rebote, sin escalar. */
 @keyframes cheer {
-  0%   { transform: translateY(0); }
-  30%  { transform: translateY(-6px); }
-  60%  { transform: translateY(0); }
-  100% { transform: translateY(-2px); }
+  0%   { transform: translateY(0)     scale(1); }
+  20%  { transform: translateY(-16px) scale(1.1); }
+  40%  { transform: translateY(0)     scale(1); }
+  60%  { transform: translateY(-10px) scale(1.06); }
+  80%  { transform: translateY(0)     scale(1); }
+  100% { transform: translateY(-4px)  scale(1.02); }
 }
-.avatar--cheer { animation: cheer .5s steps(5) forwards; }
+.avatar--cheer { animation: cheer .8s steps(8) forwards; }
 
 @keyframes slump {
   0%   { transform: translateY(0)   rotate(0deg); }
@@ -307,10 +310,6 @@ h3 { font-size: 12px; }
 .swatch:hover { border-color: var(--ink-dim); }
 .swatch:focus-visible { outline: var(--px) solid var(--warn); outline-offset: 2px; }
 .swatch.is-on { border-color: #fff; box-shadow: 0 0 0 var(--px) var(--bg-0) inset; }
-/* Bloqueado: se ve que existe, no se ve el color. Se gana dominando un nivel. */
-.swatch.is-locked { background: var(--bg-0) !important; cursor: not-allowed; opacity: .8; display: grid; place-items: center; }
-.swatch__lock { font-size: 14px; line-height: 1; }
-.swatch--inline { display: inline-block; width: 16px; height: 16px; vertical-align: middle; border-width: 2px; }
 
 .armoury__preview {
   display: grid; justify-items: center; gap: 10px;
@@ -661,81 +660,6 @@ h3 { font-size: 12px; }
   .door__frame { transition: none; }
 }
 
-/* ---------- 8c. LUGARES (ENV) y CAMINO DE TRAMOS ----------
-   Cinco capas detras de la escena: cielo, lejano, pared, suelo, primer plano.
-   Props en SVG inline (assets/props.js) y materiales como patron SVG tintado.
-   Todo decorativo va aria-hidden y sin pointer-events: la escena esta encima.
-   Regla R1 del panel: nada decorativo junto a las casillas. ------------------ */
-.world { position: relative; --env-floor-h: 78px; }
-.world .scene-host { position: relative; z-index: 1; }
-.world.is-stacked { --env-floor-h: 18px; }
-
-/* Con lugar, el corredor de la escena se vuelve transparente y las
-   casillas se visten del material del lugar. */
-.has-env .scene__corridor { background: transparent; border-color: transparent; }
-.has-env .scene__floor    { background: transparent; border-top-color: transparent; }
-.has-env .door__frame  { background: var(--env-slot); border-color: var(--env-slotline); }
-.has-env .door__key    { border-color: var(--env-slotline); color: var(--env-glow); }
-.has-env .scene__start { border-color: var(--env-slotline); color: var(--env-slotline); }
-.has-env .door.is-here .door__frame { border-color: var(--env-glow); }
-.has-env .scene--stacked .scene__corridor::before { background: repeating-linear-gradient(180deg, var(--env-slotline) 0 8px, transparent 8px 16px); }
-
-.env { position: absolute; inset: 0; overflow: hidden; z-index: 0; border: var(--px) solid var(--env-line); }
-.env__layer { position: absolute; left: 0; right: 0; }
-.env__props { position: absolute; inset: 0; }
-.env__sky   { top: 0; bottom: 0; background: linear-gradient(180deg, var(--env-sky), var(--env-sky2)); }
-.env__far   { top: 0; bottom: var(--env-floor-h); }
-.env__wall  { top: 0; bottom: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
-              background-position: calc(var(--hx, 0) * -48px) 0; transition: background-position .22s steps(6); }
-.env__floor { bottom: 0; height: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
-              border-top: var(--px) solid var(--env-line);
-              background-position: calc(var(--hx, 0) * -72px) 0; transition: background-position .22s steps(6); }
-.env__fg    { bottom: 0; height: var(--env-floor-h); }
-
-/* Parallax: una variable. Lo lejano se mueve menos que lo cercano. */
-.env__far  .env__props { transform: translateX(calc(var(--hx, 0) * -3%)); transition: transform .22s steps(6); }
-.env__wall .env__props { transform: translateX(calc(var(--hx, 0) * -6%)); transition: transform .22s steps(6); }
-
-.prop { position: absolute; transform: translateX(-50%); image-rendering: pixelated; }
-.env__gate { transform: translateX(-50%) scale(var(--gs, .45)); transform-origin: bottom center; transition: transform .35s steps(5); }
-
-/* Llamas / luces: dos cuadros alternos con steps. En aula quedan quietas. */
-.prop .f1 { animation: flick 1s steps(1, end) infinite; }
-.prop .f2 { opacity: 0; animation: flick 1s steps(1, end) infinite reverse; }
-@keyframes flick { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
-
-/* Deslizamiento de tramo al pulsar NEXT: el lugar LLEGA desde la derecha y
-   se asienta. Un solo disparo por clase; sin temporizadores. */
-.env.is-shift .env__far  .env__props { animation: envArriveFar .24s steps(6); }
-.env.is-shift .env__wall .env__props { animation: envArrive .24s steps(6); }
-.env.is-shift .env__wall, .env.is-shift .env__floor { animation: envArriveBg .24s steps(6); }
-@keyframes envArriveFar { from { transform: translateX(3%); } to { transform: translateX(calc(var(--hx, 0) * -3%)); } }
-@keyframes envArrive    { from { transform: translateX(8%); } to { transform: translateX(calc(var(--hx, 0) * -6%)); } }
-@keyframes envArriveBg  { from { background-position: 64px 0; } to { background-position: 0 0; } }
-
-/* La escena anterior sale por la izquierda; la nueva entra por la derecha.
-   Nada bloquea: el heroe nuevo responde desde el primer frame. */
-.scene-slot { position: relative; }
-.scene-slot.is-in  { animation: sceneIn .24s steps(6); }
-.scene-slot.is-out { position: absolute; inset: 0; z-index: 0; pointer-events: none; animation: sceneOut .24s steps(6) forwards; }
-@keyframes sceneIn  { from { transform: translateX(28%); opacity: .3; } to { transform: none; opacity: 1; } }
-@keyframes sceneOut { from { transform: none; opacity: 1; } to { transform: translateX(-28%); opacity: 0; } }
-
-/* El camino del HUD: un tramo por familia. */
-.bar.path { display: flex; gap: 3px; padding: 2px; height: 16px; }
-.bar.path i { flex: 1; background: var(--bg-2); }
-.bar.path i.on  { background: var(--good); }
-.bar.path i.now { background: var(--warn); }
-
-@media (max-width: 700px) { .world { --env-floor-h: 64px; } }
-
-/* Modo aula y reduced-motion: el lugar se queda quieto, la transicion es un
-   corte seco, las llamas no titilan. El lugar sigue ahi; solo no se mueve. */
-@media (prefers-reduced-motion: reduce) {
-  .env, .env *, .scene-slot { animation: none !important; transition: none !important; }
-}
-.is-aula .env, .is-aula .env *, .is-aula .scene-slot { animation: none !important; transition: none !important; }
-
 /* Solo para lectores de pantalla: anuncia la posicion del heroe. */
 .sr-only {
   position: absolute;
@@ -846,3 +770,169 @@ footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top:
   .tile { min-width: 52px; padding: 10px 8px; font-size: 12px; }
   .q-stem { font-size: 17px; }
 }
+
+/* ================= PROTOTIPO: NIVEL 1, PUENTE DEL CASTILLO ================= */
+.proto { --env-sky:#1a1420; --env-sky2:#2b2030; --env-glow:#ffb347; --env-line:#6b5c70; --env-water:#1f3d5a; --env-water2:#173049; }
+.proto .stage2 { position:relative; height:420px; overflow:hidden; border:var(--px) solid var(--env-line); background:linear-gradient(180deg,var(--env-sky),var(--env-sky2)); }
+.layer { position:absolute; inset:0; pointer-events:none; }
+/* lejano: torres, se mueve 4% */
+.far  { transform:translateX(calc(var(--hx,0) * -4%)); transition:transform .22s steps(6); }
+/* pared de bloques, 10% */
+.wall { top:0; height:230px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Crect width='32' height='16' fill='%234a3f4d'/%3E%3Cpath fill='%2333293a' d='M0 7h32v1H0zM0 15h32v1H0zM15 0h1v7h-1zM31 8h1v7h-1z'/%3E%3Cpath fill='%235c5061' d='M1 1h13v1H1zM17 9h13v1H17z'/%3E%3C/svg%3E"); background-size:32px 16px; transform:translateX(calc(var(--hx,0) * -10%)); transition:transform .22s steps(6); width:120%; left:-10%; }
+.wall::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 14% 18%, rgba(255,179,71,.28), transparent 26%), radial-gradient(circle at 86% 18%, rgba(255,179,71,.28), transparent 26%); animation:flick 1.4s steps(2) infinite; }
+@keyframes flick { 0%,100%{opacity:.75} 50%{opacity:1} }
+.floor { top:230px; height:120px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Crect width='24' height='24' fill='%232f2733'/%3E%3Cpath fill='%23221b26' d='M0 11h24v1H0zM0 23h24v1H0zM11 0h1v11h-1zM23 12h1v11h-1z'/%3E%3Cpath fill='%233b323f' d='M1 1h9v1H1zM13 13h9v1h-9z'/%3E%3C/svg%3E"); background-size:24px 24px; border-top:var(--px) solid var(--env-line); }
+.moat  { top:350px; height:70px; background:repeating-linear-gradient(90deg,var(--env-water) 0 12px,var(--env-water2) 12px 24px); animation:wave 1.6s steps(2) infinite; border-top:var(--px) solid #0f2238; }
+@keyframes wave { 0%,100%{background-position:0 0} 50%{background-position:12px 0} }
+/* camino de tramos: una "sala" por pregunta */
+.track { position:absolute; left:0; top:130px; height:220px; display:flex; width:100%; transform:translateX(calc(var(--room,0) * -100%)); transition:transform .24s steps(6); }
+.room  { flex:0 0 100%; position:relative; display:flex; align-items:flex-end; gap:8px; padding:0 14px; }
+.room .scene__start { pointer-events:none; }
+.room .door { pointer-events:auto; }
+.room.is-past .door { opacity:.35; }
+.room.is-past .door.is-open .door__frame { background:var(--good-dark); border-color:var(--good); opacity:1; }
+.room.is-past .door.is-open { opacity:1; }
+.room .door__frame { background:#3a2a1f; border-color:#c98a4b; min-height:96px; }
+.room .door__key { color:var(--env-glow); border-color:#c98a4b; }
+/* puerta del jefe: se acerca con cada acierto */
+.gate { position:absolute; right:6%; bottom:190px; transform-origin:bottom center; transform:scale(var(--gs,.45)); transition:transform .35s steps(5); }
+.hero2 { position:absolute; bottom:80px; left:0; transform:translateX(-50%); transition:left .22s steps(6); pointer-events:none; }
+.hero2 .avatar { width:56px; height:56px; }
+/* antorchas y ventanas: symbols reutilizados */
+.prop { position:absolute; }
+.prop--torch { width:20px; height:56px; top:36px; }
+.prop--torch .flame2 { animation:flame .5s steps(2) infinite; }
+@keyframes flame { 0%,100%{opacity:0} 50%{opacity:1} }
+.prop--win { width:28px; height:40px; top:40px; }
+.prop--tower { width:90px; height:160px; bottom:190px; }
+.hud2 { display:flex; gap:6px; margin:14px 0 4px; }
+.hud2 i { flex:1; height:10px; background:#0a0e24; border:2px solid var(--env-line); }
+.hud2 i.on { background:var(--good); border-color:var(--good); }
+.hud2 i.now { border-color:var(--warn); }
+/* modo aula / reduced motion: todo quieto */
+.aula .layer, .aula .layer::before, .aula .track, .aula .gate, .aula .hero2, .aula .prop * { animation:none !important; transition:none !important; }
+@media (prefers-reduced-motion: reduce) { .layer, .layer::before, .track, .gate, .hero2, .prop * { animation:none !important; transition:none !important; } }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="p-torch" viewBox="0 0 10 28" shape-rendering="crispEdges">
+    <path fill="#5a3a1f" d="M4 10h2v18H4z"/><path fill="#8a6a3f" d="M3 9h4v2H3z"/>
+    <g class="flame1"><path fill="#ffb347" d="M3 4h4v5H3z"/><path fill="#ffe08a" d="M4 6h2v3H4z"/><path fill="#ff6a3d" d="M4 2h2v2H4z"/></g>
+    <g class="flame2"><path fill="#ffb347" d="M2 5h6v4H2z"/><path fill="#ffe08a" d="M4 5h2v4H4z"/><path fill="#ff6a3d" d="M3 3h2v2H3zM6 1h1v3H6z"/></g>
+  </symbol>
+  <symbol id="p-win" viewBox="0 0 14 20" shape-rendering="crispEdges">
+    <path fill="#221b26" d="M0 0h14v20H0z"/><path fill="#ffe08a" d="M2 2h10v16H2z"/><path fill="#221b26" d="M6 2h2v16H6zM2 9h10v2H2z"/>
+  </symbol>
+  <symbol id="p-tower" viewBox="0 0 18 32" shape-rendering="crispEdges">
+    <path fill="#2a2030" d="M3 6h12v26H3z"/><path fill="#3a2d40" d="M2 4h2v3H2zM6 4h2v3H6zM10 4h2v3h-2zM14 4h2v3h-2z"/><path fill="#ffe08a" d="M8 12h2v3H8zM8 20h2v3H8z"/>
+  </symbol>
+  <symbol id="p-gate" viewBox="0 0 40 44" shape-rendering="crispEdges">
+    <path fill="#2a2030" d="M0 8h40v36H0z"/><path fill="#3a2d40" d="M0 4h4v4H0zM8 4h4v4H8zM16 4h4v4h-4zM24 4h4v4h-4zM32 4h4v4h-4z"/>
+    <path fill="#120c16" d="M10 16h20v28H10z"/><path fill="#5a3a1f" d="M12 18h16v26H12z"/><path fill="#c98a4b" d="M12 24h16v2H12zM12 34h16v2H12zM19 18h2v26h-2z"/>
+    <path fill="#ff4d6d" d="M14 12h2v2h-2zM24 12h2v2h-2z"/>
+  </symbol>
+</defs></svg>
+
+<div class="wrap proto" id="proto">
+  <header class="site-head"><div><h1>Prototipo: el puente del castillo</h1>
+  <p>Nivel 1 con escenografía real. Prueba: <b>← →</b> mover, <b>Enter</b> cruzar, <b>NEXT</b> avanzar. La puerta correcta siempre es la <b>B</b>, para que veas acierto y fallo.</p></div></header>
+
+  <div class="pixel-box hud"><div class="hud__group"><span class="hud__stat" id="qn">TRAMO 1 / 16</span></div>
+    <div class="hud__group"><button class="btn btn--ghost" id="aula" type="button">MODO AULA: OFF</button></div></div>
+
+  <div class="pixel-box stage" style="padding:14px">
+    <div class="q-stem" id="stem">This sequence counts back in 7s. What is the next number?</div>
+    <div class="hud2" id="path"></div>
+
+    <div class="stage2" id="stage">
+      <div class="layer far">
+        <svg class="prop prop--tower" style="left:8%"><use href="#p-tower"/></svg>
+        <svg class="prop prop--tower" style="left:34%;transform:scale(.8);transform-origin:bottom"><use href="#p-tower"/></svg>
+        <svg class="prop prop--tower" style="left:62%;transform:scale(.9);transform-origin:bottom"><use href="#p-tower"/></svg>
+        <svg class="gate" id="gate" width="120" height="132"><use href="#p-gate"/></svg>
+      </div>
+      <div class="layer wall">
+        <svg class="prop prop--torch" style="left:14%"><use href="#p-torch"/></svg>
+        <svg class="prop prop--win"   style="left:48%"><use href="#p-win"/></svg>
+        <svg class="prop prop--torch" style="left:84%"><use href="#p-torch"/></svg>
+      </div>
+      <div class="track" id="track"></div>
+      <div class="layer floor"></div>
+      <div class="layer moat"></div>
+      <div class="hero2" id="hero"><svg class="avatar avatar--bob" viewBox="0 0 17 20" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true"><path fill="#2b1a12" d="M4 1h9v2H4z M4 2h9v2H4z M3 2h1v3H3z M13 2h1v3h-1z"/><path fill="#e8b088" d="M4 4h9v8H4z"/><path fill="#141a33" d="M6 6h1v2H6z M10 6h1v2h-1z"/><path fill="#8c4a3a" d="M7 10h3v1H7z"/><path fill="var(--h-helm)"  d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/><path fill="var(--h-body)"  d="M5 12h7v6H5z M3 13h2v2H3z M12 13h2v2h-2z"/><path fill="var(--h-glove)" d="M3 15h2v2H3z M12 15h2v2h-2z"/><path fill="#fff" d="M8 14h1v3H8z M7 15h3v1H7z"/><path fill="var(--h-boot)"  d="M5 18h3v2H5z M9 18h3v2H9z"/></svg></div>
+    </div>
+
+    <p class="scene__help mt"><kbd>← →</kbd> move &nbsp;·&nbsp; <b>Enter</b> go through the door &nbsp;·&nbsp; <b>A B C D</b> jump</p>
+    <div class="row row--end mt"><button class="btn btn--primary" id="next" type="button" style="display:none">NEXT &gt;</button></div>
+  </div>
+  <footer>Prototipo de decisión — no es código del juego. Todo dibujado con SVG inline y CSS; sin imágenes.</footer>
+</div>
+
+<script>
+(function(){
+  var TOTAL=16, room=0, cursor=-1, locked=false;
+  var stems=["This sequence counts back in 7s. What is the next number?","Count on in steps of 25 from 175. What comes next?","10, 5, 0, ... What is the next number?","The first number is missing. What is it?"];
+  var opts=[["42","35","49","28"],["190","200","225","150"],["-10","-5","5","0"],["45","15","0","30"]];
+  var track=document.getElementById('track'), hero=document.getElementById('hero'), stage=document.getElementById('stage');
+  var next=document.getElementById('next'), path=document.getElementById('path'), gate=document.getElementById('gate');
+
+  function buildRoom(i){
+    var r=document.createElement('div'); r.className='room'; r.setAttribute('data-i',i);
+    var o=opts[i%opts.length];
+    r.innerHTML='<div class="scene__start"><span class="scene__start-tag">START</span></div>'+
+      o.map(function(v,k){return '<button type="button" class="door" data-k="'+k+'"><span class="door__key">'+"ABCD"[k]+'</span><span class="door__frame"><span class="door__value">'+v+'</span></span></button>';}).join('');
+    r.querySelectorAll('.door').forEach(function(d,k){ d.addEventListener('click',function(){ jump(k); }); });
+    return r;
+  }
+  for(var i=0;i<TOTAL;i++) track.appendChild(buildRoom(i));
+
+  function cur(){ return track.children[room]; }
+  function place(){
+    var r=cur(), t = cursor<0 ? r.querySelector('.scene__start') : r.querySelectorAll('.door')[cursor];
+    var x = t.offsetLeft + t.offsetWidth/2;           // relativo a la sala, y la sala esta alineada al stage
+    hero.style.left = x + 'px';
+    r.querySelectorAll('.door').forEach(function(d,i){ d.classList.toggle('is-here', i===cursor); });
+    r.querySelector('.scene__start').classList.toggle('is-here', cursor<0);
+    stage.style.setProperty('--hx', String(Math.max(0,cursor+1)/4));     // parallax
+  }
+  function paint(){
+    path.innerHTML=''; for(var i=0;i<TOTAL;i++){ var s=document.createElement('i'); if(i<room) s.className='on'; if(i===room) s.className='now'; path.appendChild(s); }
+    document.getElementById('qn').textContent='TRAMO '+(room+1)+' / '+TOTAL;
+    document.getElementById('stem').textContent=stems[room%stems.length];
+    gate.style.setProperty('--gs', String(0.45 + 0.55*(room/(TOTAL-1))));   // el jefe se acerca
+  }
+  function move(d){ if(locked) return; cursor=Math.max(-1,Math.min(3,cursor+d)); place(); }
+  function jump(k){ if(locked) return; cursor=k; place(); confirm(); }
+  function confirm(){
+    if(locked||cursor<0) return; locked=true;
+    var r=cur(), doors=r.querySelectorAll('.door'), ok=(cursor===1);
+    doors.forEach(function(d,i){ d.disabled=true; if(i===1) d.classList.add('is-right','is-open'); });
+    var a=hero.querySelector('.avatar'); a.classList.remove('avatar--bob');
+    if(ok){ a.classList.add('avatar--cheer'); } else { doors[cursor].classList.add('is-wrong','shake'); a.classList.add('avatar--down'); }
+    // H2 del panel: el heroe se queda donde esta; no vuelve al inicio.
+    next.style.display='inline-block'; next.focus();
+  }
+  function advance(){
+    if(room>=TOTAL-1){ alert('Fin del prototipo: aqui vendria el jefe.'); return; }
+    cur().classList.add('is-past'); room++; cursor=-1; locked=false;
+    track.style.setProperty('--room', String(room));
+    hero.innerHTML=hero.innerHTML; // reinicia animacion
+    hero.querySelector('.avatar').classList.add('avatar--bob');
+    next.style.display='none'; paint(); place();
+  }
+  next.addEventListener('click',advance);
+  document.addEventListener('keydown',function(e){
+    if(e.repeat) return;                                   // H1 del panel: el teclado viejo no te pasa de largo
+    if((e.key==='Enter'||e.key===' ') && next.style.display!=='none'){ e.preventDefault(); advance(); return; }
+    if(e.key==='ArrowRight'){ e.preventDefault(); move(1); }
+    else if(e.key==='ArrowLeft'){ e.preventDefault(); move(-1); }
+    else if(e.key==='Enter'||e.key===' '){ e.preventDefault(); confirm(); }
+    else { var i="ABCD".indexOf(e.key.toUpperCase()); if(i<0 && /^[1-4]$/.test(e.key)) i=+e.key-1; if(i>=0) jump(i); }
+  });
+  document.getElementById('aula').addEventListener('click',function(){
+    var p=document.getElementById('proto'); p.classList.toggle('aula');
+    this.textContent='MODO AULA: '+(p.classList.contains('aula')?'ON':'OFF');
+  });
+  window.addEventListener('resize',place);
+  paint(); place();
+})();
+</script></body></html>

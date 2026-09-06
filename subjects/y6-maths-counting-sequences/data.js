@@ -14,7 +14,7 @@ window.QUIZ_DATA = {
    "name": "WHOLE NUMBER WAY",
    "subtitle": "Counting on and back with whole numbers",
    "briefing": [
-    "<p>Welcome, {hero}. Before anything else you need the basic move: <b>the step</b>.</p>",
+    "<p>Welcome. Before anything else you need the basic move: <b>the step</b>.</p>",
     "<p>A sequence is just numbers that follow a rule. To find the rule, look at the jump between two numbers next to each other.</p>",
     "<div class='example'>4, 11, 18, 25<br>11 - 4 = 7<br>18 - 11 = 7<br>Rule: count on in steps of 7</div>",
     "<ul><li><b>Count on</b> = numbers get bigger. Add the step.</li><li><b>Count back</b> = numbers get smaller. Subtract the step.</li><li>Always check <i>two</i> jumps, not one, so you don't guess.</li></ul>",
@@ -1583,7 +1583,72 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#1a1420",
+     "sky2": "#2b2030",
+     "far": "#2a2030",
+     "wall": "#4a3f4d",
+     "floor": "#2f2733",
+     "prop": "#5a3a1f",
+     "prop2": "#7a6a80",
+     "glow": "#ffb347",
+     "glow2": "#ffe08a",
+     "line": "#6b5c70",
+     "slot": "#3a2a1f",
+     "slotline": "#c98a4b"
+    },
+    "materials": {
+     "wall": "brick",
+     "floor": "flag"
+    },
+    "far": [
+     {
+      "prop": "tower",
+      "x": 8,
+      "scale": 1.1
+     },
+     {
+      "prop": "tower",
+      "x": 34,
+      "scale": 0.8
+     },
+     {
+      "prop": "tower",
+      "x": 60,
+      "scale": 0.95
+     }
+    ],
+    "wall": [
+     {
+      "prop": "merlon",
+      "repeat": 8,
+      "y": "top",
+      "top": 0
+     },
+     {
+      "prop": "torch",
+      "x": 14,
+      "y": "top",
+      "top": 16
+     },
+     {
+      "prop": "window",
+      "x": 48,
+      "y": "top",
+      "top": 14
+     },
+     {
+      "prop": "torch",
+      "x": 84,
+      "y": "top",
+      "top": 16
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   },
   {
    "id": 2,
@@ -2422,7 +2487,7 @@ window.QUIZ_DATA = {
      "skill": "decimal word problem",
      "variants": [
       {
-       "stem": "{hero} has &pound;12.5 and spends &pound;1.75 each week. How much after 3 weeks?",
+       "stem": "You have &pound;12.5 and spend &pound;1.75 each week. How much after 3 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -2436,7 +2501,7 @@ window.QUIZ_DATA = {
        "explain": "<code>3 x 1.75 = 5.25</code>, so the answer is <code>7.25</code>."
       },
       {
-       "stem": "{hero} has &pound;2 and saves &pound;0.45 each week. How much after 4 weeks?",
+       "stem": "You have &pound;2 and save &pound;0.45 each week. How much after 4 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -2450,7 +2515,7 @@ window.QUIZ_DATA = {
        "explain": "<code>4 x 0.45 = 1.8</code>, so the answer is <code>3.8</code>."
       },
       {
-       "stem": "{hero} has &pound;30 and spends &pound;2.5 each week. How much after 5 weeks?",
+       "stem": "You have &pound;30 and spend &pound;2.5 each week. How much after 5 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -2464,7 +2529,7 @@ window.QUIZ_DATA = {
        "explain": "<code>5 x 2.5 = 12.5</code>, so the answer is <code>17.5</code>."
       },
       {
-       "stem": "{hero} has &pound;20.5 and spends &pound;2.5 each week. How much after 4 weeks?",
+       "stem": "You have &pound;20.5 and spend &pound;2.5 each week. How much after 4 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -2478,7 +2543,7 @@ window.QUIZ_DATA = {
        "explain": "<code>4 x 2.5 = 10</code>, so the answer is <code>10.5</code>."
       },
       {
-       "stem": "{hero} has &pound;5 and saves &pound;1.25 each week. How much after 3 weeks?",
+       "stem": "You have &pound;5 and save &pound;1.25 each week. How much after 3 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -3130,7 +3195,71 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#4f86cf",
+     "sky2": "#a9c8f0",
+     "far": "#5c6f9c",
+     "wall": "#8b8c9a",
+     "floor": "#6d6e7c",
+     "prop": "#6b4a2c",
+     "prop2": "#9a9bb0",
+     "glow": "#ffe08a",
+     "glow2": "#ffffff",
+     "line": "#4a4a66",
+     "slot": "#3f3f52",
+     "slotline": "#d0d0e0"
+    },
+    "materials": {
+     "wall": "stone",
+     "floor": "flag"
+    },
+    "far": [
+     {
+      "prop": "tower",
+      "x": 12,
+      "scale": 0.9
+     },
+     {
+      "prop": "treefar",
+      "x": 40,
+      "scale": 0.7
+     },
+     {
+      "prop": "treefar",
+      "x": 50,
+      "scale": 0.9
+     },
+     {
+      "prop": "tower",
+      "x": 72,
+      "scale": 0.7
+     }
+    ],
+    "wall": [
+     {
+      "prop": "merlon",
+      "repeat": 9,
+      "y": "top",
+      "top": 0
+     },
+     {
+      "prop": "window",
+      "x": 30,
+      "y": "top",
+      "top": 14
+     },
+     {
+      "prop": "window",
+      "x": 70,
+      "y": "top",
+      "top": 14
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   },
   {
    "id": 3,
@@ -4621,7 +4750,87 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#0e2a1c",
+     "sky2": "#173d26",
+     "far": "#123320",
+     "wall": "#1f5a33",
+     "floor": "#3d6b2a",
+     "prop": "#4a2f1a",
+     "prop2": "#2e7d3e",
+     "glow": "#c8ff5c",
+     "glow2": "#eaffb0",
+     "line": "#5a8a3a",
+     "slot": "#3b2412",
+     "slotline": "#a4722f"
+    },
+    "materials": {
+     "wall": "leaves",
+     "floor": "grass"
+    },
+    "far": [
+     {
+      "prop": "treefar",
+      "x": 6,
+      "scale": 1.2
+     },
+     {
+      "prop": "treefar",
+      "x": 18,
+      "scale": 0.9
+     },
+     {
+      "prop": "treefar",
+      "x": 30,
+      "scale": 1.1
+     },
+     {
+      "prop": "treefar",
+      "x": 70,
+      "scale": 1.0
+     },
+     {
+      "prop": "treefar",
+      "x": 82,
+      "scale": 1.2
+     }
+    ],
+    "wall": [
+     {
+      "prop": "tree",
+      "x": 9,
+      "scale": 1.3
+     },
+     {
+      "prop": "reeds",
+      "x": 40
+     },
+     {
+      "prop": "reeds",
+      "x": 62
+     },
+     {
+      "prop": "tree",
+      "x": 92,
+      "scale": 1.15
+     }
+    ],
+    "fg": [
+     {
+      "prop": "bush",
+      "x": 5
+     },
+     {
+      "prop": "bush",
+      "x": 94,
+      "scale": 0.9
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   },
   {
    "id": 4,
@@ -6089,7 +6298,59 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#0b1018",
+     "sky2": "#141c28",
+     "far": "#1b2838",
+     "wall": "#2b3a4a",
+     "floor": "#1e2a36",
+     "prop": "#3a4a5a",
+     "prop2": "#4a5a6a",
+     "glow": "#7ee8fa",
+     "glow2": "#d8f6ff",
+     "line": "#4a6a8a",
+     "slot": "#1e2c3d",
+     "slotline": "#9fe0ff"
+    },
+    "materials": {
+     "wall": "rock",
+     "floor": "rock"
+    },
+    "far": [
+     {
+      "prop": "stalac",
+      "repeat": 6,
+      "y": "top",
+      "top": 0
+     }
+    ],
+    "wall": [
+     {
+      "prop": "crystal",
+      "x": 12
+     },
+     {
+      "prop": "torch",
+      "x": 32,
+      "y": "top",
+      "top": 18
+     },
+     {
+      "prop": "crystal",
+      "x": 52,
+      "scale": 0.8
+     },
+     {
+      "prop": "crystal",
+      "x": 86,
+      "scale": 1.1
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   },
   {
    "id": 5,
@@ -7539,7 +7800,64 @@ window.QUIZ_DATA = {
       }
      ]
     }
-   ]
+   ],
+   "env": {
+    "palette": {
+     "sky": "#2a1a08",
+     "sky2": "#3e2c10",
+     "far": "#4a3618",
+     "wall": "#6a4a20",
+     "floor": "#5a3d1a",
+     "prop": "#3a2a10",
+     "prop2": "#c48a2a",
+     "glow": "#ffd93d",
+     "glow2": "#fff2b0",
+     "line": "#8a6a2a",
+     "slot": "#3e2c10",
+     "slotline": "#ffd93d"
+    },
+    "materials": {
+     "wall": "metal",
+     "floor": "plank"
+    },
+    "far": [
+     {
+      "prop": "gear",
+      "x": 15,
+      "y": "top",
+      "top": 8,
+      "scale": 1.8
+     },
+     {
+      "prop": "gear",
+      "x": 78,
+      "y": "top",
+      "top": 4,
+      "scale": 1.3
+     }
+    ],
+    "wall": [
+     {
+      "prop": "lamp",
+      "x": 25,
+      "y": "top",
+      "top": 0
+     },
+     {
+      "prop": "lamp",
+      "x": 75,
+      "y": "top",
+      "top": 0
+     },
+     {
+      "prop": "gear",
+      "x": 50,
+      "scale": 1.4
+     }
+    ],
+    "gate": "gate",
+    "transition": "slide"
+   }
   }
  ]
 };

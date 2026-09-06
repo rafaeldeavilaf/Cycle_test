@@ -87,13 +87,14 @@ def head(title, description, font_href, css, accent):
     )
 
 
-def build_game(sub, css, font_href, ui, engine, brand):
+def build_game(sub, css, font_href, ui, props, engine, brand):
     data = read("subjects", sub["slug"], "data.js")
     title = brand + " — " + sub["topic"]
     desc = sub["blurb"].replace('"', "&quot;")
     html = head(title, desc, font_href, css, sub.get("accent", "maths"))
     html += '<div id="app"></div>\n'
     html += '<script>\n' + ui + '\n</script>\n'
+    html += '<script>\n' + props + '\n</script>\n'
     html += '<script>\n' + data + '\n</script>\n'
     html += '<script>\n' + engine + '\n</script>\n'
     html += '</body>\n</html>\n'
@@ -199,6 +200,7 @@ def main():
     css_raw = read("assets", "engine.css")
     font_href, css = split_css(css_raw)
     ui = read("assets", "ui.js")
+    props = read("assets", "props.js")     # escenografia pixel-art (SVG inline)
     engine = read("assets", "engine.js")
     brand = brand_from_ui(ui)
 
@@ -215,7 +217,7 @@ def main():
 
     built = []
     for sub in subjects:
-        name, html = build_game(sub, css, font_href, ui, engine, brand)
+        name, html = build_game(sub, css, font_href, ui, props, engine, brand)
         built.append((name, write(name, html)))
 
     hub = head(brand,

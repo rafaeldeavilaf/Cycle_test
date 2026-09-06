@@ -16,6 +16,7 @@ knowledge del proyecto.
 | 1 — Escena `doors` sobre los 5 niveles v1 | **Hecha y publicada** |
 | 2 — HERO + armería + animación de la calculadora | **Hecha** |
 | 3 — Puntuación v2 | **Hecha** |
+| 3b — Lugares (`PLAN-AMBIENTES.md`): ENV, props, camino de tramos, modo aula, colores por dominio | **Hecha** |
 | 4 — Generador v2: 7 niveles, `mech`, jefes | Pendiente |
 | 5 — Escenas `bridge`/`ruler`/`planks`/`lift`/`rule`/`machine`/`smash` | Pendiente |
 | 6 — Sistema de jefes | Pendiente |
@@ -93,12 +94,15 @@ personaje en cada una. Guarda `{v, body:'a'|'b', alias, chosen, colors}`.
 
 - El motor **no sabe de género**: son cuerpos `a` y `b`; las etiquetas visibles
   ("SHORT HAIR" / "LONG HAIR") están en `ui.js`.
-- **Nunca se pide ni se guarda el nombre real.** Solo un alias de 12 caracteres
-  elegido por el niño, con sugerencias generadas, que no sale del navegador.
-- Ningún texto de contenido puede llevar un nombre propio: se escribe `{hero}`
-  en `data.js` y el motor lo sustituye por el alias (`heroText()`). El harness
-  recorre el juego y falla si algún texto **visible** lleva un nombre real o
-  deja un `{hero}` sin sustituir.
+- **El personaje NO tiene nombre. Ni real ni alias.** Decisión de Rafael: un
+  nombre es la vía más fácil de atribuirle género; el héroe es un avatar neutro
+  que el niño viste. No hay campo de texto libre en ninguna pantalla y la clave
+  del héroe guarda solo `{v, body, chosen, colors}`. El plan v2 §5 pedía un
+  alias; **queda anulado** (la Fase 2 lo tuvo y se retiró).
+- **Todo el contenido habla en segunda persona** ("You have £12.50 and spend…").
+  Ningún `data.js` puede llevar un nombre propio ni el antiguo token `{hero}`.
+  El harness recorre el juego y falla si algún texto **visible** lleva un
+  nombre, y falla si el token existe en el contenido.
 - El sprite se ensambla por partes (`BODIES`/`LIMBS`/`FACES`/`OVERLAYS`), nunca
   un string por mood. Las 4 piezas de armadura se pintan con
   `var(--h-helm|body|glove|boot)`; ningún `fill` fijo en esas piezas.
@@ -106,6 +110,37 @@ personaje en cada una. Guarda `{v, body:'a'|'b', alias, chosen, colors}`.
   `--bg-1`**, y **todo color por defecto debe estar en la paleta** — si no, la
   armería muestra esa fila sin nada marcado. Ambas cosas las comprueba el
   harness. El `#1c2555` de las piernas de v1 da 1.16:1 y por eso no está.
+
+**7d. Cada nivel es un LUGAR, declarado en datos (`PLAN-AMBIENTES.md`).**
+Módulo `ENV` hermano de `SCENES`: pinta cinco capas (cielo, lejano, pared,
+casillas, suelo) detrás de la escena y no sabe qué mecánica hay encima.
+
+- Un nivel declara `env: { palette, materials:{wall,floor}, far[], wall[], fg[],
+  gate, transition }`. Los props salen de `assets/props.js` por id
+  (`torch`, `tree`, `gear`…), inlinado por `build.py`. Sin `env`, el nivel se ve
+  como antes: cualquier `data.js` sigue valiendo.
+- **`engine.js` no conoce lugares ni ids de prop.** "castle" no existe: el lugar
+  es la combinación de props + materiales + paleta. El harness falla si un id de
+  prop o un nombre de lugar aparece como literal en el motor (comentarios aparte).
+- Materiales = patrones SVG en gris como `url('data:image/svg+xml,…')`, tintados
+  con `--env-wall`/`--env-floor` por `multiply`. **Comillas simples** dentro del
+  `url()`: va en un atributo `style="…"` y con dobles se corta (pasó).
+- Regla R1: nada decorativo junto a las casillas. Regla R2: mientras se decide
+  solo se mueve el héroe; animación ambiental ≤ 6 por escena, `steps()`, > 2 s.
+- **Camino de tramos:** al pulsar NEXT la escena vieja sale (`.scene-slot.is-out`)
+  y la nueva entra (`.is-in`); el lugar se desliza (`.env.is-shift`); la barra
+  del HUD es el camino (`#hudPath`, un tramo por familia); la puerta del jefe
+  (`.env__gate`) se acerca con `--gs`. Nada de esto bloquea la respuesta: la
+  pregunta nueva es respondible en el mismo tick. jsdom no dispara
+  `animationend`, así que el harness mira solo `.scene-slot:not(.is-out)`.
+- **Modo aula** (`STATE.aula`, clase `is-aula` en `<html>`) y
+  `prefers-reduced-motion`: cero animación, transición en corte seco, la pista
+  abre sin esperar. `motionOff()` es la única función que lo decide.
+- **Playtest aplicado:** `e.repeat` se ignora (teclados de colegio); al fallar el
+  héroe **se queda** en la puerta roja (anula plan v2 §3.3); la celebración es
+  contenida (sin brinco escalado).
+- **Colores por dominio:** 4 de salida + 1 por nivel con 2+ estrellas, calculado
+  (no guardado). Un color ya puesto nunca se bloquea.
 
 **8. DOM + CSS, nunca canvas.** Un héroe y ≤ 12 casillas no lo justifican, y
 canvas obliga a construir una capa de accesibilidad paralela.
@@ -128,10 +163,11 @@ node tools/harness.js
 ```
 
 `tools/harness.js` abre el `.html` **ya construido** en jsdom y juega niveles
-completos con aciertos y errores. Hoy son 135 comprobaciones. Encontró la
+completos con aciertos y errores. Hoy son 183 comprobaciones. Encontró la
 repetición de variantes, el doble conteo al pulsar NEXT dos veces, un texto con
 "daily" colado en `ui.js`, tres filas de la armería que arrancaban sin ningún
-color marcado, y que fallar la primera pregunta no costaba XP.
+color marcado, que fallar la primera pregunta no costaba XP, y que el `url()` de
+los materiales cortaba el atributo `style` y no se pintaba nada.
 
 Al añadir una pieza, **añade sus comprobaciones al harness**, y no borres las
 que ya están. Para una escena nueva, como mínimo: el nivel termina; solo con

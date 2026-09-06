@@ -197,15 +197,16 @@ h3 { font-size: 12px; }
 .avatar--bob { animation: bob 1.4s steps(4) infinite; }
 
 /* Reacciones a la respuesta */
+/* Playtest H3: el brinco con escalado se leia "de kinder" a los 10-11.
+   Ahora es un gesto contenido: brazos arriba (ya en el sprite) y un pequeno
+   rebote, sin escalar. */
 @keyframes cheer {
-  0%   { transform: translateY(0)     scale(1); }
-  20%  { transform: translateY(-16px) scale(1.1); }
-  40%  { transform: translateY(0)     scale(1); }
-  60%  { transform: translateY(-10px) scale(1.06); }
-  80%  { transform: translateY(0)     scale(1); }
-  100% { transform: translateY(-4px)  scale(1.02); }
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-6px); }
+  60%  { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
 }
-.avatar--cheer { animation: cheer .8s steps(8) forwards; }
+.avatar--cheer { animation: cheer .5s steps(5) forwards; }
 
 @keyframes slump {
   0%   { transform: translateY(0)   rotate(0deg); }
@@ -317,6 +318,10 @@ h3 { font-size: 12px; }
 .swatch:hover { border-color: var(--ink-dim); }
 .swatch:focus-visible { outline: var(--px) solid var(--warn); outline-offset: 2px; }
 .swatch.is-on { border-color: #fff; box-shadow: 0 0 0 var(--px) var(--bg-0) inset; }
+/* Bloqueado: se ve que existe, no se ve el color. Se gana dominando un nivel. */
+.swatch.is-locked { background: var(--bg-0) !important; cursor: not-allowed; opacity: .8; display: grid; place-items: center; }
+.swatch__lock { font-size: 14px; line-height: 1; }
+.swatch--inline { display: inline-block; width: 16px; height: 16px; vertical-align: middle; border-width: 2px; }
 
 .armoury__preview {
   display: grid; justify-items: center; gap: 10px;
@@ -667,6 +672,81 @@ h3 { font-size: 12px; }
   .door__frame { transition: none; }
 }
 
+/* ---------- 8c. LUGARES (ENV) y CAMINO DE TRAMOS ----------
+   Cinco capas detras de la escena: cielo, lejano, pared, suelo, primer plano.
+   Props en SVG inline (assets/props.js) y materiales como patron SVG tintado.
+   Todo decorativo va aria-hidden y sin pointer-events: la escena esta encima.
+   Regla R1 del panel: nada decorativo junto a las casillas. ------------------ */
+.world { position: relative; --env-floor-h: 78px; }
+.world .scene-host { position: relative; z-index: 1; }
+.world.is-stacked { --env-floor-h: 18px; }
+
+/* Con lugar, el corredor de la escena se vuelve transparente y las
+   casillas se visten del material del lugar. */
+.has-env .scene__corridor { background: transparent; border-color: transparent; }
+.has-env .scene__floor    { background: transparent; border-top-color: transparent; }
+.has-env .door__frame  { background: var(--env-slot); border-color: var(--env-slotline); }
+.has-env .door__key    { border-color: var(--env-slotline); color: var(--env-glow); }
+.has-env .scene__start { border-color: var(--env-slotline); color: var(--env-slotline); }
+.has-env .door.is-here .door__frame { border-color: var(--env-glow); }
+.has-env .scene--stacked .scene__corridor::before { background: repeating-linear-gradient(180deg, var(--env-slotline) 0 8px, transparent 8px 16px); }
+
+.env { position: absolute; inset: 0; overflow: hidden; z-index: 0; border: var(--px) solid var(--env-line); }
+.env__layer { position: absolute; left: 0; right: 0; }
+.env__props { position: absolute; inset: 0; }
+.env__sky   { top: 0; bottom: 0; background: linear-gradient(180deg, var(--env-sky), var(--env-sky2)); }
+.env__far   { top: 0; bottom: var(--env-floor-h); }
+.env__wall  { top: 0; bottom: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
+              background-position: calc(var(--hx, 0) * -48px) 0; transition: background-position .22s steps(6); }
+.env__floor { bottom: 0; height: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
+              border-top: var(--px) solid var(--env-line);
+              background-position: calc(var(--hx, 0) * -72px) 0; transition: background-position .22s steps(6); }
+.env__fg    { bottom: 0; height: var(--env-floor-h); }
+
+/* Parallax: una variable. Lo lejano se mueve menos que lo cercano. */
+.env__far  .env__props { transform: translateX(calc(var(--hx, 0) * -3%)); transition: transform .22s steps(6); }
+.env__wall .env__props { transform: translateX(calc(var(--hx, 0) * -6%)); transition: transform .22s steps(6); }
+
+.prop { position: absolute; transform: translateX(-50%); image-rendering: pixelated; }
+.env__gate { transform: translateX(-50%) scale(var(--gs, .45)); transform-origin: bottom center; transition: transform .35s steps(5); }
+
+/* Llamas / luces: dos cuadros alternos con steps. En aula quedan quietas. */
+.prop .f1 { animation: flick 1s steps(1, end) infinite; }
+.prop .f2 { opacity: 0; animation: flick 1s steps(1, end) infinite reverse; }
+@keyframes flick { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+/* Deslizamiento de tramo al pulsar NEXT: el lugar LLEGA desde la derecha y
+   se asienta. Un solo disparo por clase; sin temporizadores. */
+.env.is-shift .env__far  .env__props { animation: envArriveFar .24s steps(6); }
+.env.is-shift .env__wall .env__props { animation: envArrive .24s steps(6); }
+.env.is-shift .env__wall, .env.is-shift .env__floor { animation: envArriveBg .24s steps(6); }
+@keyframes envArriveFar { from { transform: translateX(3%); } to { transform: translateX(calc(var(--hx, 0) * -3%)); } }
+@keyframes envArrive    { from { transform: translateX(8%); } to { transform: translateX(calc(var(--hx, 0) * -6%)); } }
+@keyframes envArriveBg  { from { background-position: 64px 0; } to { background-position: 0 0; } }
+
+/* La escena anterior sale por la izquierda; la nueva entra por la derecha.
+   Nada bloquea: el heroe nuevo responde desde el primer frame. */
+.scene-slot { position: relative; }
+.scene-slot.is-in  { animation: sceneIn .24s steps(6); }
+.scene-slot.is-out { position: absolute; inset: 0; z-index: 0; pointer-events: none; animation: sceneOut .24s steps(6) forwards; }
+@keyframes sceneIn  { from { transform: translateX(28%); opacity: .3; } to { transform: none; opacity: 1; } }
+@keyframes sceneOut { from { transform: none; opacity: 1; } to { transform: translateX(-28%); opacity: 0; } }
+
+/* El camino del HUD: un tramo por familia. */
+.bar.path { display: flex; gap: 3px; padding: 2px; height: 16px; }
+.bar.path i { flex: 1; background: var(--bg-2); }
+.bar.path i.on  { background: var(--good); }
+.bar.path i.now { background: var(--warn); }
+
+@media (max-width: 700px) { .world { --env-floor-h: 64px; } }
+
+/* Modo aula y reduced-motion: el lugar se queda quieto, la transicion es un
+   corte seco, las llamas no titilan. El lugar sigue ahi; solo no se mueve. */
+@media (prefers-reduced-motion: reduce) {
+  .env, .env *, .scene-slot { animation: none !important; transition: none !important; }
+}
+.is-aula .env, .is-aula .env *, .is-aula .scene-slot { animation: none !important; transition: none !important; }
+
 /* Solo para lectores de pantalla: anuncia la posicion del heroe. */
 .sr-only {
   position: absolute;
@@ -845,6 +925,8 @@ window.GAME_UI = {
     btnSoundOn:  'SOUND: ON',
     btnSoundOff: 'SOUND: OFF',
     btnReset:    'RESET',
+    btnAulaOn:   'CLASSROOM MODE: ON',
+    btnAulaOff:  'CLASSROOM MODE: OFF',
     intro:       'Clear a level to unlock the next one. Play as many as you want, whenever you want.',
     cardMeta:    'LEVEL {n} &middot; {count} challenges',
     cardBest:    ' &middot; best {xp} XP',
@@ -887,25 +969,19 @@ window.GAME_UI = {
      El motor solo conoce cuerpos 'a' y 'b'. Como se llamen y como se
      describan se decide aqui. Las etiquetas describen el PELO, no un genero:
      es lo que de verdad cambia entre las dos siluetas. */
+  /* El personaje NO tiene nombre: ni real ni alias. Es un avatar neutro que el
+     nino viste. Todo el contenido le habla de "you". */
   hero: {
     title:        'CHOOSE YOUR HERO',
     intro:        'Pick a look. You can change it any time, and it follows you into every game.',
     bodyA:        'SHORT HAIR',
     bodyB:        'LONG HAIR',
     pickAria:     'Choose the {name} hero',
-    aliasTitle:   'HERO NAME',
-    aliasHelp:    'Optional. Up to 12 characters. Use a made-up name, not your real one &mdash; it stays in this browser and is never sent anywhere.',
-    aliasLabel:   'Your hero name',
-    aliasDice:    'SURPRISE ME',
-    defaultAlias: 'HERO',
+    you:          'you',
     btnStart:     'START &gt;',
     btnArmoury:   'ARMOURY',
     btnHero:      'HERO',
-    btnBack:      '&lt; MAP',
-    /* Sugerencias generadas: el nino elige de una lista, nunca escribe su
-       nombre real por inercia. Se combinan adjetivo + animal. */
-    aliasWordsA:  ['PIXEL', 'TURBO', 'NEON', 'IRON', 'STORM', 'LUCKY', 'SHADOW', 'COSMIC', 'RAPID', 'BRAVE'],
-    aliasWordsB:  ['FOX', 'OWL', 'WOLF', 'CROW', 'LYNX', 'HAWK', 'BEAR', 'MOTH', 'RAY', 'CUB']
+    btnBack:      '&lt; MAP'
   },
 
   armoury: {
@@ -918,6 +994,12 @@ window.GAME_UI = {
     pieceGlove: 'GLOVES',
     pieceBoot:  'BOOTS',
     swatchAria: '{piece}: {colour}',
+    /* Recompensa por dominio (PLAN-AMBIENTES §8.4): 4 colores de salida y
+       uno mas por cada nivel superado con 2+ estrellas. Coleccionar ligado a
+       dominar, no a compararse con nadie. */
+    lockedAria: '{piece}: {colour} — locked. Clear {n} more level{s} with 2+ stars to unlock.',
+    unlockLine: '{have} of {total} colours unlocked. Clear a level with 2 or more stars to unlock the next.',
+    unlockAll:  'All {total} colours unlocked.',
     preview:    'PREVIEW',
     btnDone:    'DONE &gt;',
     /* Ocho colores fijos. Todos verificados con contraste >= 5:1 sobre
@@ -989,6 +1071,7 @@ window.GAME_UI = {
     firstPlay:  'First time through this level.',
     medalsNew:  'NEW MEDALS',
     medalsMore: '+{n} more',
+    colourNew:  '&#127912; NEW ARMOUR COLOUR UNLOCKED: {colour}',
     unlocked:   '&#128275; UNLOCKED: LEVEL {n} &mdash; {name}',
     btnReplay:  'REPLAY',
     btnMap:     'BACK TO MAP &gt;'

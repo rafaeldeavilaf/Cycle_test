@@ -61,6 +61,8 @@ window.GAME_UI = {
     btnSoundOn:  'SOUND: ON',
     btnSoundOff: 'SOUND: OFF',
     btnReset:    'RESET',
+    btnAulaOn:   'CLASSROOM MODE: ON',
+    btnAulaOff:  'CLASSROOM MODE: OFF',
     intro:       'Clear a level to unlock the next one. Play as many as you want, whenever you want.',
     cardMeta:    'LEVEL {n} &middot; {count} challenges',
     cardBest:    ' &middot; best {xp} XP',
@@ -103,25 +105,19 @@ window.GAME_UI = {
      El motor solo conoce cuerpos 'a' y 'b'. Como se llamen y como se
      describan se decide aqui. Las etiquetas describen el PELO, no un genero:
      es lo que de verdad cambia entre las dos siluetas. */
+  /* El personaje NO tiene nombre: ni real ni alias. Es un avatar neutro que el
+     nino viste. Todo el contenido le habla de "you". */
   hero: {
     title:        'CHOOSE YOUR HERO',
     intro:        'Pick a look. You can change it any time, and it follows you into every game.',
     bodyA:        'SHORT HAIR',
     bodyB:        'LONG HAIR',
     pickAria:     'Choose the {name} hero',
-    aliasTitle:   'HERO NAME',
-    aliasHelp:    'Optional. Up to 12 characters. Use a made-up name, not your real one &mdash; it stays in this browser and is never sent anywhere.',
-    aliasLabel:   'Your hero name',
-    aliasDice:    'SURPRISE ME',
-    defaultAlias: 'HERO',
+    you:          'you',
     btnStart:     'START &gt;',
     btnArmoury:   'ARMOURY',
     btnHero:      'HERO',
-    btnBack:      '&lt; MAP',
-    /* Sugerencias generadas: el nino elige de una lista, nunca escribe su
-       nombre real por inercia. Se combinan adjetivo + animal. */
-    aliasWordsA:  ['PIXEL', 'TURBO', 'NEON', 'IRON', 'STORM', 'LUCKY', 'SHADOW', 'COSMIC', 'RAPID', 'BRAVE'],
-    aliasWordsB:  ['FOX', 'OWL', 'WOLF', 'CROW', 'LYNX', 'HAWK', 'BEAR', 'MOTH', 'RAY', 'CUB']
+    btnBack:      '&lt; MAP'
   },
 
   armoury: {
@@ -134,6 +130,12 @@ window.GAME_UI = {
     pieceGlove: 'GLOVES',
     pieceBoot:  'BOOTS',
     swatchAria: '{piece}: {colour}',
+    /* Recompensa por dominio (PLAN-AMBIENTES §8.4): 4 colores de salida y
+       uno mas por cada nivel superado con 2+ estrellas. Coleccionar ligado a
+       dominar, no a compararse con nadie. */
+    lockedAria: '{piece}: {colour} — locked. Clear {n} more level{s} with 2+ stars to unlock.',
+    unlockLine: '{have} of {total} colours unlocked. Clear a level with 2 or more stars to unlock the next.',
+    unlockAll:  'All {total} colours unlocked.',
     preview:    'PREVIEW',
     btnDone:    'DONE &gt;',
     /* Ocho colores fijos. Todos verificados con contraste >= 5:1 sobre
@@ -205,6 +207,7 @@ window.GAME_UI = {
     firstPlay:  'First time through this level.',
     medalsNew:  'NEW MEDALS',
     medalsMore: '+{n} more',
+    colourNew:  '&#127912; NEW ARMOUR COLOUR UNLOCKED: {colour}',
     unlocked:   '&#128275; UNLOCKED: LEVEL {n} &mdash; {name}',
     btnReplay:  'REPLAY',
     btnMap:     'BACK TO MAP &gt;'
