@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-BUILD — Samuel Quest
+BUILD — Samu: A Link to the Math
 
-Inlines the shared engine (assets/engine.css + assets/engine.js) and each
-subject's data.js into ONE self-contained .html file per game, written to the
-repo root.
+Inlines the shared engine (assets/engine.css + assets/ui.js + assets/engine.js)
+and each subject's data.js into ONE self-contained .html file per game, written
+to the repo root.
 
 Why: GitHub's drag-and-drop upload silently drops subfolders. A game that
 depends on assets/engine.css renders unstyled the moment that happens. A single
@@ -13,6 +13,10 @@ file cannot half-upload.
 
 The folders stay in the repo as the source of truth. The browser never needs
 them.
+
+NOTA (PLAN-V2 §0.2): este script no contiene NI UN texto visible en ingles.
+El titulo, el nombre de marca y todos los textos del hub viven en
+assets/ui.js y se pintan en el navegador desde window.GAME_UI.
 
 Usage:
     python3 tools/build.py
@@ -46,6 +50,16 @@ SPRITE = """<svg class="avatar avatar--lg avatar--bob" viewBox="0 0 17 20" xmlns
     </svg>"""
 
 
+def brand_from_ui(ui_src):
+    """El nombre del juego vive en un solo sitio: assets/ui.js.
+    Si alguien lo renombra alli, el <title> y el hub siguen solos."""
+    m = re.search(r"""\bbrand\s*:\s*(['"])(.+?)\1""", ui_src)
+    if not m:
+        sys.exit("assets/ui.js: no encuentro la clave `brand`. "
+                 "El titulo del juego debe estar ahi y en ningun otro sitio.")
+    return m.group(2)
+
+
 def split_css(css):
     """Pull the Google Fonts @import out so it can become a <link> in <head>.
     An @import inside an inlined <style> still works, but a <link> starts the
@@ -73,64 +87,79 @@ def head(title, description, font_href, css, accent):
     )
 
 
-def build_game(sub, css, font_href, engine):
+def build_game(sub, css, font_href, ui, engine, brand):
     data = read("subjects", sub["slug"], "data.js")
-    title = "Samuel Quest — " + sub["topic"]
+    title = brand + " — " + sub["topic"]
     desc = sub["blurb"].replace('"', "&quot;")
     html = head(title, desc, font_href, css, sub.get("accent", "maths"))
     html += '<div id="app"></div>\n'
+    html += '<script>\n' + ui + '\n</script>\n'
     html += '<script>\n' + data + '\n</script>\n'
     html += '<script>\n' + engine + '\n</script>\n'
     html += '</body>\n</html>\n'
     return sub["slug"] + ".html", html
 
 
+# El hub no lleva texto en este archivo: solo el esqueleto con ids.
+# Todo lo visible se pinta desde window.GAME_UI.hub (assets/ui.js).
 HUB_BODY = """<div class="wrap">
 
   <header class="site-head">
     __SPRITE__
     <div>
-      <h1>SAMUEL QUEST</h1>
-      <p>Year 6 &middot; British International School &middot; Pick a game, clear one level a day.</p>
+      <h1 id="hubBrand"></h1>
+      <p id="hubSub"></p>
     </div>
   </header>
 
   <div class="pixel-box hud">
-    <div class="hud__group"><span class="hud__stat">GAMES <b id="cnt">0</b></span></div>
-    <div class="hud__group"><span class="hud__stat text-dim">5 levels &middot; ~30 min each</span></div>
+    <div class="hud__group"><span class="hud__stat"><span id="hubStatGames"></span> <b id="cnt">0</b></span></div>
+    <div class="hud__group"><span class="hud__stat text-dim" id="hubNote"></span></div>
   </div>
 
   <div class="levels" id="list"></div>
 
   <div class="pixel-box brief mt-lg">
-    <h2>HOW TO PLAY</h2>
-    <ul>
-      <li><b>One level per day</b>, five days before the test. Each level is about 30 minutes.</li>
-      <li>Read the <b>briefing</b> first &mdash; it teaches the method for that level.</li>
-      <li>Answer with the mouse or the keyboard: <b>A B C D</b> or <b>1 2 3 4</b>.</li>
-      <li>Get one wrong and it comes back later <b>with different numbers</b>, so you have to think it through again.</li>
-      <li>Clear every challenge to finish the level and unlock the next one.</li>
-      <li>Progress is saved in this browser. Replay any level to hunt for 3 stars.</li>
-    </ul>
+    <h2 id="hubHowTitle"></h2>
+    <ul id="hubHow"></ul>
   </div>
 
-  <footer>Samuel Quest &middot; built for Samuel</footer>
+  <footer id="hubFoot"></footer>
 </div>
 
 <script>
 var SUBJECTS = __REGISTRY__;
 (function () {
+  var UI = (window.GAME_UI || {});
+  var H  = UI.hub || {};
+  function fmt(tpl, vals) {
+    return String(tpl == null ? '' : tpl).replace(/\\{(\\w+)\\}/g, function (m, k) {
+      return (vals && vals[k] != null) ? String(vals[k]) : m;
+    });
+  }
+  function set(id, html) { var n = document.getElementById(id); if (n) n.innerHTML = html == null ? '' : html; }
+
+  set('hubBrand',     UI.brand);
+  set('hubSub',       H.subtitle);
+  set('hubStatGames', H.statGames);
+  set('hubNote',      H.statNote);
+  set('hubHowTitle',  H.howTitle);
+  set('hubFoot',      UI.brand);
+  document.getElementById('hubHow').innerHTML =
+    (H.how || []).map(function (t) { return '<li>' + t + '</li>'; }).join('');
+
   var list = document.getElementById('list');
   document.getElementById('cnt').textContent = SUBJECTS.length;
 
   if (!SUBJECTS.length) {
-    list.innerHTML = '<div class="pixel-box stage"><p>No games yet.</p></div>';
+    list.innerHTML = '<div class="pixel-box stage"><p>' + (H.empty || '') + '</p></div>';
     return;
   }
 
   SUBJECTS.forEach(function (s) {
     var done = 0, stars = 0;
     try {
+      // La clave de guardado no cambia aunque el juego cambie de nombre.
       var raw = localStorage.getItem('samuel-quest:' + s.slug);
       if (raw) {
         var st = JSON.parse(raw);
@@ -154,7 +183,7 @@ var SUBJECTS = __REGISTRY__;
         '<div class="level-card__name">' + s.topic + '</div>' +
         '<div class="level-card__sub">' + s.blurb + '</div>' +
         '<div class="level-card__sub text-dim" style="margin-top:6px;font-size:13px">' +
-          s.test + ' &middot; ' + s.levels + ' levels &middot; ' + done + '/' + s.levels + ' cleared</div>' +
+          fmt(H.cardMeta, { test: s.test, levels: s.levels, done: done }) + '</div>' +
       '</div>' +
       '<div class="stars">' + stars + '&#9733;</div>';
     list.appendChild(a);
@@ -169,7 +198,9 @@ var SUBJECTS = __REGISTRY__;
 def main():
     css_raw = read("assets", "engine.css")
     font_href, css = split_css(css_raw)
+    ui = read("assets", "ui.js")
     engine = read("assets", "engine.js")
+    brand = brand_from_ui(ui)
 
     reg_src = read("subjects.js")
     m = re.search(r"window\.SUBJECTS\s*=\s*(\[.*?\]);", reg_src, re.S)
@@ -184,16 +215,24 @@ def main():
 
     built = []
     for sub in subjects:
-        name, html = build_game(sub, css, font_href, engine)
+        name, html = build_game(sub, css, font_href, ui, engine, brand)
         built.append((name, write(name, html)))
 
-    hub = head("Samuel Quest",
-               "Samuel&#39;s revision arcade &mdash; one game per test, five levels each.",
+    hub = head(brand,
+               "A revision arcade &mdash; one game per test.",
                font_href, css, "maths")
+    hub += '<script>\n' + ui + '\n</script>\n'
     hub += (HUB_BODY
             .replace("__SPRITE__", SPRITE)
             .replace("__REGISTRY__", json.dumps(subjects, indent=2)))
     built.insert(0, ("index.html", write("index.html", hub)))
+
+    # Guardarrail: el modo de fallo conocido del proyecto es publicar un HTML
+    # que apunte a assets/. Si eso vuelve a pasar, el build para aqui.
+    for name, _ in built:
+        text = read(name)
+        if re.search(r'(src|href)\s*=\s*["\'][^"\']*assets/', text):
+            sys.exit("ERROR: %s referencia assets/ en vez de llevarlo inline." % name)
 
     print("Built self-contained files in the repo root:")
     for name, size in built:

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Samuel Quest</title>
-<meta name="description" content="Samuel&#39;s revision arcade &mdash; one game per test, five levels each.">
+<title>Samu: A Link to the Math</title>
+<meta name="description" content="A revision arcade &mdash; one game per test.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>%F0%9F%8E%AE</text></svg>">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap">
@@ -444,6 +444,138 @@ footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top:
 </style>
 </head>
 <body>
+<script>
+/* ============================================================
+   SAMU: A LINK TO THE MATH — UI.JS
+   Capa de CHROME compartido.
+
+   Aqui vive TODO el texto de interfaz que es identico para
+   cualquier materia: botones, HUD, titulos de pantalla, mensajes
+   genericos del companero. `engine.js` no contiene ni un solo
+   texto visible; lo lee de aqui.
+
+   Tres capas (PLAN-V2.md §0.2):
+     data.js  -> contenido de la materia (mundos, jefes, preguntas)
+     ui.js    -> chrome compartido            <- ESTE ARCHIVO
+     engine.js-> logica, cero texto visible
+
+   Cualquier materia puede sobreescribir cualquier clave de aqui
+   declarando `DATA.ui = { ... }` en su data.js. La mezcla es
+   profunda: solo se pisa lo que se declara.
+
+   Placeholders: {n}, {total}, {xp}... se sustituyen con UI.fmt().
+   Se editan a mano, casi nunca. Un nombre de jefe NO va aqui:
+   va en data.js. (Regla grep del proyecto.)
+   ============================================================ */
+window.GAME_UI = {
+
+  /* ---------- MARCA ----------
+     `brand` lo lee tambien tools/build.py para el <title> y el hub.
+     Si se renombra, cambiarlo AQUI y en ningun otro sitio.
+     La clave de localStorage NO depende de esto y no se renombra. */
+  brand:   'Samu: A Link to the Math',
+  tagline: 'Year 6 &middot; Counting, sequences and rules',
+
+  /* ---------- HUB (index.html) ---------- */
+  hub: {
+    subtitle:   'Year 6 &middot; Pick a game and start playing.',
+    statGames:  'GAMES',
+    statNote:   'Play at your own pace',
+    empty:      'No games yet.',
+    howTitle:   'HOW TO PLAY',
+    how: [
+      'Play <b>as many levels as you like</b>, whenever you like. There is no timer.',
+      'Read the <b>briefing</b> first &mdash; it teaches the method for that level.',
+      'Answer with the mouse or the keyboard: <b>A B C D</b> or <b>1 2 3 4</b>.',
+      'Get one wrong and it comes back later <b>with different numbers</b>, so you have to think it through again.',
+      'Clear every challenge to finish the level and unlock the next one.',
+      'Progress is saved in this browser. Replay any level to hunt for 3 stars.'
+    ],
+    cardMeta:   '{test} &middot; {levels} levels &middot; {done}/{levels} cleared'
+  },
+
+  /* ---------- ERRORES ---------- */
+  err: {
+    noData: 'Missing QUIZ_DATA.'
+  },
+
+  /* ---------- MAPA ---------- */
+  map: {
+    statXP:      'XP',
+    statLevels:  'LEVELS',
+    btnMusicOn:  'MUSIC: ON',
+    btnMusicOff: 'MUSIC: OFF',
+    btnSoundOn:  'SOUND: ON',
+    btnSoundOff: 'SOUND: OFF',
+    btnReset:    'RESET',
+    intro:       'Clear a level to unlock the next one. Play as many as you want, whenever you want.',
+    cardMeta:    'LEVEL {n} &middot; {count} challenges',
+    cardBest:    ' &middot; best {xp} XP',
+    lockIcon:    '&#128274;',
+    allDone:     '&#127942; ALL LEVELS CLEARED',
+    allDoneBody: 'You are ready for the {test}. Replay any level to push for 3 stars.',
+    confirmReset:'Reset all progress for {topic}?'
+  },
+
+  /* ---------- BRIEFING ---------- */
+  brief: {
+    tag:   'LEVEL {n} &middot; BRIEFING',
+    back:  '&lt; MAP',
+    start: 'START LEVEL &gt;'
+  },
+
+  /* ---------- PARTIDA ---------- */
+  play: {
+    levelTag:    'LV {n}',
+    statXP:      'XP',
+    statCombo:   'COMBO',
+    optionsLabel:'Answer options',
+    btnHint:     'HINT',
+    btnMusic:    'MUSIC: {state}',
+    stateOn:     'ON',
+    stateOff:    'OFF',
+    btnQuit:     'QUIT',
+    btnNext:     'NEXT &gt;',
+    btnFinish:   'FINISH LEVEL &gt;',
+    hintLabel:   '<b>Hint:</b> ',
+    hintRetry:   '<b>You saw this one before &mdash; here is the method:</b> ',
+    hintFallback:'Look at the size of each jump.',
+    goodTitle:   '&#10003; CORRECT',
+    badTitle:    '&#10007; NOT YET',
+    badNote:     '<b>This challenge comes back later with different numbers</b> &mdash; so work out the method, not the answer.',
+    confirmQuit: 'Leave this level? Progress in this level is not saved.'
+  },
+
+  /* ---------- COMPANERO DE PANTALLA ----------
+     Genericos: nunca nombran a nadie. Una materia puede sustituirlos
+     desde data.js con `meta.mate` o `ui.mate`. */
+  mate: {
+    start:   'LET\'S GO',
+    turn:    'YOUR TURN',
+    retry:   'ROUND TWO',
+    combo:   'COMBO x{n}',
+    comboPop:'COMBO x{n}!',
+    cheers:   ['NICE ONE!', 'GOT IT!', 'YES!', 'SHARP!', 'CLEAN WORK!', 'THAT\'S IT!'],
+    consoles: ['NOT YET...', 'ALMOST!', 'TRY AGAIN', 'KEEP GOING', 'SHAKE IT OFF']
+  },
+
+  /* ---------- VICTORIA ---------- */
+  win: {
+    title:      'LEVEL {n} CLEARED',
+    statXP:     'XP',
+    statFirst:  'FIRST TRY',
+    statCombo:  'BEST COMBO',
+    statMisses: 'MISSES',
+    verdict3:   'Perfect run. You have this topic locked in.',
+    verdict2:   'Strong. Replay to hunt the third star.',
+    verdict1:   'Cleared it. Play it again &mdash; the questions come back with new numbers.',
+    unlocked:   '&#128275; UNLOCKED: LEVEL {n} &mdash; {name}',
+    btnReplay:  'REPLAY',
+    btnMap:     'BACK TO MAP &gt;'
+  }
+};
+
+</script>
 <div class="wrap">
 
   <header class="site-head">
@@ -458,31 +590,24 @@ footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top:
       <path fill="#1c2555" d="M5 18h3v2H5z M9 18h3v2H9z"/>
     </svg>
     <div>
-      <h1>SAMUEL QUEST</h1>
-      <p>Year 6 &middot; British International School &middot; Pick a game, clear one level a day.</p>
+      <h1 id="hubBrand"></h1>
+      <p id="hubSub"></p>
     </div>
   </header>
 
   <div class="pixel-box hud">
-    <div class="hud__group"><span class="hud__stat">GAMES <b id="cnt">0</b></span></div>
-    <div class="hud__group"><span class="hud__stat text-dim">5 levels &middot; ~30 min each</span></div>
+    <div class="hud__group"><span class="hud__stat"><span id="hubStatGames"></span> <b id="cnt">0</b></span></div>
+    <div class="hud__group"><span class="hud__stat text-dim" id="hubNote"></span></div>
   </div>
 
   <div class="levels" id="list"></div>
 
   <div class="pixel-box brief mt-lg">
-    <h2>HOW TO PLAY</h2>
-    <ul>
-      <li><b>One level per day</b>, five days before the test. Each level is about 30 minutes.</li>
-      <li>Read the <b>briefing</b> first &mdash; it teaches the method for that level.</li>
-      <li>Answer with the mouse or the keyboard: <b>A B C D</b> or <b>1 2 3 4</b>.</li>
-      <li>Get one wrong and it comes back later <b>with different numbers</b>, so you have to think it through again.</li>
-      <li>Clear every challenge to finish the level and unlock the next one.</li>
-      <li>Progress is saved in this browser. Replay any level to hunt for 3 stars.</li>
-    </ul>
+    <h2 id="hubHowTitle"></h2>
+    <ul id="hubHow"></ul>
   </div>
 
-  <footer>Samuel Quest &middot; built for Samuel</footer>
+  <footer id="hubFoot"></footer>
 </div>
 
 <script>
@@ -499,17 +624,36 @@ var SUBJECTS = [
   }
 ];
 (function () {
+  var UI = (window.GAME_UI || {});
+  var H  = UI.hub || {};
+  function fmt(tpl, vals) {
+    return String(tpl == null ? '' : tpl).replace(/\{(\w+)\}/g, function (m, k) {
+      return (vals && vals[k] != null) ? String(vals[k]) : m;
+    });
+  }
+  function set(id, html) { var n = document.getElementById(id); if (n) n.innerHTML = html == null ? '' : html; }
+
+  set('hubBrand',     UI.brand);
+  set('hubSub',       H.subtitle);
+  set('hubStatGames', H.statGames);
+  set('hubNote',      H.statNote);
+  set('hubHowTitle',  H.howTitle);
+  set('hubFoot',      UI.brand);
+  document.getElementById('hubHow').innerHTML =
+    (H.how || []).map(function (t) { return '<li>' + t + '</li>'; }).join('');
+
   var list = document.getElementById('list');
   document.getElementById('cnt').textContent = SUBJECTS.length;
 
   if (!SUBJECTS.length) {
-    list.innerHTML = '<div class="pixel-box stage"><p>No games yet.</p></div>';
+    list.innerHTML = '<div class="pixel-box stage"><p>' + (H.empty || '') + '</p></div>';
     return;
   }
 
   SUBJECTS.forEach(function (s) {
     var done = 0, stars = 0;
     try {
+      // La clave de guardado no cambia aunque el juego cambie de nombre.
       var raw = localStorage.getItem('samuel-quest:' + s.slug);
       if (raw) {
         var st = JSON.parse(raw);
@@ -533,7 +677,7 @@ var SUBJECTS = [
         '<div class="level-card__name">' + s.topic + '</div>' +
         '<div class="level-card__sub">' + s.blurb + '</div>' +
         '<div class="level-card__sub text-dim" style="margin-top:6px;font-size:13px">' +
-          s.test + ' &middot; ' + s.levels + ' levels &middot; ' + done + '/' + s.levels + ' cleared</div>' +
+          fmt(H.cardMeta, { test: s.test, levels: s.levels, done: done }) + '</div>' +
       '</div>' +
       '<div class="stars">' + stars + '&#9733;</div>';
     list.appendChild(a);

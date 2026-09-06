@@ -11,6 +11,10 @@ __pycache__/
 .vscode/
 .idea/
 
+# Node — SOLO para el harness de test. El juego publicado no usa npm.
+node_modules/
+package-lock.json
+
 # Temporales
 *.tmp
 *.bak

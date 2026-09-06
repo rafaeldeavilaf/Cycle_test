@@ -5,7 +5,7 @@ cd /d "%~dp0"
 
 echo.
 echo ============================================
-echo   SAMUEL QUEST - Publicar en GitHub Pages
+echo   SAMU: A LINK TO THE MATH - Publicar en GitHub Pages
 echo ============================================
 echo.
 
@@ -45,7 +45,7 @@ if not errorlevel 1 (
 )
 
 set "MSG=%~1"
-if "%MSG%"=="" set "MSG=Actualizar Samuel Quest"
+if "%MSG%"=="" set "MSG=Actualizar Samu: A Link to the Math"
 
 git add -A
 git commit -m "%MSG%"

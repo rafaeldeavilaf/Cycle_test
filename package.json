@@ -1,0 +1,12 @@
+{
+  "name": "samu-link-to-the-math",
+  "version": "2.0.0-fase0",
+  "private": true,
+  "description": "Herramientas de verificacion. El juego publicado no usa npm ni node: es HTML+CSS+JS plano servido por GitHub Pages. jsdom solo existe para el harness de test.",
+  "scripts": {
+    "test": "node tools/harness.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

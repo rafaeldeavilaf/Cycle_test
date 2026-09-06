@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Samuel Quest — Counting and Sequences</title>
+<title>Samu: A Link to the Math — Counting and Sequences</title>
 <meta name="description" content="Counting on and back with whole numbers, decimals, fractions and negatives, plus position-to-term rules.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>%F0%9F%8E%AE</text></svg>">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -445,6 +445,138 @@ footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top:
 </head>
 <body>
 <div id="app"></div>
+<script>
+/* ============================================================
+   SAMU: A LINK TO THE MATH — UI.JS
+   Capa de CHROME compartido.
+
+   Aqui vive TODO el texto de interfaz que es identico para
+   cualquier materia: botones, HUD, titulos de pantalla, mensajes
+   genericos del companero. `engine.js` no contiene ni un solo
+   texto visible; lo lee de aqui.
+
+   Tres capas (PLAN-V2.md §0.2):
+     data.js  -> contenido de la materia (mundos, jefes, preguntas)
+     ui.js    -> chrome compartido            <- ESTE ARCHIVO
+     engine.js-> logica, cero texto visible
+
+   Cualquier materia puede sobreescribir cualquier clave de aqui
+   declarando `DATA.ui = { ... }` en su data.js. La mezcla es
+   profunda: solo se pisa lo que se declara.
+
+   Placeholders: {n}, {total}, {xp}... se sustituyen con UI.fmt().
+   Se editan a mano, casi nunca. Un nombre de jefe NO va aqui:
+   va en data.js. (Regla grep del proyecto.)
+   ============================================================ */
+window.GAME_UI = {
+
+  /* ---------- MARCA ----------
+     `brand` lo lee tambien tools/build.py para el <title> y el hub.
+     Si se renombra, cambiarlo AQUI y en ningun otro sitio.
+     La clave de localStorage NO depende de esto y no se renombra. */
+  brand:   'Samu: A Link to the Math',
+  tagline: 'Year 6 &middot; Counting, sequences and rules',
+
+  /* ---------- HUB (index.html) ---------- */
+  hub: {
+    subtitle:   'Year 6 &middot; Pick a game and start playing.',
+    statGames:  'GAMES',
+    statNote:   'Play at your own pace',
+    empty:      'No games yet.',
+    howTitle:   'HOW TO PLAY',
+    how: [
+      'Play <b>as many levels as you like</b>, whenever you like. There is no timer.',
+      'Read the <b>briefing</b> first &mdash; it teaches the method for that level.',
+      'Answer with the mouse or the keyboard: <b>A B C D</b> or <b>1 2 3 4</b>.',
+      'Get one wrong and it comes back later <b>with different numbers</b>, so you have to think it through again.',
+      'Clear every challenge to finish the level and unlock the next one.',
+      'Progress is saved in this browser. Replay any level to hunt for 3 stars.'
+    ],
+    cardMeta:   '{test} &middot; {levels} levels &middot; {done}/{levels} cleared'
+  },
+
+  /* ---------- ERRORES ---------- */
+  err: {
+    noData: 'Missing QUIZ_DATA.'
+  },
+
+  /* ---------- MAPA ---------- */
+  map: {
+    statXP:      'XP',
+    statLevels:  'LEVELS',
+    btnMusicOn:  'MUSIC: ON',
+    btnMusicOff: 'MUSIC: OFF',
+    btnSoundOn:  'SOUND: ON',
+    btnSoundOff: 'SOUND: OFF',
+    btnReset:    'RESET',
+    intro:       'Clear a level to unlock the next one. Play as many as you want, whenever you want.',
+    cardMeta:    'LEVEL {n} &middot; {count} challenges',
+    cardBest:    ' &middot; best {xp} XP',
+    lockIcon:    '&#128274;',
+    allDone:     '&#127942; ALL LEVELS CLEARED',
+    allDoneBody: 'You are ready for the {test}. Replay any level to push for 3 stars.',
+    confirmReset:'Reset all progress for {topic}?'
+  },
+
+  /* ---------- BRIEFING ---------- */
+  brief: {
+    tag:   'LEVEL {n} &middot; BRIEFING',
+    back:  '&lt; MAP',
+    start: 'START LEVEL &gt;'
+  },
+
+  /* ---------- PARTIDA ---------- */
+  play: {
+    levelTag:    'LV {n}',
+    statXP:      'XP',
+    statCombo:   'COMBO',
+    optionsLabel:'Answer options',
+    btnHint:     'HINT',
+    btnMusic:    'MUSIC: {state}',
+    stateOn:     'ON',
+    stateOff:    'OFF',
+    btnQuit:     'QUIT',
+    btnNext:     'NEXT &gt;',
+    btnFinish:   'FINISH LEVEL &gt;',
+    hintLabel:   '<b>Hint:</b> ',
+    hintRetry:   '<b>You saw this one before &mdash; here is the method:</b> ',
+    hintFallback:'Look at the size of each jump.',
+    goodTitle:   '&#10003; CORRECT',
+    badTitle:    '&#10007; NOT YET',
+    badNote:     '<b>This challenge comes back later with different numbers</b> &mdash; so work out the method, not the answer.',
+    confirmQuit: 'Leave this level? Progress in this level is not saved.'
+  },
+
+  /* ---------- COMPANERO DE PANTALLA ----------
+     Genericos: nunca nombran a nadie. Una materia puede sustituirlos
+     desde data.js con `meta.mate` o `ui.mate`. */
+  mate: {
+    start:   'LET\'S GO',
+    turn:    'YOUR TURN',
+    retry:   'ROUND TWO',
+    combo:   'COMBO x{n}',
+    comboPop:'COMBO x{n}!',
+    cheers:   ['NICE ONE!', 'GOT IT!', 'YES!', 'SHARP!', 'CLEAN WORK!', 'THAT\'S IT!'],
+    consoles: ['NOT YET...', 'ALMOST!', 'TRY AGAIN', 'KEEP GOING', 'SHAKE IT OFF']
+  },
+
+  /* ---------- VICTORIA ---------- */
+  win: {
+    title:      'LEVEL {n} CLEARED',
+    statXP:     'XP',
+    statFirst:  'FIRST TRY',
+    statCombo:  'BEST COMBO',
+    statMisses: 'MISSES',
+    verdict3:   'Perfect run. You have this topic locked in.',
+    verdict2:   'Strong. Replay to hunt the third star.',
+    verdict1:   'Cleared it. Play it again &mdash; the questions come back with new numbers.',
+    unlocked:   '&#128275; UNLOCKED: LEVEL {n} &mdash; {name}',
+    btnReplay:  'REPLAY',
+    btnMap:     'BACK TO MAP &gt;'
+  }
+};
+
+</script>
 <script>
 /* AUTO-GENERATED by tools/gen_y6_maths_counting.py - do not hand-edit */
 window.QUIZ_DATA = {
@@ -7995,32 +8127,106 @@ window.QUIZ_DATA = {
 </script>
 <script>
 /* ============================================================
-   SAMUEL QUEST — ENGINE.JS
+   SAMU: A LINK TO THE MATH — ENGINE.JS
    Subject-agnostic game engine. Reads window.QUIZ_DATA.
+
+   REGLA DEL PROYECTO: este archivo NO contiene texto visible.
+   Todo lo que el jugador lee vive en `assets/ui.js` (chrome) o en
+   `subjects/<slug>/data.js` (contenido). Si un `grep` de un nombre
+   de jefe, de mundo o de boton devuelve una linea de este archivo,
+   esta mal.
+
    Never edit this file to add a subject; only add a data file.
    ============================================================ */
 (function () {
   'use strict';
 
   var DATA = window.QUIZ_DATA;
-  if (!DATA) { document.body.innerHTML = '<p style="padding:40px">Missing QUIZ_DATA.</p>'; return; }
 
+  /* ---------- UI: chrome compartido + override por materia ----------
+     Prioridad: ui.js  <  DATA.ui  <  DATA.meta.mate (solo companero).
+     Mezcla profunda: una materia puede pisar una sola clave sin
+     copiar el resto. */
+  function deepMerge(base, over) {
+    if (!over || typeof over !== 'object') return base;
+    var out = {}, k;
+    for (k in base) if (Object.prototype.hasOwnProperty.call(base, k)) out[k] = base[k];
+    for (k in over) {
+      if (!Object.prototype.hasOwnProperty.call(over, k)) continue;
+      var b = base[k], o = over[k];
+      if (o && typeof o === 'object' && !(o instanceof Array) &&
+          b && typeof b === 'object' && !(b instanceof Array)) {
+        out[k] = deepMerge(b, o);
+      } else {
+        out[k] = o;
+      }
+    }
+    return out;
+  }
+
+  var UI = deepMerge(window.GAME_UI || {}, (DATA && DATA.ui) || {});
+  if (DATA && DATA.meta && DATA.meta.mate) UI.mate = deepMerge(UI.mate || {}, DATA.meta.mate);
+
+  /* Sustituye {clave} por el valor. Los valores se pasan YA escapados
+     cuando vienen de datos; las plantillas de ui.js pueden llevar HTML. */
+  function fmt(tpl, vals) {
+    if (tpl == null) return '';
+    return String(tpl).replace(/\{(\w+)\}/g, function (m, k) {
+      return (vals && vals[k] != null) ? String(vals[k]) : m;
+    });
+  }
+
+  if (!DATA) {
+    document.body.innerHTML = '<p style="padding:40px">' + ((UI.err && UI.err.noData) || '') + '</p>';
+    return;
+  }
+
+  /* La clave de guardado NO cambia aunque el juego cambie de nombre.
+     Renombrarla borraria el progreso de quien ya venia jugando. */
   var SAVE_KEY = 'samuel-quest:' + DATA.meta.slug;
+  var SAVE_VERSION = 3;
   var KEYS = ['A', 'B', 'C', 'D', 'E'];
 
-  /* ---------- SAVE STATE ---------- */
+  /* ---------- SAVE STATE ----------
+     Migracion v2 -> v3: solo ANADE campos con valores por defecto.
+     Nunca borra niveles, estrellas ni XP. */
+  function blankLevel() {
+    return { done: false, stars: 0, best: 0, plays: 0, bossClean: false, history: [] };
+  }
+  function normalizeLevel(ls) {
+    if (!ls || typeof ls !== 'object') return blankLevel();
+    ls.done      = !!ls.done;
+    if (typeof ls.stars !== 'number' || ls.stars < 0) ls.stars = 0;
+    if (typeof ls.best  !== 'number' || ls.best  < 0) ls.best  = 0;
+    if (typeof ls.plays !== 'number' || ls.plays < 0) ls.plays = 0;
+    if (typeof ls.bossClean !== 'boolean') ls.bossClean = false;
+    if (!(ls.history instanceof Array)) ls.history = [];
+    return ls;
+  }
   function blankSave() {
-    return { levels: {}, totalXP: 0, sound: true, music: true, version: 2 };
+    return {
+      version: SAVE_VERSION,
+      levels: {}, totalXP: 0, sound: true, music: true,
+      skills: {}, bestComboEver: 0
+    };
+  }
+  function migrate(s) {
+    if (typeof s.totalXP !== 'number' || s.totalXP < 0) s.totalXP = 0;
+    if (typeof s.music !== 'boolean') s.music = true;
+    if (typeof s.sound !== 'boolean') s.sound = true;
+    if (!s.skills || typeof s.skills !== 'object' || s.skills instanceof Array) s.skills = {};
+    if (typeof s.bestComboEver !== 'number' || s.bestComboEver < 0) s.bestComboEver = 0;
+    Object.keys(s.levels).forEach(function (id) { s.levels[id] = normalizeLevel(s.levels[id]); });
+    s.version = SAVE_VERSION;
+    return s;
   }
   function load() {
     try {
       var raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return blankSave();
       var s = JSON.parse(raw);
-      if (!s || typeof s !== 'object' || !s.levels) return blankSave();
-      if (typeof s.music !== 'boolean') s.music = true;   // saves anteriores
-      if (typeof s.sound !== 'boolean') s.sound = true;
-      return s;
+      if (!s || typeof s !== 'object' || !s.levels || typeof s.levels !== 'object') return blankSave();
+      return migrate(s);
     } catch (e) { return blankSave(); }
   }
   function save() {
@@ -8197,9 +8403,11 @@ window.QUIZ_DATA = {
     return a;
   }
   function el(id) { return document.getElementById(id); }
+  function onOff(flag) { return flag ? UI.play.stateOn : UI.play.stateOff; }
 
   function levelSave(id) {
-    if (!STATE.levels[id]) STATE.levels[id] = { done: false, stars: 0, best: 0, plays: 0 };
+    if (!STATE.levels[id]) STATE.levels[id] = blankLevel();
+    else STATE.levels[id] = normalizeLevel(STATE.levels[id]);
     return STATE.levels[id];
   }
   function isUnlocked(idx) {
@@ -8208,11 +8416,11 @@ window.QUIZ_DATA = {
     return !!levelSave(prev.id).done;
   }
 
-  /* ---------- SPRITE (inline pixel-art Samuel) ----------
+  /* ---------- SPRITE (inline pixel-art hero) ----------
      Moods: 'idle' | 'happy' (celebra) | 'sad' (derrotado)
      Cada mood cambia ojos, boca y BRAZOS. Nada de archivos de imagen.
   -------------------------------------------------------- */
-  function samuelSVG(mood) {
+  function heroSVG(mood) {
     var eyes, brow = '', mouth, arms, extra = '';
 
     if (mood === 'happy') {
@@ -8253,17 +8461,16 @@ window.QUIZ_DATA = {
       '<path fill="#1c2555" d="M5 18h3v2H5z M9 18h3v2H9z"/>' +
       '</svg>';
   }
-  window.SamuelSprite = samuelSVG;
+  window.HeroSprite = heroSVG;
+  window.SamuelSprite = heroSVG;   // alias historico
 
-  var CHEERS = ['NICE ONE!', 'GOT IT!', 'YES!', 'SHARP!', 'CLEAN WORK!', 'THAT\'S IT!'];
-  var CONSOLES = ['NOT YET...', 'ALMOST!', 'TRY AGAIN', 'KEEP GOING', 'SHAKE IT OFF'];
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
 
-  /* Cambia la cara de Samuel en la pantalla de juego. */
+  /* Cambia la cara del companero en la pantalla de juego. */
   function setMate(mood, msg, cls) {
     var box = el('mateSprite');
     if (!box) return;
-    box.innerHTML = samuelSVG(mood);
+    box.innerHTML = heroSVG(mood);
     var sprite = box.querySelector('.avatar');
     if (mood === 'happy') sprite.classList.add('avatar--cheer');
     else if (mood === 'sad') sprite.classList.add('avatar--down');
@@ -8275,7 +8482,7 @@ window.QUIZ_DATA = {
   /* ---------- QUESTION QUEUE ----------
      Regla anti-repeticion: cada pregunta es una FAMILIA con varias variantes.
      Una familia solo se supera al acertarla. Al fallar vuelve al final de la
-     cola y se sirve OTRA variante, para que Samuel razone de nuevo en vez de
+     cola y se sirve OTRA variante, para que el nino razone de nuevo en vez de
      recordar que boton pulso.
 
      Garantias:
@@ -8284,7 +8491,7 @@ window.QUIZ_DATA = {
           imposible ver la misma pregunta dos veces seguidas.
        3. `tries` cuenta los intentos reales de la familia (no se reinicia con
           el ciclo de variantes), asi que "acierto al primer intento" y las
-          estrellas siguen siendo correctos por muchas vueltas que dé.
+          estrellas siguen siendo correctos por muchas vueltas que de.
   ------------------------------------------------------------- */
   function Runner(level) {
     this.level = level;
@@ -8362,9 +8569,9 @@ window.QUIZ_DATA = {
   root.innerHTML =
     '<div class="wrap">' +
       '<header class="site-head">' +
-        '<div id="heroSprite">' + samuelSVG('idle') + '</div>' +
+        '<div id="heroSprite">' + heroSVG('idle') + '</div>' +
         '<div>' +
-          '<h1>SAMUEL QUEST</h1>' +
+          '<h1>' + UI.brand + '</h1>' +
           '<p>' + esc(DATA.meta.year) + ' &middot; ' + esc(DATA.meta.subject) + ' &middot; ' + esc(DATA.meta.topic) + '</p>' +
         '</div>' +
       '</header>' +
@@ -8373,16 +8580,16 @@ window.QUIZ_DATA = {
       '<section id="scrMap" class="screen is-on">' +
         '<div class="pixel-box hud">' +
           '<div class="hud__group">' +
-            '<span class="hud__stat">XP <b id="mapXP">0</b></span>' +
-            '<span class="hud__stat">LEVELS <b id="mapDone">0/5</b></span>' +
+            '<span class="hud__stat">' + UI.map.statXP + ' <b id="mapXP">0</b></span>' +
+            '<span class="hud__stat">' + UI.map.statLevels + ' <b id="mapDone">0/0</b></span>' +
           '</div>' +
           '<div class="hud__group">' +
-            '<button class="btn btn--ghost" id="btnMusic" type="button">MUSIC: ON</button>' +
-            '<button class="btn btn--ghost" id="btnSound" type="button">SOUND: ON</button>' +
-            '<button class="btn btn--ghost" id="btnReset" type="button">RESET</button>' +
+            '<button class="btn btn--ghost" id="btnMusic" type="button"></button>' +
+            '<button class="btn btn--ghost" id="btnSound" type="button"></button>' +
+            '<button class="btn btn--ghost" id="btnReset" type="button">' + UI.map.btnReset + '</button>' +
           '</div>' +
         '</div>' +
-        '<p class="text-dim" style="font-size:15px">One level per day. About 30 minutes each. Finish a level to unlock the next one.</p>' +
+        '<p class="text-dim" style="font-size:15px">' + UI.map.intro + '</p>' +
         '<div class="levels" id="levelList"></div>' +
         '<div id="allDone"></div>' +
       '</section>' +
@@ -8391,8 +8598,8 @@ window.QUIZ_DATA = {
       '<section id="scrBrief" class="screen">' +
         '<div class="pixel-box brief" id="briefBody"></div>' +
         '<div class="row row--end mt">' +
-          '<button class="btn btn--ghost" id="briefBack" type="button">&lt; MAP</button>' +
-          '<button class="btn btn--primary" id="briefGo" type="button">START LEVEL &gt;</button>' +
+          '<button class="btn btn--ghost" id="briefBack" type="button">' + UI.brief.back + '</button>' +
+          '<button class="btn btn--primary" id="briefGo" type="button">' + UI.brief.start + '</button>' +
         '</div>' +
       '</section>' +
 
@@ -8401,16 +8608,16 @@ window.QUIZ_DATA = {
         '<div class="pixel-box hud">' +
           '<div class="mate">' +
             '<div class="mate__sprite" id="mateSprite"></div>' +
-            '<div class="mate__msg" id="mateMsg">LET\'S GO</div>' +
+            '<div class="mate__msg" id="mateMsg"></div>' +
           '</div>' +
           '<div class="hud__group" style="flex:1">' +
-            '<span class="hud__stat" id="hudLvl">LV 1</span>' +
+            '<span class="hud__stat" id="hudLvl"></span>' +
             '<div class="bar"><div class="bar__fill" id="hudBar"></div></div>' +
             '<span class="hud__stat" id="hudCount">0/0</span>' +
           '</div>' +
           '<div class="hud__group">' +
-            '<span class="hud__stat">XP <b id="hudXP">0</b></span>' +
-            '<span class="hud__stat">COMBO <b id="hudCombo">0</b></span>' +
+            '<span class="hud__stat">' + UI.play.statXP + ' <b id="hudXP">0</b></span>' +
+            '<span class="hud__stat">' + UI.play.statCombo + ' <b id="hudCombo">0</b></span>' +
           '</div>' +
         '</div>' +
         '<div class="pixel-box stage">' +
@@ -8418,16 +8625,16 @@ window.QUIZ_DATA = {
           '<div id="qStem" class="q-stem"></div>' +
           '<div id="qSub" class="q-sub"></div>' +
           '<div id="qSeq" class="seq"></div>' +
-          '<div id="qOpts" class="options" role="group" aria-label="Answer options"></div>' +
+          '<div id="qOpts" class="options" role="group" aria-label="' + UI.play.optionsLabel + '"></div>' +
           '<div id="qHint" class="hint" role="note"></div>' +
           '<div class="row mt">' +
-            '<button class="btn btn--ghost" id="btnHint" type="button">HINT</button>' +
-            '<button class="btn btn--ghost" id="btnMusic2" type="button">MUSIC</button>' +
-            '<button class="btn btn--ghost" id="btnQuit" type="button">QUIT</button>' +
+            '<button class="btn btn--ghost" id="btnHint" type="button">' + UI.play.btnHint + '</button>' +
+            '<button class="btn btn--ghost" id="btnMusic2" type="button"></button>' +
+            '<button class="btn btn--ghost" id="btnQuit" type="button">' + UI.play.btnQuit + '</button>' +
           '</div>' +
         '</div>' +
         '<div id="qFeed" class="pixel-box feedback" role="status" aria-live="polite"></div>' +
-        '<div class="row row--end mt"><button class="btn btn--primary" id="btnNext" type="button" style="display:none">NEXT &gt;</button></div>' +
+        '<div class="row row--end mt"><button class="btn btn--primary" id="btnNext" type="button" style="display:none"></button></div>' +
       '</section>' +
 
       /* WIN */
@@ -8435,14 +8642,14 @@ window.QUIZ_DATA = {
         '<div class="pixel-box victory" id="winBody"></div>' +
       '</section>' +
 
-      '<footer>Samuel Quest &middot; built for Samuel, Year 6</footer>' +
+      '<footer>' + UI.brand + '</footer>' +
     '</div>' +
     '<div class="combo" id="comboPop"></div>';
 
   var screens = { map: el('scrMap'), brief: el('scrBrief'), play: el('scrPlay'), win: el('scrWin') };
   function show(name) {
     Object.keys(screens).forEach(function (k) { screens[k].classList.toggle('is-on', k === name); });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { /* jsdom / navegadores viejos */ }
   }
 
   /* ---------- MAP ---------- */
@@ -8463,13 +8670,14 @@ window.QUIZ_DATA = {
       var card = document.createElement('div');
       card.className = 'pixel-box level-card' + (unlocked ? '' : ' is-locked') + (ls.done ? ' is-done' : '');
       card.innerHTML =
-        '<div class="level-card__num">' + (unlocked ? lv.id : '&#128274;') + '</div>' +
+        '<div class="level-card__num">' + (unlocked ? lv.id : UI.map.lockIcon) + '</div>' +
         '<div>' +
           '<div class="level-card__name">' + esc(lv.name) + '</div>' +
           '<div class="level-card__sub">' + esc(lv.subtitle) + '</div>' +
-          '<div class="level-card__sub text-dim" style="margin-top:6px;font-size:13px">Day ' + lv.id +
-            ' &middot; ' + lv.questions.length + ' challenges' +
-            (ls.done ? ' &middot; best ' + ls.best + ' XP' : '') + '</div>' +
+          '<div class="level-card__sub text-dim" style="margin-top:6px;font-size:13px">' +
+            fmt(UI.map.cardMeta, { n: lv.id, count: lv.questions.length }) +
+            (ls.done ? fmt(UI.map.cardBest, { xp: ls.best }) : '') +
+          '</div>' +
         '</div>' +
         '<div class="stars">' + starStr(ls.stars) + '</div>';
       if (unlocked) {
@@ -8483,11 +8691,11 @@ window.QUIZ_DATA = {
     });
     el('mapXP').textContent = STATE.totalXP;
     el('mapDone').textContent = done + '/' + DATA.levels.length;
-    el('btnSound').textContent = 'SOUND: ' + (STATE.sound ? 'ON' : 'OFF');
-    el('btnMusic').textContent = 'MUSIC: ' + (STATE.music ? 'ON' : 'OFF');
+    el('btnSound').textContent = STATE.sound ? UI.map.btnSoundOn : UI.map.btnSoundOff;
+    el('btnMusic').textContent = STATE.music ? UI.map.btnMusicOn : UI.map.btnMusicOff;
     el('allDone').innerHTML = (done === DATA.levels.length)
-      ? '<div class="pixel-box victory mt-lg"><h2>&#127942; ALL LEVELS CLEARED</h2>' +
-        '<p>You are ready for the ' + esc(DATA.meta.test) + '. Replay any level to push for 3 stars.</p></div>'
+      ? '<div class="pixel-box victory mt-lg"><h2>' + UI.map.allDone + '</h2>' +
+        '<p>' + fmt(UI.map.allDoneBody, { test: esc(DATA.meta.test) }) + '</p></div>'
       : '';
   }
 
@@ -8498,7 +8706,7 @@ window.QUIZ_DATA = {
     currentIdx = idx;
     var lv = DATA.levels[idx];
     el('briefBody').innerHTML =
-      '<div class="q-tag">DAY ' + lv.id + ' &middot; BRIEFING</div>' +
+      '<div class="q-tag">' + fmt(UI.brief.tag, { n: lv.id }) + '</div>' +
       '<h2>' + esc(lv.name) + '</h2>' +
       lv.briefing.join('');
     show('brief');
@@ -8513,8 +8721,8 @@ window.QUIZ_DATA = {
   function startLevel(idx) {
     var lv = DATA.levels[idx];
     run = new Runner(lv);
-    el('hudLvl').textContent = 'LV ' + lv.id;
-    setMate('idle', 'LET\'S GO');
+    el('hudLvl').textContent = fmt(UI.play.levelTag, { n: lv.id });
+    setMate('idle', UI.mate.start);
     if (STATE.music) MUSIC.start();
     show('play');
     nextQuestion();
@@ -8554,15 +8762,16 @@ window.QUIZ_DATA = {
       box.appendChild(b);
     });
 
-    // Andamiaje: si ya falló esta familia antes, la pista aparece sola.
+    // Andamiaje: si ya fallo esta familia antes, la pista aparece sola.
     var retry = q.tries > 1;
     el('qHint').className = 'hint' + (retry ? ' is-on' : '');
-    el('qHint').innerHTML = (retry ? '<b>You saw this one before &mdash; here is the method:</b> ' : '<b>Hint:</b> ')
-      + (q.v.hint || 'Look at the size of each jump.');
+    el('qHint').innerHTML = (retry ? UI.play.hintRetry : UI.play.hintLabel)
+      + (q.v.hint || UI.play.hintFallback);
     el('btnHint').style.display = retry ? 'none' : 'inline-block';
     el('qFeed').className = 'pixel-box feedback';
     el('btnNext').style.display = 'none';
-    setMate('idle', run.combo >= 3 ? 'COMBO x' + run.combo : (retry ? 'ROUND TWO' : 'YOUR TURN'));
+    setMate('idle', run.combo >= 3 ? fmt(UI.mate.combo, { n: run.combo })
+                                   : (retry ? UI.mate.retry : UI.mate.turn));
     updateHUD();
   }
 
@@ -8599,22 +8808,25 @@ window.QUIZ_DATA = {
       SFX.right();
       MUSIC.duck(900);
       run.resolve(true);
-      setMate('happy', run.combo >= 3 ? 'COMBO x' + run.combo + '!' : pick(CHEERS), 'is-good');
-      if (run.combo >= 3) popCombo('COMBO x' + run.combo + '!');
+      if (run.combo > (STATE.bestComboEver || 0)) { STATE.bestComboEver = run.combo; save(); }
+      setMate('happy', run.combo >= 3 ? fmt(UI.mate.comboPop, { n: run.combo }) : pick(UI.mate.cheers), 'is-good');
+      if (run.combo >= 3) popCombo(fmt(UI.mate.comboPop, { n: run.combo }));
       fb.className = 'pixel-box feedback is-on feedback--good';
-      fb.innerHTML = '<div class="feedback__title">&#10003; CORRECT</div><div class="feedback__body">' + q.v.explain + '</div>';
+      fb.innerHTML = '<div class="feedback__title">' + UI.play.goodTitle + '</div>' +
+                     '<div class="feedback__body">' + q.v.explain + '</div>';
     } else {
       SFX.wrong();
       MUSIC.duck(900);
       run.resolve(false);
-      setMate('sad', pick(CONSOLES), 'is-bad');
+      setMate('sad', pick(UI.mate.consoles), 'is-bad');
       fb.className = 'pixel-box feedback is-on feedback--bad';
-      fb.innerHTML = '<div class="feedback__title">&#10007; NOT YET</div><div class="feedback__body">' + q.v.explain +
-        '<p style="margin-top:12px;color:var(--warn)"><b>This challenge comes back later with different numbers</b> &mdash; so work out the method, not the answer.</p></div>';
+      fb.innerHTML = '<div class="feedback__title">' + UI.play.badTitle + '</div>' +
+                     '<div class="feedback__body">' + q.v.explain +
+                     '<p style="margin-top:12px;color:var(--warn)">' + UI.play.badNote + '</p></div>';
     }
     el('btnHint').style.display = 'none';
     el('btnNext').style.display = 'inline-block';
-    el('btnNext').textContent = run.queue.length ? 'NEXT >' : 'FINISH LEVEL >';
+    el('btnNext').innerHTML = run.queue.length ? UI.play.btnNext : UI.play.btnFinish;
     el('btnNext').focus();
     updateHUD();
   }
@@ -8622,7 +8834,7 @@ window.QUIZ_DATA = {
   el('btnNext').addEventListener('click', function () { SFX.click(); nextQuestion(); });
   el('btnHint').addEventListener('click', function () { SFX.click(); el('qHint').classList.add('is-on'); });
   el('btnQuit').addEventListener('click', function () {
-    if (confirm('Leave this level? Progress in this level is not saved.')) { renderMap(); show('map'); }
+    if (window.confirm(UI.play.confirmQuit)) { renderMap(); show('map'); }
   });
 
   // keyboard: A/B/C/D or 1-4
@@ -8650,30 +8862,35 @@ window.QUIZ_DATA = {
     ls.plays++;
     if (stars > ls.stars) ls.stars = stars;
     if (run.xp > ls.best) { STATE.totalXP += (run.xp - ls.best); ls.best = run.xp; }
+    // Historial: ultimas 5 partidas de este nivel (lo consume la Fase 3).
+    ls.history.push({ xp: run.xp, first: run.firstTry, misses: run.misses, combo: run.bestCombo, at: Date.now() });
+    if (ls.history.length > 5) ls.history = ls.history.slice(-5);
+    if (run.bestCombo > (STATE.bestComboEver || 0)) STATE.bestComboEver = run.bestCombo;
     save();
 
     SFX.level();
     MUSIC.duck(2600);
     var nextLv = DATA.levels[currentIdx + 1];
     el('winBody').innerHTML =
-      '<div style="display:flex;justify-content:center">' + samuelSVG('happy').replace('class="avatar"', 'class="avatar avatar--lg avatar--bob"') + '</div>' +
-      '<h2>LEVEL ' + lv.id + ' CLEARED</h2>' +
+      '<div style="display:flex;justify-content:center">' + heroSVG('happy').replace('class="avatar"', 'class="avatar avatar--lg avatar--bob"') + '</div>' +
+      '<h2>' + fmt(UI.win.title, { n: lv.id }) + '</h2>' +
       '<div class="stars">' + starStr(stars) + '</div>' +
       '<div class="victory__stats">' +
-        '<div><span>XP</span>' + run.xp + '</div>' +
-        '<div><span>FIRST TRY</span>' + run.firstTry + '/' + run.total + '</div>' +
-        '<div><span>BEST COMBO</span>' + run.bestCombo + '</div>' +
-        '<div><span>MISSES</span>' + run.misses + '</div>' +
+        '<div><span>' + UI.win.statXP     + '</span>' + run.xp + '</div>' +
+        '<div><span>' + UI.win.statFirst  + '</span>' + run.firstTry + '/' + run.total + '</div>' +
+        '<div><span>' + UI.win.statCombo  + '</span>' + run.bestCombo + '</div>' +
+        '<div><span>' + UI.win.statMisses + '</span>' + run.misses + '</div>' +
       '</div>' +
       '<p class="text-dim" style="font-size:15px">' +
-        (stars === 3 ? 'Perfect run. You have this topic locked in.'
-         : stars === 2 ? 'Strong. Replay to hunt the third star.'
-         : 'Cleared it. Replay this level tomorrow &mdash; the questions come back with new numbers.') +
+        (stars === 3 ? UI.win.verdict3 : stars === 2 ? UI.win.verdict2 : UI.win.verdict1) +
       '</p>' +
-      (nextLv && wasNew ? '<p class="mt" style="color:var(--good);font-family:var(--font-ui);font-size:11px">&#128275; UNLOCKED: LEVEL ' + nextLv.id + ' &mdash; ' + esc(nextLv.name) + '</p>' : '') +
+      (nextLv && wasNew
+        ? '<p class="mt" style="color:var(--good);font-family:var(--font-ui);font-size:11px">' +
+          fmt(UI.win.unlocked, { n: nextLv.id, name: esc(nextLv.name) }) + '</p>'
+        : '') +
       '<div class="row mt-lg" style="justify-content:center">' +
-        '<button class="btn btn--ghost" id="winReplay" type="button">REPLAY</button>' +
-        '<button class="btn btn--primary" id="winMap" type="button">' + (nextLv ? 'BACK TO MAP >' : 'BACK TO MAP >') + '</button>' +
+        '<button class="btn btn--ghost" id="winReplay" type="button">' + UI.win.btnReplay + '</button>' +
+        '<button class="btn btn--primary" id="winMap" type="button">' + UI.win.btnMap + '</button>' +
       '</div>';
 
     if (nextLv && wasNew) setTimeout(SFX.unlock, 700);
@@ -8686,19 +8903,19 @@ window.QUIZ_DATA = {
   /* ---------- MAP CONTROLS ---------- */
   el('btnSound').addEventListener('click', function () {
     STATE.sound = !STATE.sound; save(); SFX.click();
-    el('btnSound').textContent = 'SOUND: ' + (STATE.sound ? 'ON' : 'OFF');
+    el('btnSound').textContent = STATE.sound ? UI.map.btnSoundOn : UI.map.btnSoundOff;
   });
 
   function toggleMusic() {
     STATE.music = !STATE.music;
     save();
     if (STATE.music) MUSIC.start(); else MUSIC.stop();
-    el('btnMusic').textContent = 'MUSIC: ' + (STATE.music ? 'ON' : 'OFF');
-    el('btnMusic2').textContent = 'MUSIC: ' + (STATE.music ? 'ON' : 'OFF');
+    el('btnMusic').textContent = STATE.music ? UI.map.btnMusicOn : UI.map.btnMusicOff;
+    el('btnMusic2').textContent = fmt(UI.play.btnMusic, { state: onOff(STATE.music) });
   }
   el('btnMusic').addEventListener('click', toggleMusic);
   el('btnMusic2').addEventListener('click', toggleMusic);
-  el('btnMusic2').textContent = 'MUSIC: ' + (STATE.music ? 'ON' : 'OFF');
+  el('btnMusic2').textContent = fmt(UI.play.btnMusic, { state: onOff(STATE.music) });
 
   // Los navegadores solo permiten audio tras una interaccion del usuario.
   document.addEventListener('click', function once() {
@@ -8706,13 +8923,13 @@ window.QUIZ_DATA = {
     if (STATE.music) MUSIC.start();
   });
 
-  // Silencia si Samuel cambia de pestana.
+  // Silencia si el jugador cambia de pestana.
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) MUSIC.stop();
     else if (STATE.music) MUSIC.start();
   });
   el('btnReset').addEventListener('click', function () {
-    if (confirm('Reset all progress for ' + DATA.meta.topic + '?')) {
+    if (window.confirm(fmt(UI.map.confirmReset, { topic: DATA.meta.topic }))) {
       STATE = blankSave(); save(); renderMap();
     }
   });
