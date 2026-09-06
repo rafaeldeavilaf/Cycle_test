@@ -666,13 +666,18 @@ h3 { font-size: 12px; }
    Props en SVG inline (assets/props.js) y materiales como patron SVG tintado.
    Todo decorativo va aria-hidden y sin pointer-events: la escena esta encima.
    Regla R1 del panel: nada decorativo junto a las casillas. ------------------ */
-.world { position: relative; --env-floor-h: 78px; }
+/* Alturas del lugar: cielo (donde asoman torres y la puerta del jefe),
+   franja alta de pared (almenas, antorchas, ventanas: SIN puertas debajo),
+   luego las casillas, y el suelo. Visto en vivo: sin la franja de cielo la
+   pared lo tapaba todo y los props caian detras de las puertas. */
+.world { position: relative; --env-floor-h: 78px; --env-sky-h: 64px; --env-strip-h: 34px; }
 .world .scene-host { position: relative; z-index: 1; }
 .world.is-stacked { --env-floor-h: 18px; }
 
-/* Con lugar, el corredor de la escena se vuelve transparente y las
-   casillas se visten del material del lugar. */
-.has-env .scene__corridor { background: transparent; border-color: transparent; }
+/* Con lugar, el corredor de la escena se vuelve transparente, deja sitio
+   arriba para cielo y pared, y las casillas se visten del material. */
+.has-env .scene__corridor { background: transparent; border-color: transparent;
+                            padding-top: calc(var(--env-sky-h) + var(--env-strip-h) + 12px); }
 .has-env .scene__floor    { background: transparent; border-top-color: transparent; }
 .has-env .door__frame  { background: var(--env-slot); border-color: var(--env-slotline); }
 .has-env .door__key    { border-color: var(--env-slotline); color: var(--env-glow); }
@@ -684,8 +689,10 @@ h3 { font-size: 12px; }
 .env__layer { position: absolute; left: 0; right: 0; }
 .env__props { position: absolute; inset: 0; }
 .env__sky   { top: 0; bottom: 0; background: linear-gradient(180deg, var(--env-sky), var(--env-sky2)); }
-.env__far   { top: 0; bottom: var(--env-floor-h); }
-.env__wall  { top: 0; bottom: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
+/* Lo lejano se apoya en la linea alta del muro (bottom:0 de esta capa). */
+.env__far   { top: 0; height: var(--env-sky-h); }
+.env__far .env__props { overflow: visible; }
+.env__wall  { top: var(--env-sky-h); bottom: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
               background-position: calc(var(--hx, 0) * -48px) 0; transition: background-position .22s steps(6); }
 .env__floor { bottom: 0; height: var(--env-floor-h); background-blend-mode: multiply; background-repeat: repeat;
               border-top: var(--px) solid var(--env-line);
@@ -727,7 +734,7 @@ h3 { font-size: 12px; }
 .bar.path i.on  { background: var(--good); }
 .bar.path i.now { background: var(--warn); }
 
-@media (max-width: 700px) { .world { --env-floor-h: 64px; } }
+@media (max-width: 700px) { .world { --env-floor-h: 64px; --env-sky-h: 44px; --env-strip-h: 22px; } }
 
 /* Modo aula y reduced-motion: el lugar se queda quieto, la transicion es un
    corte seco, las llamas no titilan. El lugar sigue ahi; solo no se mueve. */

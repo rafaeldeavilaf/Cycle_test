@@ -798,7 +798,8 @@
           layer('env__fg', env.fg);
         if (env.gate) {
           var far = node.querySelector('.env__far .env__props');
-          far.insertAdjacentHTML('beforeend', propSVG(env.gate, { x: 90, scale: 1 }));
+          // A escala 0.5 cabe en la franja de cielo aun cuando --gs llega a 1.
+          far.insertAdjacentHTML('beforeend', propSVG(env.gate, { x: 90, scale: 0.5 }));
           gateEl = far.lastElementChild;
           gateEl.classList.add('env__gate');
         }

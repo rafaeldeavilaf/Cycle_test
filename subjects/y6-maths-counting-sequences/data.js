@@ -1607,17 +1607,17 @@ window.QUIZ_DATA = {
      {
       "prop": "tower",
       "x": 8,
-      "scale": 1.1
+      "scale": 0.6
      },
      {
       "prop": "tower",
       "x": 34,
-      "scale": 0.8
+      "scale": 0.45
      },
      {
       "prop": "tower",
       "x": 60,
-      "scale": 0.95
+      "scale": 0.55
      }
     ],
     "wall": [
@@ -1629,21 +1629,24 @@ window.QUIZ_DATA = {
      },
      {
       "prop": "torch",
-      "x": 14,
+      "x": 12,
       "y": "top",
-      "top": 16
+      "top": 0,
+      "scale": 0.45
      },
      {
       "prop": "window",
-      "x": 48,
+      "x": 50,
       "y": "top",
-      "top": 14
+      "top": 0,
+      "scale": 0.6
      },
      {
       "prop": "torch",
-      "x": 84,
+      "x": 88,
       "y": "top",
-      "top": 16
+      "top": 0,
+      "scale": 0.45
      }
     ],
     "gate": "gate",
@@ -3219,22 +3222,22 @@ window.QUIZ_DATA = {
      {
       "prop": "tower",
       "x": 12,
-      "scale": 0.9
+      "scale": 0.5
      },
      {
       "prop": "treefar",
       "x": 40,
-      "scale": 0.7
+      "scale": 0.6
      },
      {
       "prop": "treefar",
       "x": 50,
-      "scale": 0.9
+      "scale": 0.8
      },
      {
       "prop": "tower",
       "x": 72,
-      "scale": 0.7
+      "scale": 0.4
      }
     ],
     "wall": [
@@ -3248,13 +3251,15 @@ window.QUIZ_DATA = {
       "prop": "window",
       "x": 30,
       "y": "top",
-      "top": 14
+      "top": 0,
+      "scale": 0.6
      },
      {
       "prop": "window",
       "x": 70,
       "y": "top",
-      "top": 14
+      "top": 0,
+      "scale": 0.6
      }
     ],
     "gate": "gate",
@@ -4774,53 +4779,42 @@ window.QUIZ_DATA = {
      {
       "prop": "treefar",
       "x": 6,
-      "scale": 1.2
-     },
-     {
-      "prop": "treefar",
-      "x": 18,
       "scale": 0.9
      },
      {
       "prop": "treefar",
-      "x": 30,
-      "scale": 1.1
-     },
-     {
-      "prop": "treefar",
-      "x": 70,
-      "scale": 1.0
-     },
-     {
-      "prop": "treefar",
-      "x": 82,
-      "scale": 1.2
-     }
-    ],
-    "wall": [
-     {
-      "prop": "tree",
-      "x": 9,
-      "scale": 1.3
-     },
-     {
-      "prop": "reeds",
-      "x": 40
-     },
-     {
-      "prop": "reeds",
-      "x": 62
+      "x": 20,
+      "scale": 0.7
      },
      {
       "prop": "tree",
-      "x": 92,
-      "scale": 1.15
+      "x": 32,
+      "scale": 0.7
+     },
+     {
+      "prop": "treefar",
+      "x": 64,
+      "scale": 0.8
+     },
+     {
+      "prop": "tree",
+      "x": 76,
+      "scale": 0.65
      }
     ],
+    "wall": [],
     "fg": [
      {
       "prop": "bush",
       "x": 5
+     },
+     {
+      "prop": "reeds",
+      "x": 38
+     },
+     {
+      "prop": "reeds",
+      "x": 62
      },
      {
       "prop": "bush",
@@ -6328,14 +6322,17 @@ window.QUIZ_DATA = {
     ],
     "wall": [
      {
+      "prop": "torch",
+      "x": 50,
+      "y": "top",
+      "top": 0,
+      "scale": 0.45
+     }
+    ],
+    "fg": [
+     {
       "prop": "crystal",
       "x": 12
-     },
-     {
-      "prop": "torch",
-      "x": 32,
-      "y": "top",
-      "top": 18
      },
      {
       "prop": "crystal",
@@ -7825,15 +7822,15 @@ window.QUIZ_DATA = {
       "prop": "gear",
       "x": 15,
       "y": "top",
-      "top": 8,
-      "scale": 1.8
+      "top": 6,
+      "scale": 1.2
      },
      {
       "prop": "gear",
       "x": 78,
       "y": "top",
-      "top": 4,
-      "scale": 1.3
+      "top": 2,
+      "scale": 0.9
      }
     ],
     "wall": [
@@ -7841,18 +7838,22 @@ window.QUIZ_DATA = {
       "prop": "lamp",
       "x": 25,
       "y": "top",
-      "top": 0
+      "top": 0,
+      "scale": 0.55
      },
      {
       "prop": "lamp",
       "x": 75,
       "y": "top",
-      "top": 0
-     },
+      "top": 0,
+      "scale": 0.55
+     }
+    ],
+    "fg": [
      {
       "prop": "gear",
       "x": 50,
-      "scale": 1.4
+      "scale": 0.9
      }
     ],
     "gate": "gate",

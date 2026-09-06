@@ -859,6 +859,12 @@ async function main() {
   check('todo prop declarado en datos existe en props.js',
         usedProps.every(p => propIds.indexOf(p) !== -1), usedProps.filter(p => propIds.indexOf(p) === -1).join(','));
   check('todo material declarado existe en props.js', usedMats.every(m => matIds.indexOf(m) !== -1));
+  /* Visto en vivo: un prop de `wall` apoyado en el suelo cae DETRAS de las
+     puertas y no se ve. En la pared solo van cosas de la franja alta. */
+  check('ningun prop de pared se apoya en el suelo (quedaria detras de las puertas)',
+        lvls.every(l => (l.env.wall || []).every(o => o.y === 'top')));
+  check('todo nivel tiene algo asomando contra el cielo (capa far)',
+        lvls.every(l => (l.env.far || []).length >= 1 || l.env.gate));
   check('cada nivel tiene una paleta distinta (no son el mismo sitio repintado)',
         new Set(lvls.map(l => l.env.palette.sky + l.env.materials.wall + l.env.materials.floor)).size === lvls.length);
 
