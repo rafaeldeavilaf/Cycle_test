@@ -128,6 +128,24 @@ Nunca se añade una pantalla nueva sin actualizar este documento.
 
 ---
 
+## 8. Accesibilidad
+
+Auditado, con los ratios calculados sobre los tokens reales:
+
+- **Contraste WCAG AA en las 12 combinaciones del juego.** La más ajustada es el error
+  rojo sobre panel (5.24:1) y el texto sobre la opción correcta (5.98:1); el mínimo es 4.5:1.
+- `:focus-visible` amarillo de 4px en botones, opciones y tarjetas.
+- Las tarjetas de nivel son operables con `Enter` y `Espacio`.
+- El panel de feedback es `role="status"` con `aria-live="polite"`: un lector de pantalla
+  anuncia si acertó y la explicación.
+- Las opciones van en un `role="group"` con etiqueta.
+- Nada de texto por debajo de 11px.
+- Sin scroll horizontal: `.options` pasa a una columna bajo 620px, `.seq` desplaza dentro
+  de su propia caja, y hay un breakpoint de 380px para móviles estrechos.
+- `prefers-reduced-motion` desactiva todas las animaciones.
+
+---
+
 ## 9. Samuel reacciona
 
 El sprite vive en el HUD de la pantalla de juego (`.mate`) y tiene tres estados.
@@ -163,12 +181,3 @@ cero licencias.
 - Arranca en el primer clic, nunca antes: los navegadores bloquean el audio automático.
 
 **No añadas archivos de audio al proyecto.** Rompería la regla del HTML autocontenido.
-
----
-
-## 8. Accesibilidad
-
-- Contraste mínimo AA sobre `--bg-1` en todos los textos.
-- `:focus-visible` amarillo de 4px en botones, opciones y tarjetas.
-- Las tarjetas de nivel son operables con `Enter` y `Espacio`.
-- Todo el contenido visible sin scroll horizontal; `.options` pasa a una columna bajo 620px.
