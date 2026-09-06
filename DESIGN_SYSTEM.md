@@ -114,9 +114,11 @@ Nunca se añade una pantalla nueva sin actualizar este documento.
 ## 7. Reglas de juego (constantes del motor)
 
 - 5 niveles, uno por día.
-- 16 familias de preguntas por nivel, 3 variantes cada una.
+- 16 familias de preguntas por nivel, 5 variantes cada una.
 - Un nivel se supera cuando **todas** las familias se han respondido bien una vez.
-- Al fallar, la familia vuelve al final de la cola con **otra variante**.
+- Al fallar, la familia vuelve al final de la cola con **otra variante**. El motor agota
+  todas las variantes antes de reutilizar ninguna y nunca repite la última servida.
+- Al reintentar una familia ya fallada, la pista se muestra sola.
 - El orden de las opciones se baraja en cada aparición.
 - XP: 100 base + 20 por cada eslabón de combo (tope 8) = máximo 260 por acierto.
 - Estrellas por aciertos al primer intento: ≥90% = 3, ≥70% = 2, resto = 1.

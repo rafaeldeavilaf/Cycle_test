@@ -277,10 +277,18 @@
   }
 
   /* ---------- QUESTION QUEUE ----------
-     Anti-repeat rule: every question is a FAMILY with >=2 variants.
-     A family is only cleared when answered correctly. On a miss the
-     family goes to the back of the queue and serves a DIFFERENT
-     variant, so Samuel has to reason again, not recall an answer.
+     Regla anti-repeticion: cada pregunta es una FAMILIA con varias variantes.
+     Una familia solo se supera al acertarla. Al fallar vuelve al final de la
+     cola y se sirve OTRA variante, para que Samuel razone de nuevo en vez de
+     recordar que boton pulso.
+
+     Garantias:
+       1. Se agotan TODAS las variantes antes de reutilizar ninguna.
+       2. Al reiniciar el ciclo nunca se repite la ultima servida, asi que es
+          imposible ver la misma pregunta dos veces seguidas.
+       3. `tries` cuenta los intentos reales de la familia (no se reinicia con
+          el ciclo de variantes), asi que "acierto al primer intento" y las
+          estrellas siguen siendo correctos por muchas vueltas que dé.
   ------------------------------------------------------------- */
   function Runner(level) {
     this.level = level;
@@ -293,8 +301,10 @@
     this.combo = 0;
     this.bestCombo = 0;
     this.xp = 0;
-    this.seen = {};      // familyIndex -> [variantIndex,...]
-    this.answered = {};  // familyIndex -> true once cleared
+    this.seen = {};      // familia -> [variantes ya servidas en este ciclo]
+    this.tries = {};     // familia -> intentos reales acumulados
+    this.lastVar = {};   // familia -> ultima variante servida
+    this.answered = {};
     this.startedAt = Date.now();
   }
   Runner.prototype.current = function () {
@@ -302,12 +312,27 @@
     var fi = this.queue[0];
     var fam = this.level.questions[fi];
     var used = this.seen[fi] || [];
-    var pool = [];
-    for (var i = 0; i < fam.variants.length; i++) if (used.indexOf(i) === -1) pool.push(i);
-    if (!pool.length) { pool = []; for (var j = 0; j < fam.variants.length; j++) pool.push(j); this.seen[fi] = []; used = []; }
+    var last = this.lastVar[fi];
+    var i, pool = [];
+
+    for (i = 0; i < fam.variants.length; i++) if (used.indexOf(i) === -1) pool.push(i);
+
+    if (!pool.length) {
+      // Ciclo agotado: se reinicia, pero nunca con la variante recien vista.
+      for (i = 0; i < fam.variants.length; i++) if (i !== last) pool.push(i);
+      if (!pool.length) pool = [0];        // familia con una sola variante
+      this.seen[fi] = [];
+    }
+
     var vi = pool[Math.floor(Math.random() * pool.length)];
     (this.seen[fi] = this.seen[fi] || []).push(vi);
-    return { familyIndex: fi, variantIndex: vi, family: fam, v: fam.variants[vi], firstAttempt: used.length === 0 };
+    this.lastVar[fi] = vi;
+    this.tries[fi] = (this.tries[fi] || 0) + 1;
+    return {
+      familyIndex: fi, variantIndex: vi, family: fam, v: fam.variants[vi],
+      tries: this.tries[fi],
+      firstAttempt: this.tries[fi] === 1
+    };
   };
   Runner.prototype.resolve = function (correct) {
     var fi = this.queue.shift();
@@ -319,12 +344,12 @@
       var base = 100;
       var bonus = Math.min(this.combo, 8) * 20;
       this.xp += base + bonus;
-      if ((this.seen[fi] || []).length === 1) this.firstTry++;
+      if (this.tries[fi] === 1) this.firstTry++;
       this.answered[fi] = true;
     } else {
       this.misses++;
       this.combo = 0;
-      this.queue.push(fi);   // back of the line, different variant next time
+      this.queue.push(fi);   // al final de la cola, con otra variante
     }
   };
   Runner.prototype.progress = function () { return this.cleared / this.total; };
@@ -397,15 +422,15 @@
           '<div id="qStem" class="q-stem"></div>' +
           '<div id="qSub" class="q-sub"></div>' +
           '<div id="qSeq" class="seq"></div>' +
-          '<div id="qOpts" class="options"></div>' +
-          '<div id="qHint" class="hint"></div>' +
+          '<div id="qOpts" class="options" role="group" aria-label="Answer options"></div>' +
+          '<div id="qHint" class="hint" role="note"></div>' +
           '<div class="row mt">' +
             '<button class="btn btn--ghost" id="btnHint" type="button">HINT</button>' +
             '<button class="btn btn--ghost" id="btnMusic2" type="button">MUSIC</button>' +
             '<button class="btn btn--ghost" id="btnQuit" type="button">QUIT</button>' +
           '</div>' +
         '</div>' +
-        '<div id="qFeed" class="pixel-box feedback"></div>' +
+        '<div id="qFeed" class="pixel-box feedback" role="status" aria-live="polite"></div>' +
         '<div class="row row--end mt"><button class="btn btn--primary" id="btnNext" type="button" style="display:none">NEXT &gt;</button></div>' +
       '</section>' +
 
@@ -533,12 +558,15 @@
       box.appendChild(b);
     });
 
-    el('qHint').className = 'hint';
-    el('qHint').innerHTML = '<b>Hint:</b> ' + (q.v.hint || 'Look at the size of each jump.');
-    el('btnHint').style.display = 'inline-block';
+    // Andamiaje: si ya falló esta familia antes, la pista aparece sola.
+    var retry = q.tries > 1;
+    el('qHint').className = 'hint' + (retry ? ' is-on' : '');
+    el('qHint').innerHTML = (retry ? '<b>You saw this one before &mdash; here is the method:</b> ' : '<b>Hint:</b> ')
+      + (q.v.hint || 'Look at the size of each jump.');
+    el('btnHint').style.display = retry ? 'none' : 'inline-block';
     el('qFeed').className = 'pixel-box feedback';
     el('btnNext').style.display = 'none';
-    setMate('idle', run.combo >= 3 ? 'COMBO x' + run.combo : 'YOUR TURN');
+    setMate('idle', run.combo >= 3 ? 'COMBO x' + run.combo : (retry ? 'ROUND TWO' : 'YOUR TURN'));
     updateHUD();
   }
 
@@ -615,6 +643,8 @@
 
   /* ---------- WIN ---------- */
   function winLevel() {
+    if (run.finished) return;      // evita que un doble clic cuente la partida dos veces
+    run.finished = true;
     var lv = DATA.levels[currentIdx];
     var ls = levelSave(lv.id);
     var stars = run.stars();

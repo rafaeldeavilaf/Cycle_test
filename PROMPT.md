@@ -49,6 +49,10 @@ Exactamente cuatro cosas:
    descriptivas), el script igual se usa para garantizar que **no haya opciones duplicadas**
    y que cada familia tenga sus variantes.
 2. `subjects/<slug>/data.js` — salida del script.
+   Reglas de contenido que el script debe respetar: nada de distractores de relleno
+   descartables a simple vista, y ningún enunciado con contexto imposible (un submarino
+   que acaba sobre el nivel del mar, una planta que encoge). Cada opción incorrecta debe
+   ser un error real que cometería un niño de 10 años.
 3. Una línea nueva al inicio del array en `subjects.js`.
 4. La salida de `python3 tools/build.py`, que produce `<slug>.html` e `index.html`
    autocontenidos en la raíz. **Esos dos son los archivos que subo a GitHub.**
@@ -61,8 +65,8 @@ tiene, dímelo antes de escribirla.
 - **Todo en inglés**, incluidos briefings, pistas y explicaciones. Registro: claro,
   directo, para un chico de 10-11 años. Sin infantilizar.
 - **5 niveles = 5 días**, uno por día, ~30 minutos cada uno.
-- **Mínimo 16 familias de preguntas por nivel** (80 en total) y **3 variantes por familia**
-  (240 preguntas). Una familia solo se supera al responderla bien; al fallar vuelve a la
+- **Mínimo 16 familias de preguntas por nivel** (80 en total) y **5 variantes por familia**
+  (400 preguntas). Una familia solo se supera al responderla bien; al fallar vuelve a la
   cola y el motor sirve **otra variante**, nunca la misma pregunta. Por eso las variantes
   deben cambiar los números/datos, no solo la redacción.
 - **Prioriza selección múltiple**: 4 opciones, siempre. Los distractores deben ser
@@ -103,7 +107,7 @@ window.QUIZ_DATA = {
         answer: 0,                       // índice de la correcta
         hint: "...",
         explain: "..."
-      }, /* +2 variantes */]
+      }, /* +4 variantes */]
     }, /* +15 familias */]
   }, /* +4 niveles */]
 }

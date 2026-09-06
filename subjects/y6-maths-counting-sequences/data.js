@@ -82,6 +82,44 @@ window.QUIZ_DATA = {
        "answer": 1,
        "hint": "Each jump goes down by 9. Take 9 off the last number you can see.",
        "explain": "The last visible number is <code>27</code>. Counting back 9 gives <code>27 - 9 = 18</code>."
+      },
+      {
+       "stem": "Count back in steps of 6. What number comes next?",
+       "sub": null,
+       "seq": [
+        "24",
+        "18",
+        "12",
+        "?"
+       ],
+       "options": [
+        "6",
+        "0",
+        "12",
+        "24"
+       ],
+       "answer": 0,
+       "hint": "Each jump goes down by 6. Take 6 off the last number you can see.",
+       "explain": "The last visible number is <code>12</code>. Counting back 6 gives <code>12 - 6 = 6</code>."
+      },
+      {
+       "stem": "Count back in steps of 8. What number comes next?",
+       "sub": null,
+       "seq": [
+        "36",
+        "28",
+        "20",
+        "?"
+       ],
+       "options": [
+        "36",
+        "20",
+        "12",
+        "4"
+       ],
+       "answer": 2,
+       "hint": "Each jump goes down by 8. Take 8 off the last number you can see.",
+       "explain": "The last visible number is <code>20</code>. Counting back 8 gives <code>20 - 8 = 12</code>."
       }
      ]
     },
@@ -100,9 +138,9 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "28",
+        "29",
         "35",
-        "21",
-        "29"
+        "21"
        ],
        "answer": 0,
        "hint": "Add 7 to the last number in the sequence.",
@@ -118,12 +156,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "101",
         "75",
-        "100",
-        "125"
+        "101",
+        "125",
+        "100"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "Add 25 to the last number in the sequence.",
        "explain": "<code>75 + 25 = 100</code>."
       },
@@ -137,14 +175,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "44",
-        "45",
         "55",
-        "33"
+        "44",
+        "33",
+        "45"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "Add 11 to the last number in the sequence.",
        "explain": "<code>33 + 11 = 44</code>."
+      },
+      {
+       "stem": "Count on in steps of 9. What number comes next?",
+       "sub": null,
+       "seq": [
+        "9",
+        "18",
+        "27",
+        "?"
+       ],
+       "options": [
+        "27",
+        "45",
+        "36",
+        "37"
+       ],
+       "answer": 2,
+       "hint": "Add 9 to the last number in the sequence.",
+       "explain": "<code>27 + 9 = 36</code>."
+      },
+      {
+       "stem": "Count on in steps of 15. What number comes next?",
+       "sub": null,
+       "seq": [
+        "15",
+        "30",
+        "45",
+        "?"
+       ],
+       "options": [
+        "61",
+        "45",
+        "75",
+        "60"
+       ],
+       "answer": 3,
+       "hint": "Add 15 to the last number in the sequence.",
+       "explain": "<code>45 + 15 = 60</code>."
       }
      ]
     },
@@ -163,11 +239,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "5",
-        "12",
         "7",
-        "6"
+        "6",
+        "12"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Subtract one term from the term straight after it.",
        "explain": "<code>9 - 3 = 6</code>. The sequence counts on in steps of 6."
       },
@@ -181,12 +257,12 @@ window.QUIZ_DATA = {
         "25"
        ],
        "options": [
-        "8",
-        "7",
+        "14",
         "6",
-        "14"
+        "8",
+        "7"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Subtract one term from the term straight after it.",
        "explain": "<code>11 - 4 = 7</code>. The sequence counts on in steps of 7."
       },
@@ -200,14 +276,52 @@ window.QUIZ_DATA = {
         "33"
        ],
        "options": [
-        "7",
-        "9",
         "8",
+        "9",
+        "7",
         "16"
+       ],
+       "answer": 0,
+       "hint": "Subtract one term from the term straight after it.",
+       "explain": "<code>17 - 9 = 8</code>. The sequence counts on in steps of 8."
+      },
+      {
+       "stem": "What is the step size in this sequence?",
+       "sub": null,
+       "seq": [
+        "5",
+        "14",
+        "23",
+        "32"
+       ],
+       "options": [
+        "18",
+        "8",
+        "9",
+        "10"
        ],
        "answer": 2,
        "hint": "Subtract one term from the term straight after it.",
-       "explain": "<code>17 - 9 = 8</code>. The sequence counts on in steps of 8."
+       "explain": "<code>14 - 5 = 9</code>. The sequence counts on in steps of 9."
+      },
+      {
+       "stem": "What is the step size in this sequence?",
+       "sub": null,
+       "seq": [
+        "2",
+        "14",
+        "26",
+        "38"
+       ],
+       "options": [
+        "24",
+        "11",
+        "12",
+        "13"
+       ],
+       "answer": 2,
+       "hint": "Subtract one term from the term straight after it.",
+       "explain": "<code>14 - 2 = 12</code>. The sequence counts on in steps of 12."
       }
      ]
     },
@@ -226,11 +340,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "20",
+        "18",
         "12",
-        "24",
-        "18"
+        "24"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Work out the step first, then add it to the number before the gap.",
        "explain": "The step is 6. So the missing term is <code>12 + (6) = 18</code>."
       },
@@ -244,12 +358,12 @@ window.QUIZ_DATA = {
         "9"
        ],
        "options": [
+        "16",
         "23",
         "9",
-        "16",
         "18"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Work out the step first, then add it to the number before the gap.",
        "explain": "The step is -7. So the missing term is <code>23 + (-7) = 16</code>."
       },
@@ -263,14 +377,52 @@ window.QUIZ_DATA = {
         "41"
        ],
        "options": [
-        "25",
         "14",
         "32",
+        "25",
         "23"
        ],
        "answer": 3,
        "hint": "Work out the step first, then add it to the number before the gap.",
        "explain": "The step is 9. So the missing term is <code>14 + (9) = 23</code>."
+      },
+      {
+       "stem": "Which number belongs in the gap?",
+       "sub": null,
+       "seq": [
+        "20",
+        "28",
+        "?",
+        "44"
+       ],
+       "options": [
+        "36",
+        "44",
+        "38",
+        "28"
+       ],
+       "answer": 0,
+       "hint": "Work out the step first, then add it to the number before the gap.",
+       "explain": "The step is 8. So the missing term is <code>28 + (8) = 36</code>."
+      },
+      {
+       "stem": "Which number belongs in the gap?",
+       "sub": null,
+       "seq": [
+        "40",
+        "?",
+        "28",
+        "22"
+       ],
+       "options": [
+        "34",
+        "28",
+        "36",
+        "40"
+       ],
+       "answer": 0,
+       "hint": "Work out the step first, then add it to the number before the gap.",
+       "explain": "The step is -6. So the missing term is <code>40 + (-6) = 34</code>."
       }
      ]
     },
@@ -288,12 +440,12 @@ window.QUIZ_DATA = {
         "28"
        ],
        "options": [
+        "0",
         "7",
         "14",
-        "0",
         "21"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "Go backwards one step from the second number.",
        "explain": "The step is 7, so the first term is <code>14 - 7 = 7</code>."
       },
@@ -326,14 +478,52 @@ window.QUIZ_DATA = {
         "44"
        ],
        "options": [
-        "33",
+        "22",
         "0",
         "11",
-        "22"
+        "33"
        ],
        "answer": 2,
        "hint": "Go backwards one step from the second number.",
        "explain": "The step is 11, so the first term is <code>22 - 11 = 11</code>."
+      },
+      {
+       "stem": "The first number is missing. What is it?",
+       "sub": null,
+       "seq": [
+        "?",
+        "18",
+        "27",
+        "36"
+       ],
+       "options": [
+        "0",
+        "27",
+        "9",
+        "18"
+       ],
+       "answer": 2,
+       "hint": "Go backwards one step from the second number.",
+       "explain": "The step is 9, so the first term is <code>18 - 9 = 9</code>."
+      },
+      {
+       "stem": "The first number is missing. What is it?",
+       "sub": null,
+       "seq": [
+        "?",
+        "30",
+        "45",
+        "60"
+       ],
+       "options": [
+        "0",
+        "15",
+        "30",
+        "45"
+       ],
+       "answer": 1,
+       "hint": "Go backwards one step from the second number.",
+       "explain": "The step is 15, so the first term is <code>30 - 15 = 15</code>."
       }
      ]
     },
@@ -352,10 +542,10 @@ window.QUIZ_DATA = {
         "30"
        ],
        "options": [
-        "12",
-        "25",
         "18",
-        "24"
+        "25",
+        "24",
+        "12"
        ],
        "answer": 1,
        "hint": "Check every jump. Which gap is not exactly 6?",
@@ -372,12 +562,12 @@ window.QUIZ_DATA = {
         "40"
        ],
        "options": [
-        "26",
         "16",
         "24",
-        "8"
+        "8",
+        "26"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Check every jump. Which gap is not exactly 8?",
        "explain": "Counting on in 8s the term should be <code>24</code>, not <code>26</code>."
       },
@@ -400,6 +590,46 @@ window.QUIZ_DATA = {
        "answer": 3,
        "hint": "Check every jump. Which gap is not exactly 9?",
        "explain": "Counting on in 9s the term should be <code>45</code>, not <code>46</code>."
+      },
+      {
+       "stem": "This should count on in steps of 7, but one number is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "7",
+        "14",
+        "21",
+        "30",
+        "35"
+       ],
+       "options": [
+        "14",
+        "21",
+        "28",
+        "30"
+       ],
+       "answer": 3,
+       "hint": "Check every jump. Which gap is not exactly 7?",
+       "explain": "Counting on in 7s the term should be <code>28</code>, not <code>30</code>."
+      },
+      {
+       "stem": "This should count on in steps of 12, but one number is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "12",
+        "24",
+        "37",
+        "48",
+        "60"
+       ],
+       "options": [
+        "37",
+        "36",
+        "24",
+        "12"
+       ],
+       "answer": 0,
+       "hint": "Check every jump. Which gap is not exactly 12?",
+       "explain": "Counting on in 12s the term should be <code>36</code>, not <code>37</code>."
       }
      ]
     },
@@ -418,12 +648,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "45",
         "36",
         "27",
-        "54"
+        "54",
+        "45"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Take two jumps, not one.",
        "explain": "Last shown is <code>27</code>. Two jumps of 9: <code>36</code> then <code>45</code>."
       },
@@ -438,12 +668,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
+        "43",
         "37",
         "31",
-        "25",
-        "43"
+        "25"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "Take two jumps, not one.",
        "explain": "Last shown is <code>25</code>. Two jumps of 6: <code>31</code> then <code>37</code>."
       },
@@ -458,14 +688,54 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "0",
-        "8",
         "16",
-        "24"
+        "24",
+        "0",
+        "8"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Take two jumps, not one.",
        "explain": "Last shown is <code>24</code>. Two jumps of -8: <code>16</code> then <code>8</code>."
+      },
+      {
+       "stem": "What number comes <b>two steps</b> after the last one shown?",
+       "sub": null,
+       "seq": [
+        "11",
+        "18",
+        "25",
+        "?",
+        "?"
+       ],
+       "options": [
+        "25",
+        "32",
+        "39",
+        "46"
+       ],
+       "answer": 2,
+       "hint": "Take two jumps, not one.",
+       "explain": "Last shown is <code>25</code>. Two jumps of 7: <code>32</code> then <code>39</code>."
+      },
+      {
+       "stem": "What number comes <b>two steps</b> after the last one shown?",
+       "sub": null,
+       "seq": [
+        "50",
+        "44",
+        "38",
+        "?",
+        "?"
+       ],
+       "options": [
+        "26",
+        "32",
+        "38",
+        "20"
+       ],
+       "answer": 0,
+       "hint": "Take two jumps, not one.",
+       "explain": "Last shown is <code>38</code>. Two jumps of -6: <code>32</code> then <code>26</code>."
       }
      ]
     },
@@ -478,12 +748,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "80, 73, 66, 59",
-        "80, 71, 62, 53",
         "80, 72, 64, 56",
-        "80, 88, 96, 104"
+        "80, 71, 62, 53",
+        "80, 88, 96, 104",
+        "80, 73, 66, 59"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Back means the numbers get smaller. Check the size of the jump too.",
        "explain": "<code>80, 72, 64, 56</code> goes down by exactly 8 each time."
       },
@@ -492,12 +762,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "54, 60, 66, 72",
-        "54, 47, 40, 33",
         "54, 48, 42, 36",
+        "54, 47, 40, 33",
+        "54, 60, 66, 72",
         "54, 49, 44, 39"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Back means the numbers get smaller. Check the size of the jump too.",
        "explain": "<code>54, 48, 42, 36</code> goes down by exactly 6 each time."
       },
@@ -506,14 +776,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "90, 81, 72, 63",
         "90, 80, 70, 60",
         "90, 82, 74, 66",
-        "90, 81, 72, 63",
         "90, 99, 108, 117"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Back means the numbers get smaller. Check the size of the jump too.",
        "explain": "<code>90, 81, 72, 63</code> goes down by exactly 9 each time."
+      },
+      {
+       "stem": "Which sequence counts <b>back</b> in steps of 7?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "70, 77, 84, 91",
+        "70, 62, 54, 46",
+        "70, 64, 58, 52",
+        "70, 63, 56, 49"
+       ],
+       "answer": 3,
+       "hint": "Back means the numbers get smaller. Check the size of the jump too.",
+       "explain": "<code>70, 63, 56, 49</code> goes down by exactly 7 each time."
+      },
+      {
+       "stem": "Which sequence counts <b>back</b> in steps of 12?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "96, 84, 72, 60",
+        "96, 83, 70, 57",
+        "96, 85, 74, 63",
+        "96, 108, 120, 132"
+       ],
+       "answer": 0,
+       "hint": "Back means the numbers get smaller. Check the size of the jump too.",
+       "explain": "<code>96, 84, 72, 60</code> goes down by exactly 12 each time."
       }
      ]
     },
@@ -531,12 +829,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-6",
         "-3",
         "3",
+        "-6",
         "0"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Below zero the numbers are negative and keep getting further from zero.",
        "explain": "After 0 you keep subtracting 3: <code>0 - 3 = -3</code>."
       },
@@ -550,12 +848,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-10",
-        "-5",
         "5",
-        "0"
+        "0",
+        "-5",
+        "-10"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Below zero the numbers are negative and keep getting further from zero.",
        "explain": "After 0 you keep subtracting 5: <code>0 - 5 = -5</code>."
       },
@@ -569,14 +867,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-8",
+        "-4",
         "4",
         "0",
-        "-4"
+        "-8"
+       ],
+       "answer": 0,
+       "hint": "Below zero the numbers are negative and keep getting further from zero.",
+       "explain": "After 0 you keep subtracting 4: <code>0 - 4 = -4</code>."
+      },
+      {
+       "stem": "Keep counting back in 6s. What comes after zero?",
+       "sub": null,
+       "seq": [
+        "12",
+        "6",
+        "0",
+        "?"
+       ],
+       "options": [
+        "6",
+        "-6",
+        "0",
+        "-12"
+       ],
+       "answer": 1,
+       "hint": "Below zero the numbers are negative and keep getting further from zero.",
+       "explain": "After 0 you keep subtracting 6: <code>0 - 6 = -6</code>."
+      },
+      {
+       "stem": "Keep counting back in 7s. What comes after zero?",
+       "sub": null,
+       "seq": [
+        "14",
+        "7",
+        "0",
+        "?"
+       ],
+       "options": [
+        "-14",
+        "0",
+        "7",
+        "-7"
        ],
        "answer": 3,
        "hint": "Below zero the numbers are negative and keep getting further from zero.",
-       "explain": "After 0 you keep subtracting 4: <code>0 - 4 = -4</code>."
+       "explain": "After 0 you keep subtracting 7: <code>0 - 7 = -7</code>."
       }
      ]
     },
@@ -589,12 +925,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "14",
         "22",
+        "18",
         "42",
-        "18"
+        "14"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "3 moves of 4 floors is 3 x 4 floors in total.",
        "explain": "<code>3 x 4 = 12</code>, and <code>30 - 12 = 18</code>."
       },
@@ -603,9 +939,9 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "36",
         "9",
         "15",
+        "36",
         "12"
        ],
        "answer": 3,
@@ -617,14 +953,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "30",
-        "35",
         "25",
-        "60"
+        "60",
+        "30",
+        "35"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "3 moves of 5 floors is 3 x 5 floors in total.",
        "explain": "<code>3 x 5 = 15</code>, and <code>45 - 15 = 30</code>."
+      },
+      {
+       "stem": "A lift starts on floor 36 and goes down 6 floors at a time. Which floor is it on after 4 moves?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6",
+        "60",
+        "18",
+        "12"
+       ],
+       "answer": 3,
+       "hint": "4 moves of 6 floors is 4 x 6 floors in total.",
+       "explain": "<code>4 x 6 = 24</code>, and <code>36 - 24 = 12</code>."
+      },
+      {
+       "stem": "A lift starts on floor 50 and goes down 10 floors at a time. Which floor is it on after 3 moves?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "30",
+        "10",
+        "20",
+        "80"
+       ],
+       "answer": 2,
+       "hint": "3 moves of 10 floors is 3 x 10 floors in total.",
+       "explain": "<code>3 x 10 = 30</code>, and <code>50 - 30 = 20</code>."
       }
      ]
     },
@@ -637,12 +1001,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "6",
+        "5",
         "30",
-        "4",
-        "5"
+        "6",
+        "4"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Find the difference first, then divide by the step size.",
        "explain": "<code>42 - 12 = 30</code> and <code>30 / 6 = 5</code> steps."
       },
@@ -651,12 +1015,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "5",
         "6",
+        "42",
         "7",
-        "42"
+        "5"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Find the difference first, then divide by the step size.",
        "explain": "<code>49 - 7 = 42</code> and <code>42 / 7 = 6</code> steps."
       },
@@ -665,14 +1029,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "8",
+        "7",
         "28",
-        "6",
-        "7"
+        "8",
+        "6"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Find the difference first, then divide by the step size.",
        "explain": "<code>48 - 20 = 28</code> and <code>28 / 4 = 7</code> steps."
+      },
+      {
+       "stem": "A sequence counts on in steps of 5. How many steps are there from 15 to 55?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "7",
+        "9",
+        "8",
+        "40"
+       ],
+       "answer": 2,
+       "hint": "Find the difference first, then divide by the step size.",
+       "explain": "<code>55 - 15 = 40</code> and <code>40 / 5 = 8</code> steps."
+      },
+      {
+       "stem": "A sequence counts on in steps of 3. How many steps are there from 9 to 36?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "9",
+        "8",
+        "27",
+        "10"
+       ],
+       "answer": 0,
+       "hint": "Find the difference first, then divide by the step size.",
+       "explain": "<code>36 - 9 = 27</code> and <code>27 / 3 = 9</code> steps."
       }
      ]
     },
@@ -691,10 +1083,10 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
-        "60",
+        "42",
         "54",
         "48",
-        "42"
+        "60"
        ],
        "answer": 2,
        "hint": "The 1st number is 6. To reach the 8th you take 7 more jumps.",
@@ -711,12 +1103,12 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
-        "36",
-        "40",
         "44",
-        "32"
+        "40",
+        "32",
+        "36"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "The 1st number is 4. To reach the 9th you take 8 more jumps.",
        "explain": "<code>4 + 8 x 4 = 36</code>."
       },
@@ -731,14 +1123,54 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
-        "35",
         "30",
-        "40",
-        "45"
+        "35",
+        "45",
+        "40"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "The 1st number is 5. To reach the 7th you take 6 more jumps.",
        "explain": "<code>5 + 6 x 5 = 35</code>."
+      },
+      {
+       "stem": "This sequence counts on in 3s. What is the 10th number?",
+       "sub": null,
+       "seq": [
+        "3",
+        "6",
+        "9",
+        "12",
+        "..."
+       ],
+       "options": [
+        "30",
+        "36",
+        "33",
+        "27"
+       ],
+       "answer": 0,
+       "hint": "The 1st number is 3. To reach the 10th you take 9 more jumps.",
+       "explain": "<code>3 + 9 x 3 = 30</code>."
+      },
+      {
+       "stem": "This sequence counts on in 7s. What is the 6th number?",
+       "sub": null,
+       "seq": [
+        "7",
+        "14",
+        "21",
+        "28",
+        "..."
+       ],
+       "options": [
+        "42",
+        "35",
+        "49",
+        "56"
+       ],
+       "answer": 0,
+       "hint": "The 1st number is 7. To reach the 6th you take 5 more jumps.",
+       "explain": "<code>7 + 5 x 7 = 42</code>."
       }
      ]
     },
@@ -756,12 +1188,12 @@ window.QUIZ_DATA = {
         "20"
        ],
        "options": [
-        "5",
         "6",
         "15",
+        "5",
         "4"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "The two shown numbers are 3 jumps apart. Divide the difference by 3.",
        "explain": "<code>20 - 5 = 15</code>, and <code>15 / 3 = 5</code>."
       },
@@ -775,12 +1207,12 @@ window.QUIZ_DATA = {
         "27"
        ],
        "options": [
-        "7",
-        "8",
         "6",
-        "21"
+        "7",
+        "21",
+        "8"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "The two shown numbers are 3 jumps apart. Divide the difference by 3.",
        "explain": "<code>27 - 6 = 21</code>, and <code>21 / 3 = 7</code>."
       },
@@ -795,13 +1227,51 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "27",
-        "10",
         "8",
-        "9"
+        "9",
+        "10"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "The two shown numbers are 3 jumps apart. Divide the difference by 3.",
        "explain": "<code>37 - 10 = 27</code>, and <code>27 / 3 = 9</code>."
+      },
+      {
+       "stem": "Two numbers are missing. What is the step size?",
+       "sub": null,
+       "seq": [
+        "4",
+        "?",
+        "?",
+        "22"
+       ],
+       "options": [
+        "5",
+        "7",
+        "6",
+        "18"
+       ],
+       "answer": 2,
+       "hint": "The two shown numbers are 3 jumps apart. Divide the difference by 3.",
+       "explain": "<code>22 - 4 = 18</code>, and <code>18 / 3 = 6</code>."
+      },
+      {
+       "stem": "Two numbers are missing. What is the step size?",
+       "sub": null,
+       "seq": [
+        "8",
+        "?",
+        "?",
+        "41"
+       ],
+       "options": [
+        "11",
+        "10",
+        "12",
+        "33"
+       ],
+       "answer": 0,
+       "hint": "The two shown numbers are 3 jumps apart. Divide the difference by 3.",
+       "explain": "<code>41 - 8 = 33</code>, and <code>33 / 3 = 11</code>."
       }
      ]
     },
@@ -819,12 +1289,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "64",
         "76",
+        "52",
         "74",
-        "52"
+        "64"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Subtract 12 from the last number shown.",
        "explain": "<code>76 - 12 = 64</code>."
       },
@@ -838,12 +1308,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "125",
-        "100",
         "150",
-        "135"
+        "100",
+        "135",
+        "125"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Subtract 25 from the last number shown.",
        "explain": "<code>150 - 25 = 125</code>."
       },
@@ -857,14 +1327,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "90",
-        "115",
         "105",
-        "120"
+        "120",
+        "115",
+        "90"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Subtract 15 from the last number shown.",
        "explain": "<code>120 - 15 = 105</code>."
+      },
+      {
+       "stem": "Count back in steps of 20. What comes next?",
+       "sub": null,
+       "seq": [
+        "120",
+        "100",
+        "80",
+        "?"
+       ],
+       "options": [
+        "40",
+        "70",
+        "80",
+        "60"
+       ],
+       "answer": 3,
+       "hint": "Subtract 20 from the last number shown.",
+       "explain": "<code>80 - 20 = 60</code>."
+      },
+      {
+       "stem": "Count back in steps of 50. What comes next?",
+       "sub": null,
+       "seq": [
+        "300",
+        "250",
+        "200",
+        "?"
+       ],
+       "options": [
+        "160",
+        "200",
+        "150",
+        "100"
+       ],
+       "answer": 2,
+       "hint": "Subtract 50 from the last number shown.",
+       "explain": "<code>200 - 50 = 150</code>."
       }
      ]
     },
@@ -882,12 +1390,12 @@ window.QUIZ_DATA = {
         "44"
        ],
        "options": [
-        "Count on in steps of 11.",
+        "Count back in steps of 11.",
         "Count on in steps of 12.",
         "Multiply by 11 each time.",
-        "Count back in steps of 11."
+        "Count on in steps of 11."
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Check the direction first, then the size of the jump.",
        "explain": "Each jump is 11, so the rule is: count on in steps of 11."
       },
@@ -901,12 +1409,12 @@ window.QUIZ_DATA = {
         "24"
        ],
        "options": [
-        "Count back in steps of 13.",
-        "Count back in steps of 12.",
+        "Count on in steps of 12.",
         "Multiply by 12 each time.",
-        "Count on in steps of 12."
+        "Count back in steps of 13.",
+        "Count back in steps of 12."
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Check the direction first, then the size of the jump.",
        "explain": "Each jump is -12, so the rule is: count back in steps of 12."
       },
@@ -921,13 +1429,51 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "Count back in steps of 13.",
-        "Multiply by 13 each time.",
         "Count on in steps of 14.",
-        "Count on in steps of 13."
+        "Count on in steps of 13.",
+        "Multiply by 13 each time."
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Check the direction first, then the size of the jump.",
        "explain": "Each jump is 13, so the rule is: count on in steps of 13."
+      },
+      {
+       "stem": "Which sentence describes this sequence?",
+       "sub": null,
+       "seq": [
+        "14",
+        "28",
+        "42",
+        "56"
+       ],
+       "options": [
+        "Count on in steps of 15.",
+        "Count on in steps of 14.",
+        "Multiply by 14 each time.",
+        "Count back in steps of 14."
+       ],
+       "answer": 1,
+       "hint": "Check the direction first, then the size of the jump.",
+       "explain": "Each jump is 14, so the rule is: count on in steps of 14."
+      },
+      {
+       "stem": "Which sentence describes this sequence?",
+       "sub": null,
+       "seq": [
+        "80",
+        "64",
+        "48",
+        "32"
+       ],
+       "options": [
+        "Multiply by 16 each time.",
+        "Count back in steps of 16.",
+        "Count on in steps of 16.",
+        "Count back in steps of 17."
+       ],
+       "answer": 1,
+       "hint": "Check the direction first, then the size of the jump.",
+       "explain": "Each jump is -16, so the rule is: count back in steps of 16."
       }
      ]
     },
@@ -946,12 +1492,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "54, 45",
         "45, 54",
-        "36, 54",
-        "54, 63"
+        "54, 45",
+        "54, 63",
+        "36, 54"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Work out one gap, then use the same step again.",
        "explain": "The step is 9: <code>36 -> 45 -> 54</code>."
       },
@@ -966,12 +1512,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-11, -22",
-        "-11, 0",
         "11, -11",
-        "0, -11"
+        "0, -11",
+        "-11, 0",
+        "-11, -22"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Work out one gap, then use the same step again.",
        "explain": "The step is -11: <code>11 -> 0 -> -11</code>."
       },
@@ -987,13 +1533,53 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "48, 56",
-        "32, 48",
         "40, 48",
-        "48, 40"
+        "48, 40",
+        "32, 48"
        ],
-       "answer": 2,
+       "answer": 1,
        "hint": "Work out one gap, then use the same step again.",
        "explain": "The step is 8: <code>32 -> 40 -> 48</code>."
+      },
+      {
+       "stem": "Which pair fills the two gaps?",
+       "sub": null,
+       "seq": [
+        "21",
+        "28",
+        "35",
+        "?",
+        "?"
+       ],
+       "options": [
+        "49, 56",
+        "35, 49",
+        "49, 42",
+        "42, 49"
+       ],
+       "answer": 3,
+       "hint": "Work out one gap, then use the same step again.",
+       "explain": "The step is 7: <code>35 -> 42 -> 49</code>."
+      },
+      {
+       "stem": "Which pair fills the two gaps?",
+       "sub": null,
+       "seq": [
+        "48",
+        "36",
+        "24",
+        "?",
+        "?"
+       ],
+       "options": [
+        "24, 0",
+        "0, 12",
+        "0, -12",
+        "12, 0"
+       ],
+       "answer": 3,
+       "hint": "Work out one gap, then use the same step again.",
+       "explain": "The step is -12: <code>24 -> 12 -> 0</code>."
       }
      ]
     }
@@ -1024,12 +1610,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "2.7",
-        "4",
         "3.3",
-        "3"
+        "3",
+        "2.7",
+        "4"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Add the tenths. If the tenths pass 10, carry one whole.",
        "explain": "<code>2.7 + 0.3 = 3</code>."
       },
@@ -1043,10 +1629,10 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "5.3",
+        "6.1",
         "4.9",
         "5.1",
-        "6.1"
+        "5.3"
        ],
        "answer": 2,
        "hint": "Add the tenths. If the tenths pass 10, carry one whole.",
@@ -1062,14 +1648,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
+        "2",
         "2.4",
-        "3.4",
         "2.8",
-        "2"
+        "3.4"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "Add the tenths. If the tenths pass 10, carry one whole.",
        "explain": "<code>2 + 0.4 = 2.4</code>."
+      },
+      {
+       "stem": "Count on in steps of 0.5. What comes next?",
+       "sub": null,
+       "seq": [
+        "3.5",
+        "4",
+        "4.5",
+        "?"
+       ],
+       "options": [
+        "6",
+        "4.5",
+        "5.5",
+        "5"
+       ],
+       "answer": 3,
+       "hint": "Add the tenths. If the tenths pass 10, carry one whole.",
+       "explain": "<code>4.5 + 0.5 = 5</code>."
+      },
+      {
+       "stem": "Count on in steps of 0.15. What comes next?",
+       "sub": null,
+       "seq": [
+        "1.05",
+        "1.2",
+        "1.35",
+        "?"
+       ],
+       "options": [
+        "1.65",
+        "1.5",
+        "2.5",
+        "1.35"
+       ],
+       "answer": 1,
+       "hint": "Add the tenths. If the tenths pass 10, carry one whole.",
+       "explain": "<code>1.35 + 0.15 = 1.5</code>."
       }
      ]
     },
@@ -1087,12 +1711,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "4.3",
         "4.2",
-        "4.6",
-        "4"
+        "4",
+        "4.3",
+        "4.6"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "Subtract carefully. Line up the decimal points in your head.",
        "explain": "<code>4.6 - 0.3 = 4.3</code>."
       },
@@ -1106,12 +1730,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "7.25",
-        "7.15",
         "7.5",
-        "7"
+        "7.15",
+        "7",
+        "7.25"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Subtract carefully. Line up the decimal points in your head.",
        "explain": "<code>7.5 - 0.25 = 7.25</code>."
       },
@@ -1125,14 +1749,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "1.3",
-        "2.7",
+        "1.9",
         "2",
-        "1.9"
+        "2.7",
+        "1.3"
+       ],
+       "answer": 1,
+       "hint": "Subtract carefully. Line up the decimal points in your head.",
+       "explain": "<code>2.7 - 0.7 = 2</code>."
+      },
+      {
+       "stem": "Count back in steps of 0.4. What comes next?",
+       "sub": null,
+       "seq": [
+        "6.3",
+        "5.9",
+        "5.5",
+        "?"
+       ],
+       "options": [
+        "5.5",
+        "4.7",
+        "5.1",
+        "5"
        ],
        "answer": 2,
        "hint": "Subtract carefully. Line up the decimal points in your head.",
-       "explain": "<code>2.7 - 0.7 = 2</code>."
+       "explain": "<code>5.5 - 0.4 = 5.1</code>."
+      },
+      {
+       "stem": "Count back in steps of 0.15. What comes next?",
+       "sub": null,
+       "seq": [
+        "5",
+        "4.85",
+        "4.7",
+        "?"
+       ],
+       "options": [
+        "4.55",
+        "4.7",
+        "4.4",
+        "4.45"
+       ],
+       "answer": 0,
+       "hint": "Subtract carefully. Line up the decimal points in your head.",
+       "explain": "<code>4.7 - 0.15 = 4.55</code>."
       }
      ]
     },
@@ -1151,12 +1813,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
+        "1.22",
         "1.12",
         "1.06",
-        "1.22",
         "1.18"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "When the tenths or hundredths reach 10, exchange them for the next column up.",
        "explain": "<code>1.06 + 0.06 = 1.12</code>. Crossing a whole is just normal addition."
       },
@@ -1170,8 +1832,8 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "10.2",
         "10.8",
+        "10.2",
         "10.5",
         "10.6"
        ],
@@ -1190,14 +1852,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "2.15",
         "2.1",
-        "2",
-        "2.05"
+        "2.05",
+        "2.15",
+        "2"
+       ],
+       "answer": 1,
+       "hint": "When the tenths or hundredths reach 10, exchange them for the next column up.",
+       "explain": "<code>2 + 0.05 = 2.05</code>. Crossing a whole is just normal addition."
+      },
+      {
+       "stem": "Careful &mdash; this one crosses a whole number. Count on in 0.04.",
+       "sub": null,
+       "seq": [
+        "0.94",
+        "0.98",
+        "1.02",
+        "?"
+       ],
+       "options": [
+        "1.02",
+        "1.1",
+        "1.06",
+        "1.16"
+       ],
+       "answer": 2,
+       "hint": "When the tenths or hundredths reach 10, exchange them for the next column up.",
+       "explain": "<code>1.02 + 0.04 = 1.06</code>. Crossing a whole is just normal addition."
+      },
+      {
+       "stem": "Careful &mdash; this one crosses a whole number. Count on in 0.6.",
+       "sub": null,
+       "seq": [
+        "8.8",
+        "9.4",
+        "10",
+        "?"
+       ],
+       "options": [
+        "11.2",
+        "10.7",
+        "10",
+        "10.6"
        ],
        "answer": 3,
        "hint": "When the tenths or hundredths reach 10, exchange them for the next column up.",
-       "explain": "<code>2 + 0.05 = 2.05</code>. Crossing a whole is just normal addition."
+       "explain": "<code>10 + 0.6 = 10.6</code>. Crossing a whole is just normal addition."
       }
      ]
     },
@@ -1235,9 +1935,9 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "0.15",
-        "0.3",
+        "0.25",
         "-0.15",
-        "0.25"
+        "0.3"
        ],
        "answer": 0,
        "hint": "Subtract the first number from the second one.",
@@ -1253,14 +1953,52 @@ window.QUIZ_DATA = {
         "4.65"
        ],
        "options": [
+        "0.45",
         "-0.45",
         "-0.35",
-        "0.45",
         "-0.9"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "Subtract the first number from the second one.",
        "explain": "<code>5.55 - 6 = -0.45</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "2.4",
+        "3.1",
+        "3.8",
+        "4.5"
+       ],
+       "options": [
+        "0.8",
+        "0.7",
+        "-0.7",
+        "1.4"
+       ],
+       "answer": 1,
+       "hint": "Subtract the first number from the second one.",
+       "explain": "<code>3.1 - 2.4 = 0.7</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "0.45",
+        "0.7",
+        "0.95",
+        "1.2"
+       ],
+       "options": [
+        "-0.25",
+        "0.5",
+        "0.35",
+        "0.25"
+       ],
+       "answer": 3,
+       "hint": "Subtract the first number from the second one.",
+       "explain": "<code>0.7 - 0.45 = 0.25</code>."
       }
      ]
     },
@@ -1278,12 +2016,12 @@ window.QUIZ_DATA = {
         "5.2"
        ],
        "options": [
-        "4",
+        "4.61",
         "5.2",
-        "4.6",
-        "4.61"
+        "4",
+        "4.6"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "Find the step from two numbers you can see, then apply it once.",
        "explain": "The step is <code>0.6</code>, so the gap is <code>4 + (0.6) = 4.6</code>."
       },
@@ -1297,12 +2035,12 @@ window.QUIZ_DATA = {
         "0.45"
        ],
        "options": [
+        "0.9",
         "0.76",
-        "0.75",
         "0.6",
-        "0.9"
+        "0.75"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Find the step from two numbers you can see, then apply it once.",
        "explain": "The step is <code>-0.15</code>, so the gap is <code>0.9 + (-0.15) = 0.75</code>."
       },
@@ -1316,14 +2054,52 @@ window.QUIZ_DATA = {
         "0.99"
        ],
        "options": [
+        "0.81",
         "0.99",
         "0.91",
-        "0.9",
-        "0.81"
+        "0.9"
+       ],
+       "answer": 3,
+       "hint": "Find the step from two numbers you can see, then apply it once.",
+       "explain": "The step is <code>0.09</code>, so the gap is <code>0.81 + (0.09) = 0.9</code>."
+      },
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "5.2",
+        "4.8",
+        "?",
+        "4"
+       ],
+       "options": [
+        "4.41",
+        "4.4",
+        "4.8",
+        "4"
+       ],
+       "answer": 1,
+       "hint": "Find the step from two numbers you can see, then apply it once.",
+       "explain": "The step is <code>-0.4</code>, so the gap is <code>4.8 + (-0.4) = 4.4</code>."
+      },
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "0.15",
+        "?",
+        "0.39",
+        "0.51"
+       ],
+       "options": [
+        "0.15",
+        "0.28",
+        "0.27",
+        "0.39"
        ],
        "answer": 2,
        "hint": "Find the step from two numbers you can see, then apply it once.",
-       "explain": "The step is <code>0.09</code>, so the gap is <code>0.81 + (0.09) = 0.9</code>."
+       "explain": "The step is <code>0.12</code>, so the gap is <code>0.15 + (0.12) = 0.27</code>."
       }
      ]
     },
@@ -1343,11 +2119,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "0.5",
-        "0.8",
         "1.2",
-        "1.1"
+        "1.1",
+        "0.8"
        ],
-       "answer": 2,
+       "answer": 1,
        "hint": "Check each jump in turn. One of them is the wrong size.",
        "explain": "It should be <code>1.1</code> to keep the step of 0.3."
       },
@@ -1362,12 +2138,12 @@ window.QUIZ_DATA = {
         "2.5"
        ],
        "options": [
-        "2.05",
-        "1.5",
+        "2",
         "1.75",
-        "2"
+        "1.5",
+        "2.05"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Check each jump in turn. One of them is the wrong size.",
        "explain": "It should be <code>2</code> to keep the step of 0.25."
       },
@@ -1382,14 +2158,54 @@ window.QUIZ_DATA = {
         "2.4"
        ],
        "options": [
-        "3.2",
         "2.8",
         "3.6",
-        "2.9"
+        "2.9",
+        "3.2"
+       ],
+       "answer": 2,
+       "hint": "Check each jump in turn. One of them is the wrong size.",
+       "explain": "It should be <code>2.8</code> to keep the step of -0.4."
+      },
+      {
+       "stem": "One number breaks the pattern of 0.2. Which is it?",
+       "sub": null,
+       "seq": [
+        "0.3",
+        "0.5",
+        "0.7",
+        "1",
+        "1.1"
+       ],
+       "options": [
+        "0.5",
+        "0.7",
+        "0.9",
+        "1"
        ],
        "answer": 3,
        "hint": "Check each jump in turn. One of them is the wrong size.",
-       "explain": "It should be <code>2.8</code> to keep the step of -0.4."
+       "explain": "It should be <code>0.9</code> to keep the step of 0.2."
+      },
+      {
+       "stem": "One number breaks the pattern of 0.5. Which is it?",
+       "sub": null,
+       "seq": [
+        "2.5",
+        "3",
+        "3.7",
+        "4",
+        "4.5"
+       ],
+       "options": [
+        "3",
+        "2.5",
+        "3.7",
+        "3.5"
+       ],
+       "answer": 2,
+       "hint": "Check each jump in turn. One of them is the wrong size.",
+       "explain": "It should be <code>3.5</code> to keep the step of 0.5."
       }
      ]
     },
@@ -1407,12 +2223,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-0.6",
-        "0.3",
+        "-0.3",
         "0",
-        "-0.3"
+        "-0.6",
+        "0.3"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Once you pass zero the numbers become negative decimals.",
        "explain": "<code>0 - 0.3 = -0.3</code>."
       },
@@ -1426,12 +2242,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-0.2",
-        "-0.6",
         "0",
+        "-0.6",
+        "-0.2",
         "0.2"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "Once you pass zero the numbers become negative decimals.",
        "explain": "<code>0.2 - 0.4 = -0.2</code>."
       },
@@ -1446,9 +2262,47 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
+        "-0.5",
         "0.25",
         "0",
+        "-0.25"
+       ],
+       "answer": 3,
+       "hint": "Once you pass zero the numbers become negative decimals.",
+       "explain": "<code>0 - 0.25 = -0.25</code>."
+      },
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "0.8",
+        "0.4",
+        "0",
+        "?"
+       ],
+       "options": [
+        "0",
+        "-0.4",
+        "-0.8",
+        "0.4"
+       ],
+       "answer": 1,
+       "hint": "Once you pass zero the numbers become negative decimals.",
+       "explain": "<code>0 - 0.4 = -0.4</code>."
+      },
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "0.5",
+        "0.25",
+        "0",
+        "?"
+       ],
+       "options": [
+        "0.25",
         "-0.5",
+        "0",
         "-0.25"
        ],
        "answer": 3,
@@ -1472,10 +2326,10 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
+        "4.5",
         "5",
-        "3.5",
         "4",
-        "4.5"
+        "3.5"
        ],
        "answer": 2,
        "hint": "You need 7 jumps from the first number, not 8.",
@@ -1492,12 +2346,12 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
+        "2",
         "1.7",
         "2.3",
-        "2.6",
-        "2"
+        "2.6"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "You need 6 jumps from the first number, not 7.",
        "explain": "<code>0.2 + 6 x 0.3 = 2</code>."
       },
@@ -1512,14 +2366,54 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
-        "2.5",
-        "3.1",
         "2.9",
-        "2.7"
+        "2.5",
+        "2.7",
+        "3.1"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "You need 8 jumps from the first number, not 9.",
        "explain": "<code>1.1 + 8 x 0.2 = 2.7</code>."
+      },
+      {
+       "stem": "What is the 6th number in this sequence?",
+       "sub": null,
+       "seq": [
+        "0.4",
+        "0.8",
+        "1.2",
+        "1.6",
+        "..."
+       ],
+       "options": [
+        "2.4",
+        "2.8",
+        "3.2",
+        "2"
+       ],
+       "answer": 0,
+       "hint": "You need 5 jumps from the first number, not 6.",
+       "explain": "<code>0.4 + 5 x 0.4 = 2.4</code>."
+      },
+      {
+       "stem": "What is the 8th number in this sequence?",
+       "sub": null,
+       "seq": [
+        "1.5",
+        "1.75",
+        "2",
+        "2.25",
+        "..."
+       ],
+       "options": [
+        "3",
+        "3.5",
+        "3.75",
+        "3.25"
+       ],
+       "answer": 3,
+       "hint": "You need 7 jumps from the first number, not 8.",
+       "explain": "<code>1.5 + 7 x 0.25 = 3.25</code>."
       }
      ]
     },
@@ -1532,12 +2426,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "£9",
         "£5.5",
-        "£7.25",
-        "£10.75"
+        "£10.75",
+        "£9",
+        "£7.25"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "That is 3 equal steps of 1.75.",
        "explain": "<code>3 x 1.75 = 5.25</code>, so the answer is <code>7.25</code>."
       },
@@ -1546,12 +2440,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "£4.25",
         "£3.8",
+        "£4.25",
         "£2.45",
         "£3.35"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "That is 4 equal steps of 0.45.",
        "explain": "<code>4 x 0.45 = 1.8</code>, so the answer is <code>3.8</code>."
       },
@@ -1560,14 +2454,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "£27.5",
-        "£17.5",
+        "£15",
         "£20",
-        "£15"
+        "£17.5",
+        "£27.5"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "That is 5 equal steps of 2.5.",
        "explain": "<code>5 x 2.5 = 12.5</code>, so the answer is <code>17.5</code>."
+      },
+      {
+       "stem": "Samuel has &pound;20.5 and spends &pound;2.5 each week. How much after 4 weeks?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "£13",
+        "£10.5",
+        "£8",
+        "£18"
+       ],
+       "answer": 1,
+       "hint": "That is 4 equal steps of 2.5.",
+       "explain": "<code>4 x 2.5 = 10</code>, so the answer is <code>10.5</code>."
+      },
+      {
+       "stem": "Samuel has &pound;5 and saves &pound;1.25 each week. How much after 3 weeks?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "£7.5",
+        "£8.75",
+        "£6.25",
+        "£10"
+       ],
+       "answer": 1,
+       "hint": "That is 3 equal steps of 1.25.",
+       "explain": "<code>3 x 1.25 = 3.75</code>, so the answer is <code>8.75</code>."
       }
      ]
     },
@@ -1586,12 +2508,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "2.3, 2.6",
-        "2.6, 2.3",
         "2.6, 2.9",
-        "2.3, 2.9"
+        "2.6, 2.3",
+        "2.3, 2.9",
+        "2.3, 2.6"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Same step twice in a row.",
        "explain": "Step is 0.3: <code>2 -> 2.3 -> 2.6</code>."
       },
@@ -1606,10 +2528,10 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "4.55, 4.25",
+        "4.4, 4.25",
         "4.55, 4.4",
         "4.4, 4.55",
-        "4.4, 4.25"
+        "4.55, 4.25"
        ],
        "answer": 1,
        "hint": "Same step twice in a row.",
@@ -1626,14 +2548,54 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "0.67, 0.78",
         "0.56, 0.67",
-        "0.67, 0.56",
-        "0.56, 0.78"
+        "0.56, 0.78",
+        "0.67, 0.78",
+        "0.67, 0.56"
+       ],
+       "answer": 0,
+       "hint": "Same step twice in a row.",
+       "explain": "Step is 0.11: <code>0.45 -> 0.56 -> 0.67</code>."
+      },
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "2.6",
+        "3",
+        "3.4",
+        "?",
+        "?"
+       ],
+       "options": [
+        "4.2, 4.6",
+        "3.8, 4.2",
+        "4.2, 3.8",
+        "3.8, 4.6"
        ],
        "answer": 1,
        "hint": "Same step twice in a row.",
-       "explain": "Step is 0.11: <code>0.45 -> 0.56 -> 0.67</code>."
+       "explain": "Step is 0.4: <code>3.4 -> 3.8 -> 4.2</code>."
+      },
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "8",
+        "7.75",
+        "7.5",
+        "?",
+        "?"
+       ],
+       "options": [
+        "7.25, 7",
+        "7, 6.75",
+        "7, 7.25",
+        "7.25, 6.75"
+       ],
+       "answer": 0,
+       "hint": "Same step twice in a row.",
+       "explain": "Step is -0.25: <code>7.5 -> 7.25 -> 7</code>."
       }
      ]
     },
@@ -1648,10 +2610,10 @@ window.QUIZ_DATA = {
        "options": [
         "1, 0.75, 0.5, 0.25",
         "1, 1.5, 2, 2.5",
-        "1, 1.3, 1.6, 1.9",
-        "1, 1.25, 1.5, 1.75"
+        "1, 1.25, 1.5, 1.75",
+        "1, 1.3, 1.6, 1.9"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Test the first jump of each option.",
        "explain": "In <code>1, 1.25, 1.5, 1.75</code> every jump is 0.25."
       },
@@ -1660,9 +2622,9 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "2, 1.4, 0.8, 0.2",
         "2, 3.2, 4.4, 5.6",
         "2, 2.65, 3.3, 3.95",
-        "2, 1.4, 0.8, 0.2",
         "2, 2.6, 3.2, 3.8"
        ],
        "answer": 3,
@@ -1675,13 +2637,41 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "3, 2.9, 2.8, 2.7",
+        "3, 2.7, 2.4, 2.1",
         "3, 2.85, 2.7, 2.55",
-        "3, 3.15, 3.3, 3.45",
-        "3, 2.7, 2.4, 2.1"
+        "3, 3.15, 3.3, 3.45"
+       ],
+       "answer": 2,
+       "hint": "Test the first jump of each option.",
+       "explain": "In <code>3, 2.85, 2.7, 2.55</code> every jump is -0.15."
+      },
+      {
+       "stem": "Which sequence has a step of exactly 0.5?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1, 1.55, 2.1, 2.65",
+        "1, 1.5, 2, 2.5",
+        "1, 0.5, 0, -0.5",
+        "1, 2, 3, 4"
        ],
        "answer": 1,
        "hint": "Test the first jump of each option.",
-       "explain": "In <code>3, 2.85, 2.7, 2.55</code> every jump is -0.15."
+       "explain": "In <code>1, 1.5, 2, 2.5</code> every jump is 0.5."
+      },
+      {
+       "stem": "Which sequence has a step of exactly -0.2?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "4, 4.2, 4.4, 4.6",
+        "4, 3.6, 3.2, 2.8",
+        "4, 3.8, 3.6, 3.4",
+        "4, 3.85, 3.7, 3.55"
+       ],
+       "answer": 2,
+       "hint": "Test the first jump of each option.",
+       "explain": "In <code>4, 3.8, 3.6, 3.4</code> every jump is -0.2."
       }
      ]
     },
@@ -1699,12 +2689,12 @@ window.QUIZ_DATA = {
         "5"
        ],
        "options": [
-        "3",
-        "3.4",
         "3.8",
+        "3.4",
+        "3",
         "4.2"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Go backwards two jumps from the number you can see.",
        "explain": "<code>4.6 - 2 x (0.4) = 3.8</code>."
       },
@@ -1718,12 +2708,12 @@ window.QUIZ_DATA = {
         "1.7"
        ],
        "options": [
-        "2.9",
         "2.6",
         "2.3",
+        "2.9",
         "3.2"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Go backwards two jumps from the number you can see.",
        "explain": "<code>2 - 2 x (-0.3) = 2.6</code>."
       },
@@ -1738,13 +2728,51 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "0.65",
-        "0.8",
+        "0.95",
         "1.1",
-        "0.95"
+        "0.8"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Go backwards two jumps from the number you can see.",
        "explain": "<code>1.25 - 2 x (0.15) = 0.95</code>."
+      },
+      {
+       "stem": "The first two numbers are missing. What was the first number?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "5.2",
+        "5.8"
+       ],
+       "options": [
+        "2.8",
+        "4",
+        "3.4",
+        "4.6"
+       ],
+       "answer": 1,
+       "hint": "Go backwards two jumps from the number you can see.",
+       "explain": "<code>5.2 - 2 x (0.6) = 4</code>."
+      },
+      {
+       "stem": "The first two numbers are missing. What was the first number?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "3",
+        "2.75"
+       ],
+       "options": [
+        "3.75",
+        "3.5",
+        "3.25",
+        "4"
+       ],
+       "answer": 1,
+       "hint": "Go backwards two jumps from the number you can see.",
+       "explain": "<code>3 - 2 x (-0.25) = 3.5</code>."
       }
      ]
     },
@@ -1758,11 +2786,11 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "7",
-        "6",
+        "5",
         "12",
-        "5"
+        "6"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Difference divided by step size.",
        "explain": "<code>4.5 - 1.5 = 3</code>, and <code>3 / 0.5 = 6</code>."
       },
@@ -1771,12 +2799,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "16",
-        "7",
         "8",
-        "9"
+        "7",
+        "9",
+        "16"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Difference divided by step size.",
        "explain": "<code>4 - 2 = 2</code>, and <code>2 / 0.25 = 8</code>."
       },
@@ -1785,14 +2813,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "6",
+        "5",
         "10",
         "4",
-        "5"
+        "6"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Difference divided by step size.",
        "explain": "<code>8 - 10 = -2</code>, and <code>-2 / 0.4 = 5</code>."
+      },
+      {
+       "stem": "A sequence steps by 0.5. How many steps from 3 to 6.5?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6",
+        "7",
+        "8",
+        "14"
+       ],
+       "answer": 1,
+       "hint": "Difference divided by step size.",
+       "explain": "<code>6.5 - 3 = 3.5</code>, and <code>3.5 / 0.5 = 7</code>."
+      },
+      {
+       "stem": "A sequence steps by -0.25. How many steps from 12 to 10.5?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "7",
+        "6",
+        "12",
+        "5"
+       ],
+       "answer": 1,
+       "hint": "Difference divided by step size.",
+       "explain": "<code>10.5 - 12 = -1.5</code>, and <code>-1.5 / 0.25 = 6</code>."
       }
      ]
     },
@@ -1801,7 +2857,7 @@ window.QUIZ_DATA = {
      "skill": "measures",
      "variants": [
       {
-       "stem": "A plant is 1.25 m tall and changes by 0.15 m each month. How tall after 4 months?",
+       "stem": "A plant is 1.25 m tall and grows 0.15 m each month. How tall is it after 4 months?",
        "sub": null,
        "seq": null,
        "options": [
@@ -1811,36 +2867,64 @@ window.QUIZ_DATA = {
         "2 m"
        ],
        "answer": 1,
-       "hint": "4 equal changes of 0.15.",
-       "explain": "<code>4 x 0.15 = 0.6</code>, so <code>1.25 + 0.6 = 1.85</code> m."
+       "hint": "That is 4 equal changes of 0.15.",
+       "explain": "<code>4 &times; 0.15 = 0.6</code>, so <code>1.25 + 0.6 = 1.85</code> m."
       },
       {
-       "stem": "A plant is 3 m tall and changes by -0.35 m each month. How tall after 4 months?",
+       "stem": "A candle is 3 cm long and burns down 0.35 cm every hour. How long is it after 4 hours?",
        "sub": null,
        "seq": null,
        "options": [
-        "1.95 m",
-        "1.25 m",
-        "1.6 m",
-        "2.65 m"
+        "1.25 cm",
+        "1.6 cm",
+        "2.65 cm",
+        "1.95 cm"
        ],
-       "answer": 2,
-       "hint": "4 equal changes of -0.35.",
-       "explain": "<code>4 x -0.35 = -1.4</code>, so <code>3 + -1.4 = 1.6</code> m."
+       "answer": 1,
+       "hint": "That is 4 equal changes of 0.35.",
+       "explain": "<code>4 &times; 0.35 = 1.4</code>, so <code>3 &minus; 1.4 = 1.6</code> cm."
       },
       {
-       "stem": "A plant is 4.8 m tall and changes by 0.6 m each month. How tall after 3 months?",
+       "stem": "A plant is 4.8 m tall and grows 0.6 m each month. How tall is it after 3 months?",
        "sub": null,
        "seq": null,
        "options": [
-        "6.6 m",
-        "6 m",
+        "5.4 m",
         "7.2 m",
-        "5.4 m"
+        "6 m",
+        "6.6 m"
+       ],
+       "answer": 3,
+       "hint": "That is 3 equal changes of 0.6.",
+       "explain": "<code>3 &times; 0.6 = 1.8</code>, so <code>4.8 + 1.8 = 6.6</code> m."
+      },
+      {
+       "stem": "A plant is 1 m tall and grows 0.25 m each month. How tall is it after 4 months?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "2 m",
+        "1.75 m",
+        "1.25 m",
+        "2.25 m"
        ],
        "answer": 0,
-       "hint": "3 equal changes of 0.6.",
-       "explain": "<code>3 x 0.6 = 1.8</code>, so <code>4.8 + 1.8 = 6.6</code> m."
+       "hint": "That is 4 equal changes of 0.25.",
+       "explain": "<code>4 &times; 0.25 = 1</code>, so <code>1 + 1 = 2</code> m."
+      },
+      {
+       "stem": "A plant is 2.4 m tall and grows 0.3 m each month. How tall is it after 5 months?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "2.7 m",
+        "3.9 m",
+        "4.2 m",
+        "3.6 m"
+       ],
+       "answer": 1,
+       "hint": "That is 5 equal changes of 0.3.",
+       "explain": "<code>5 &times; 0.3 = 1.5</code>, so <code>2.4 + 1.5 = 3.9</code> m."
       }
      ]
     },
@@ -1858,12 +2942,12 @@ window.QUIZ_DATA = {
         "1.2"
        ],
        "options": [
-        "It doubles each time.",
-        "It counts on in steps of 0.3.",
         "It counts back in steps of 0.3.",
-        "It counts on in steps of 0.6."
+        "It counts on in steps of 0.6.",
+        "It counts on in steps of 0.3.",
+        "It doubles each time."
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Doubling and adding are different. Check by subtracting.",
        "explain": "Every jump is exactly <code>0.3</code>, so it counts on in 0.3."
       },
@@ -1878,11 +2962,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "It counts on in steps of 0.4.",
-        "It counts back in steps of 0.2.",
         "It counts on in steps of 0.2.",
+        "It counts back in steps of 0.2.",
         "It doubles each time."
        ],
-       "answer": 2,
+       "answer": 1,
        "hint": "Doubling and adding are different. Check by subtracting.",
        "explain": "Every jump is exactly <code>0.2</code>, so it counts on in 0.2."
       },
@@ -1896,14 +2980,52 @@ window.QUIZ_DATA = {
         "1.2"
        ],
        "options": [
-        "It counts on in steps of 0.1.",
-        "It counts on in steps of 0.05.",
         "It doubles each time.",
-        "It counts back in steps of 0.05."
+        "It counts on in steps of 0.05.",
+        "It counts back in steps of 0.05.",
+        "It counts on in steps of 0.1."
        ],
        "answer": 1,
        "hint": "Doubling and adding are different. Check by subtracting.",
        "explain": "Every jump is exactly <code>0.05</code>, so it counts on in 0.05."
+      },
+      {
+       "stem": "Which statement is true about this sequence?",
+       "sub": null,
+       "seq": [
+        "0.6",
+        "1.2",
+        "1.8",
+        "2.4"
+       ],
+       "options": [
+        "It doubles each time.",
+        "It counts back in steps of 0.6.",
+        "It counts on in steps of 0.6.",
+        "It counts on in steps of 1.2."
+       ],
+       "answer": 2,
+       "hint": "Doubling and adding are different. Check by subtracting.",
+       "explain": "Every jump is exactly <code>0.6</code>, so it counts on in 0.6."
+      },
+      {
+       "stem": "Which statement is true about this sequence?",
+       "sub": null,
+       "seq": [
+        "0.25",
+        "0.5",
+        "0.75",
+        "1"
+       ],
+       "options": [
+        "It counts back in steps of 0.25.",
+        "It counts on in steps of 0.25.",
+        "It counts on in steps of 0.5.",
+        "It doubles each time."
+       ],
+       "answer": 1,
+       "hint": "Doubling and adding are different. Check by subtracting.",
+       "explain": "Every jump is exactly <code>0.25</code>, so it counts on in 0.25."
       }
      ]
     },
@@ -1921,12 +3043,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "3.5",
         "2.7",
         "3.1",
+        "3.5",
         "2.3"
        ],
-       "answer": 2,
+       "answer": 1,
        "hint": "Three jumps, so multiply the step by 3 and add it on.",
        "explain": "<code>3 x 0.4 = 1.2</code>, and <code>1.9 + 1.2 = 3.1</code>."
       },
@@ -1940,12 +3062,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "0.78",
         "0.65",
-        "1.04",
-        "0.91"
+        "0.78",
+        "0.91",
+        "1.04"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Three jumps, so multiply the step by 3 and add it on.",
        "explain": "<code>3 x 0.13 = 0.39</code>, and <code>0.52 + 0.39 = 0.91</code>."
       },
@@ -1959,14 +3081,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "7.2",
+        "8.1",
         "7.65",
         "8.55",
-        "8.1"
+        "7.2"
        ],
        "answer": 1,
        "hint": "Three jumps, so multiply the step by 3 and add it on.",
        "explain": "<code>3 x -0.45 = -1.35</code>, and <code>9 + -1.35 = 7.65</code>."
+      },
+      {
+       "stem": "What number is <b>3 steps</b> after the first one?",
+       "sub": null,
+       "seq": [
+        "2.5",
+        "?",
+        "?",
+        "?"
+       ],
+       "options": [
+        "3.7",
+        "3.1",
+        "4.9",
+        "4.3"
+       ],
+       "answer": 3,
+       "hint": "Three jumps, so multiply the step by 3 and add it on.",
+       "explain": "<code>3 x 0.6 = 1.8</code>, and <code>2.5 + 1.8 = 4.3</code>."
+      },
+      {
+       "stem": "What number is <b>3 steps</b> after the first one?",
+       "sub": null,
+       "seq": [
+        "4",
+        "?",
+        "?",
+        "?"
+       ],
+       "options": [
+        "2.95",
+        "3.3",
+        "3.65",
+        "2.6"
+       ],
+       "answer": 0,
+       "hint": "Three jumps, so multiply the step by 3 and add it on.",
+       "explain": "<code>3 x -0.35 = -1.05</code>, and <code>4 + -1.05 = 2.95</code>."
       }
      ]
     }
@@ -2016,11 +3176,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "3 1/2",
+        "2 3/4",
         "3 1/4",
-        "3",
-        "2 3/4"
+        "3"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Each jump takes away 1/4. When you run out of 4ths, break down a whole.",
        "explain": "<code>3 1/2 - 1/4 = 3 1/4</code>."
       },
@@ -2035,13 +3195,51 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "4 1/5",
+        "4",
         "4 2/5",
-        "4 3/5",
-        "4"
+        "4 3/5"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Each jump takes away 1/5. When you run out of 5ths, break down a whole.",
        "explain": "<code>4 3/5 - 1/5 = 4 2/5</code>."
+      },
+      {
+       "stem": "Count back in steps of 1/2. What comes next?",
+       "sub": null,
+       "seq": [
+        "2",
+        "1 1/2",
+        "1",
+        "?"
+       ],
+       "options": [
+        "1/2",
+        "0",
+        "1",
+        "-1/2"
+       ],
+       "answer": 0,
+       "hint": "Each jump takes away 1/2. When you run out of 2ths, break down a whole.",
+       "explain": "<code>1 - 1/2 = 1/2</code>."
+      },
+      {
+       "stem": "Count back in steps of 1/8. What comes next?",
+       "sub": null,
+       "seq": [
+        "4",
+        "3 7/8",
+        "3 3/4",
+        "?"
+       ],
+       "options": [
+        "3 5/8",
+        "3 3/8",
+        "3 1/2",
+        "3 3/4"
+       ],
+       "answer": 0,
+       "hint": "Each jump takes away 1/8. When you run out of 8ths, break down a whole.",
+       "explain": "<code>3 3/4 - 1/8 = 3 5/8</code>."
       }
      ]
     },
@@ -2059,12 +3257,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "2 1/2",
-        "3",
+        "2",
         "1 1/2",
-        "2"
+        "3",
+        "2 1/2"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Add 1/2 each time. 2 of them make one whole.",
        "explain": "<code>1 1/2 + 1/2 = 2</code>."
       },
@@ -2079,12 +3277,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "1 3/4",
         "1 1/2",
+        "1 1/4",
         "1",
-        "1 1/4"
+        "1 3/4"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Add 1/4 each time. 4 of them make one whole.",
        "explain": "<code>1 + 1/4 = 1 1/4</code>."
       },
@@ -2099,14 +3297,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
+        "1 1/5",
         "1",
         "1 3/5",
-        "1 2/5",
-        "1 1/5"
+        "1 2/5"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Add 1/5 each time. 5 of them make one whole.",
        "explain": "<code>1 + 1/5 = 1 1/5</code>."
+      },
+      {
+       "stem": "Count on in steps of 1/3. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/3",
+        "2/3",
+        "1",
+        "?"
+       ],
+       "options": [
+        "1",
+        "1 1/3",
+        "1 2/3",
+        "2"
+       ],
+       "answer": 1,
+       "hint": "Add 1/3 each time. 3 of them make one whole.",
+       "explain": "<code>1 + 1/3 = 1 1/3</code>."
+      },
+      {
+       "stem": "Count on in steps of 3/8. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/8",
+        "1/2",
+        "7/8",
+        "?"
+       ],
+       "options": [
+        "7/8",
+        "1 5/8",
+        "1 3/8",
+        "1 1/4"
+       ],
+       "answer": 3,
+       "hint": "Add 3/8 each time. 8 of them make one whole.",
+       "explain": "<code>7/8 + 3/8 = 1 1/4</code>."
       }
      ]
     },
@@ -2124,12 +3360,12 @@ window.QUIZ_DATA = {
         "1 1/3"
        ],
        "options": [
-        "1",
+        "1/3",
         "2/3",
         "1/4",
-        "1/3"
+        "1"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Subtract the first term from the second one.",
        "explain": "<code>2/3 - 1/3 = 1/3</code>."
       },
@@ -2143,12 +3379,12 @@ window.QUIZ_DATA = {
         "2 1/2"
        ],
        "options": [
+        "2 1/4",
         "1/5",
         "3/4",
-        "2 1/4",
         "1 1/2"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Subtract the first term from the second one.",
        "explain": "<code>1 - 1/4 = 3/4</code>."
       },
@@ -2162,14 +3398,52 @@ window.QUIZ_DATA = {
         "1 3/5"
        ],
        "options": [
-        "1 1/5",
         "1/6",
+        "1 1/5",
         "2/5",
         "4/5"
        ],
        "answer": 2,
        "hint": "Subtract the first term from the second one.",
        "explain": "<code>4/5 - 2/5 = 2/5</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "1/6",
+        "1/3",
+        "1/2",
+        "2/3"
+       ],
+       "options": [
+        "1/7",
+        "1/2",
+        "1/6",
+        "1/3"
+       ],
+       "answer": 2,
+       "hint": "Subtract the first term from the second one.",
+       "explain": "<code>1/3 - 1/6 = 1/6</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "1/8",
+        "1/2",
+        "7/8",
+        "1 1/4"
+       ],
+       "options": [
+        "1/9",
+        "1 1/8",
+        "3/4",
+        "3/8"
+       ],
+       "answer": 3,
+       "hint": "Subtract the first term from the second one.",
+       "explain": "<code>1/2 - 1/8 = 3/8</code>."
       }
      ]
     },
@@ -2186,12 +3460,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "2/3",
         "1 1/3",
+        "1",
         "1 2/3",
-        "1"
+        "2/3"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "When you collect 3 lots of 1/3, that is one whole.",
        "explain": "<code>1 + 1/3 = 1 1/3</code>. Remember to write it as a mixed number."
       },
@@ -2204,12 +3478,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "1 1/2",
-        "1",
         "1/2",
-        "1 1/4"
+        "1",
+        "1 1/4",
+        "1 1/2"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "When you collect 4 lots of 1/4, that is one whole.",
        "explain": "<code>1 + 1/4 = 1 1/4</code>. Remember to write it as a mixed number."
       },
@@ -2222,14 +3496,50 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "2",
-        "4/5",
         "1 3/5",
-        "1 1/5"
+        "1 1/5",
+        "2",
+        "4/5"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "When you collect 5 lots of 1/5, that is one whole.",
        "explain": "<code>1 1/5 + 2/5 = 1 3/5</code>. Remember to write it as a mixed number."
+      },
+      {
+       "stem": "This one crosses a whole number. What comes next?",
+       "sub": null,
+       "seq": [
+        "5/6",
+        "1",
+        "?"
+       ],
+       "options": [
+        "1 1/3",
+        "1/3",
+        "1 1/6",
+        "1"
+       ],
+       "answer": 2,
+       "hint": "When you collect 6 lots of 1/6, that is one whole.",
+       "explain": "<code>1 + 1/6 = 1 1/6</code>. Remember to write it as a mixed number."
+      },
+      {
+       "stem": "This one crosses a whole number. What comes next?",
+       "sub": null,
+       "seq": [
+        "7/8",
+        "1",
+        "?"
+       ],
+       "options": [
+        "1 1/4",
+        "1",
+        "1/4",
+        "1 1/8"
+       ],
+       "answer": 3,
+       "hint": "When you collect 8 lots of 1/8, that is one whole.",
+       "explain": "<code>1 + 1/8 = 1 1/8</code>. Remember to write it as a mixed number."
       }
      ]
     },
@@ -2247,12 +3557,12 @@ window.QUIZ_DATA = {
         "2"
        ],
        "options": [
-        "2 1/2",
-        "1",
         "2",
-        "1 1/2"
+        "1",
+        "1 1/2",
+        "2 1/2"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Work out the step from two terms you can see.",
        "explain": "Step is 1/2, so the gap is <code>1 + 1/2 = 1 1/2</code>."
       },
@@ -2266,12 +3576,12 @@ window.QUIZ_DATA = {
         "2 1/3"
        ],
        "options": [
-        "1/3",
         "1 1/3",
-        "1",
-        "1 2/3"
+        "1 2/3",
+        "1/3",
+        "1"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "Work out the step from two terms you can see.",
        "explain": "Step is 2/3, so the gap is <code>1/3 + 2/3 = 1</code>."
       },
@@ -2286,13 +3596,51 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "1 1/4",
-        "1 3/4",
+        "1 1/2",
         "1",
-        "1 1/2"
+        "1 3/4"
        ],
        "answer": 0,
        "hint": "Work out the step from two terms you can see.",
        "explain": "Step is 1/4, so the gap is <code>1 + 1/4 = 1 1/4</code>."
+      },
+      {
+       "stem": "Which fraction fills the gap?",
+       "sub": null,
+       "seq": [
+        "1/6",
+        "1/3",
+        "?",
+        "2/3"
+       ],
+       "options": [
+        "1/2",
+        "1/3",
+        "5/6",
+        "2/3"
+       ],
+       "answer": 0,
+       "hint": "Work out the step from two terms you can see.",
+       "explain": "Step is 1/6, so the gap is <code>1/3 + 1/6 = 1/2</code>."
+      },
+      {
+       "stem": "Which fraction fills the gap?",
+       "sub": null,
+       "seq": [
+        "1/8",
+        "?",
+        "7/8",
+        "1 1/4"
+       ],
+       "options": [
+        "7/8",
+        "1/2",
+        "1/8",
+        "5/8"
+       ],
+       "answer": 1,
+       "hint": "Work out the step from two terms you can see.",
+       "explain": "Step is 3/8, so the gap is <code>1/8 + 3/8 = 1/2</code>."
       }
      ]
     },
@@ -2328,8 +3676,8 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-1",
         "1/2",
+        "-1",
         "0",
         "-1/2"
        ],
@@ -2349,13 +3697,52 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "0",
-        "-1/4",
         "-1/2",
-        "1/4"
+        "1/4",
+        "-1/4"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Past zero the fractions become negative.",
        "explain": "<code>0 - 1/4 = -1/4</code>."
+      },
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/3",
+        "0",
+        "-1/3",
+        "?"
+       ],
+       "options": [
+        "-2/3",
+        "-1",
+        "0",
+        "2/3"
+       ],
+       "answer": 0,
+       "hint": "Past zero the fractions become negative.",
+       "explain": "<code>-1/3 - 1/3 = -2/3</code>."
+      },
+      {
+       "stem": "Keep counting back past zero. What comes next?",
+       "sub": null,
+       "seq": [
+        "2/5",
+        "1/5",
+        "0",
+        "-1/5",
+        "?"
+       ],
+       "options": [
+        "-2/5",
+        "-3/5",
+        "2/5",
+        "0"
+       ],
+       "answer": 0,
+       "hint": "Past zero the fractions become negative.",
+       "explain": "<code>-1/5 - 1/5 = -2/5</code>."
       }
      ]
     },
@@ -2375,11 +3762,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "2 1/2",
-        "2",
         "2 3/4",
-        "2 1/4"
+        "2 1/4",
+        "2"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "8 jumps from the first term.",
        "explain": "<code>1/4 + 8 x 1/4 = 2 1/4</code>."
       },
@@ -2394,10 +3781,10 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
+        "2",
         "2 2/3",
-        "3",
         "2 1/3",
-        "2"
+        "3"
        ],
        "answer": 2,
        "hint": "6 jumps from the first term.",
@@ -2414,14 +3801,54 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
-        "2 1/5",
         "1 4/5",
-        "2 3/5",
-        "3"
+        "2 1/5",
+        "3",
+        "2 3/5"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "5 jumps from the first term.",
        "explain": "<code>1/5 + 5 x 2/5 = 2 1/5</code>."
+      },
+      {
+       "stem": "What is the 7th term?",
+       "sub": null,
+       "seq": [
+        "1/6",
+        "1/3",
+        "1/2",
+        "2/3",
+        "..."
+       ],
+       "options": [
+        "1 1/6",
+        "1 1/3",
+        "1",
+        "1 1/2"
+       ],
+       "answer": 0,
+       "hint": "6 jumps from the first term.",
+       "explain": "<code>1/6 + 6 x 1/6 = 1 1/6</code>."
+      },
+      {
+       "stem": "What is the 8th term?",
+       "sub": null,
+       "seq": [
+        "1/2",
+        "1",
+        "1 1/2",
+        "2",
+        "..."
+       ],
+       "options": [
+        "4",
+        "5",
+        "3 1/2",
+        "4 1/2"
+       ],
+       "answer": 0,
+       "hint": "7 jumps from the first term.",
+       "explain": "<code>1/2 + 7 x 1/2 = 4</code>."
       }
      ]
     },
@@ -2434,12 +3861,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "2/8",
         "4/4",
-        "1/2",
-        "4/2"
+        "2/8",
+        "4/2",
+        "1/2"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "Simplify the fraction by dividing top and bottom by the same number.",
        "explain": "<code>2/4 = 1/2</code> once you simplify."
       },
@@ -2448,12 +3875,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "1/3",
-        "2/12",
+        "4/6",
         "6/2",
-        "4/6"
+        "2/12",
+        "1/3"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Simplify the fraction by dividing top and bottom by the same number.",
        "explain": "<code>2/6 = 1/3</code> once you simplify."
       },
@@ -2462,14 +3889,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "10/10",
-        "5/20",
+        "1/2",
         "10/5",
-        "1/2"
+        "5/20",
+        "10/10"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Simplify the fraction by dividing top and bottom by the same number.",
        "explain": "<code>5/10 = 1/2</code> once you simplify."
+      },
+      {
+       "stem": "The step is written as 3/6. Which is the same size?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "6/6",
+        "1/2",
+        "6/3",
+        "3/12"
+       ],
+       "answer": 1,
+       "hint": "Simplify the fraction by dividing top and bottom by the same number.",
+       "explain": "<code>3/6 = 1/2</code> once you simplify."
+      },
+      {
+       "stem": "The step is written as 4/8. Which is the same size?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1/2",
+        "4/16",
+        "8/4",
+        "8/8"
+       ],
+       "answer": 0,
+       "hint": "Simplify the fraction by dividing top and bottom by the same number.",
+       "explain": "<code>4/8 = 1/2</code> once you simplify."
       }
      ]
     },
@@ -2488,12 +3943,12 @@ window.QUIZ_DATA = {
         "1 2/3"
        ],
        "options": [
-        "1 1/3",
         "2/3",
-        "1",
-        "1 2/3"
+        "1 2/3",
+        "1 1/3",
+        "1"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Check each jump in turn.",
        "explain": "It should be <code>1 1/3</code> to keep steps of 1/3."
       },
@@ -2529,13 +3984,53 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "1",
-        "4/5",
+        "3/5",
         "1 1/5",
-        "3/5"
+        "4/5"
        ],
        "answer": 2,
        "hint": "Check each jump in turn.",
        "explain": "It should be <code>1</code> to keep steps of 1/5."
+      },
+      {
+       "stem": "One term breaks the pattern of 1/6. Which one?",
+       "sub": null,
+       "seq": [
+        "1/6",
+        "1/3",
+        "1/2",
+        "5/6",
+        "5/6"
+       ],
+       "options": [
+        "5/6",
+        "1/3",
+        "2/3",
+        "1/2"
+       ],
+       "answer": 0,
+       "hint": "Check each jump in turn.",
+       "explain": "It should be <code>2/3</code> to keep steps of 1/6."
+      },
+      {
+       "stem": "One term breaks the pattern of 1/2. Which one?",
+       "sub": null,
+       "seq": [
+        "1/2",
+        "1",
+        "2",
+        "2",
+        "2 1/2"
+       ],
+       "options": [
+        "1 1/2",
+        "1",
+        "2",
+        "1/2"
+       ],
+       "answer": 2,
+       "hint": "Check each jump in turn.",
+       "explain": "It should be <code>1 1/2</code> to keep steps of 1/2."
       }
      ]
     },
@@ -2548,9 +4043,9 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "1 1/3",
-        "1 2/3",
         "2",
+        "1 2/3",
+        "1 1/3",
         "2 2/3"
        ],
        "answer": 1,
@@ -2562,12 +4057,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "3 1/4",
         "2 3/4",
-        "3",
         "3 3/4",
-        "3 1/4"
+        "3"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Four jumps of 1/4 is 4/4 altogether.",
        "explain": "<code>4 x 1/4 = 1</code>, and <code>4 - 1 = 3</code>."
       },
@@ -2577,13 +4072,41 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "3",
+        "3 2/5",
         "3 4/5",
-        "4 3/5",
-        "3 2/5"
+        "4 3/5"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Four jumps of 2/5 is 8/5 altogether.",
        "explain": "<code>4 x 2/5 = 1 3/5</code>, and <code>5 - 1 3/5 = 3 2/5</code>."
+      },
+      {
+       "stem": "Start at 6 and count back in 1/6 four times. Where do you land?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "5 5/6",
+        "5 1/3",
+        "5 1/6",
+        "5 1/2"
+       ],
+       "answer": 1,
+       "hint": "Four jumps of 1/6 is 4/6 altogether.",
+       "explain": "<code>4 x 1/6 = 2/3</code>, and <code>6 - 2/3 = 5 1/3</code>."
+      },
+      {
+       "stem": "Start at 2 and count back in 1/2 four times. Where do you land?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1/2",
+        "0",
+        "-1/2",
+        "1 1/2"
+       ],
+       "answer": 1,
+       "hint": "Four jumps of 1/2 is 4/2 altogether.",
+       "explain": "<code>4 x 1/2 = 2</code>, and <code>2 - 2 = 0</code>."
       }
      ]
     },
@@ -2596,12 +4119,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "1 1/2",
         "1",
         "1 1/4",
-        "1 1/2",
         "-1"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Each slice is 1/4 of a pizza.",
        "explain": "<code>3 slices = 3/4</code>, so <code>2 - 3/4 = 1 1/4</code>."
       },
@@ -2610,12 +4133,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "2 1/3",
         "1",
         "2",
-        "2 2/3"
+        "2 2/3",
+        "2 1/3"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Each slice is 1/3 of a pizza.",
        "explain": "<code>2 slices = 2/3</code>, so <code>3 - 2/3 = 2 1/3</code>."
       },
@@ -2624,14 +4147,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "1 1/4",
-        "1 3/8",
+        "-3",
         "1 1/2",
-        "-3"
+        "1 3/8",
+        "1 1/4"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Each slice is 1/8 of a pizza.",
        "explain": "<code>5 slices = 5/8</code>, so <code>2 - 5/8 = 1 3/8</code>."
+      },
+      {
+       "stem": "There are 2 whole pizzas, each cut into 6 equal slices. 4 slices are eaten. How much pizza is left?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "1 1/2",
+        "1 1/3",
+        "-2",
+        "1 1/6"
+       ],
+       "answer": 1,
+       "hint": "Each slice is 1/6 of a pizza.",
+       "explain": "<code>4 slices = 2/3</code>, so <code>2 - 2/3 = 1 1/3</code>."
+      },
+      {
+       "stem": "There are 3 whole pizzas, each cut into 5 equal slices. 3 slices are eaten. How much pizza is left?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "0",
+        "2 2/5",
+        "2 3/5",
+        "2 1/5"
+       ],
+       "answer": 1,
+       "hint": "Each slice is 1/5 of a pizza.",
+       "explain": "<code>3 slices = 3/5</code>, so <code>3 - 3/5 = 2 2/5</code>."
       }
      ]
     },
@@ -2644,12 +4195,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "7",
         "6",
         "5",
-        "7",
         "3"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "Ask: how many 3ths are in 2?",
        "explain": "<code>2 = 6/3</code>, so it takes 6 steps."
       },
@@ -2672,14 +4223,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "7",
         "5",
-        "9",
-        "8"
+        "8",
+        "7",
+        "9"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Ask: how many 5ths are in 1 3/5?",
        "explain": "<code>1 3/5 = 8/5</code>, so it takes 8 steps."
+      },
+      {
+       "stem": "How many steps of 1/6 does it take to get from 0 to 2/3?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "5",
+        "3",
+        "6",
+        "4"
+       ],
+       "answer": 3,
+       "hint": "Ask: how many 6ths are in 2/3?",
+       "explain": "<code>2/3 = 4/6</code>, so it takes 4 steps."
+      },
+      {
+       "stem": "How many steps of 1/8 does it take to get from 0 to 5/8?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "8",
+        "5",
+        "6",
+        "4"
+       ],
+       "answer": 1,
+       "hint": "Ask: how many 8ths are in 5/8?",
+       "explain": "<code>5/8 = 5/8</code>, so it takes 5 steps."
       }
      ]
     },
@@ -2698,8 +4277,8 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "2 1/2, 2",
         "2, 3",
+        "2 1/2, 2",
         "2, 2 1/2",
         "2 1/2, 3"
        ],
@@ -2718,9 +4297,9 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "1 2/3, 1 1/3",
-        "1 1/3, 1 2/3",
         "1 2/3, 2",
+        "1 1/3, 1 2/3",
+        "1 2/3, 1 1/3",
         "1 1/3, 2"
        ],
        "answer": 1,
@@ -2738,14 +4317,54 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "3 1/4, 4",
+        "3 1/4, 2 1/2",
         "2 1/2, 4",
-        "2 1/2, 3 1/4",
-        "3 1/4, 2 1/2"
+        "3 1/4, 4",
+        "2 1/2, 3 1/4"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "Apply the same step twice.",
        "explain": "Step is 3/4: <code>1 3/4 -> 2 1/2 -> 3 1/4</code>."
+      },
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "1/6",
+        "1/3",
+        "1/2",
+        "?",
+        "?"
+       ],
+       "options": [
+        "5/6, 1",
+        "2/3, 5/6",
+        "2/3, 1",
+        "5/6, 2/3"
+       ],
+       "answer": 1,
+       "hint": "Apply the same step twice.",
+       "explain": "Step is 1/6: <code>1/2 -> 2/3 -> 5/6</code>."
+      },
+      {
+       "stem": "Which pair fills both gaps?",
+       "sub": null,
+       "seq": [
+        "1/8",
+        "1/2",
+        "7/8",
+        "?",
+        "?"
+       ],
+       "options": [
+        "1 1/4, 1 5/8",
+        "1 1/4, 2",
+        "1 5/8, 2",
+        "1 5/8, 1 1/4"
+       ],
+       "answer": 0,
+       "hint": "Apply the same step twice.",
+       "explain": "Step is 3/8: <code>7/8 -> 1 1/4 -> 1 5/8</code>."
       }
      ]
     },
@@ -2758,12 +4377,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "0.5",
         "2.0",
         "1.0",
+        "0.5",
         "0.6"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "Divide 1 by 2.",
        "explain": "<code>1 / 2 = 0.5</code>."
       },
@@ -2772,12 +4391,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "0.25",
         "0.35",
         "4.0",
+        "0.25",
         "0.5"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "Divide 1 by 4.",
        "explain": "<code>1 / 4 = 0.25</code>."
       },
@@ -2787,13 +4406,41 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "0.4",
-        "0.2",
+        "5.0",
         "0.3",
-        "5.0"
+        "0.2"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Divide 1 by 5.",
        "explain": "<code>1 / 5 = 0.2</code>."
+      },
+      {
+       "stem": "A sequence counts on in steps of 1/8. What is the same step as a decimal?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "0.125",
+        "0.25",
+        "0.23",
+        "8.0"
+       ],
+       "answer": 0,
+       "hint": "Divide 1 by 8.",
+       "explain": "<code>1 / 8 = 0.125</code>."
+      },
+      {
+       "stem": "A sequence counts on in steps of 1/25. What is the same step as a decimal?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "0.08",
+        "0.04",
+        "0.14",
+        "25.0"
+       ],
+       "answer": 1,
+       "hint": "Divide 1 by 25.",
+       "explain": "<code>1 / 25 = 0.04</code>."
       }
      ]
     },
@@ -2811,10 +4458,10 @@ window.QUIZ_DATA = {
         "2 1/3"
        ],
        "options": [
-        "2/3",
+        "1 2/3",
         "1 1/3",
         "1",
-        "1 2/3"
+        "2/3"
        ],
        "answer": 1,
        "hint": "Go back two jumps from the term you can see.",
@@ -2830,10 +4477,10 @@ window.QUIZ_DATA = {
         "3 1/4"
        ],
        "options": [
-        "2 1/4",
-        "2 1/2",
         "2 3/4",
-        "2"
+        "2 1/2",
+        "2",
+        "2 1/4"
        ],
        "answer": 1,
        "hint": "Go back two jumps from the term you can see.",
@@ -2849,14 +4496,52 @@ window.QUIZ_DATA = {
         "3"
        ],
        "options": [
-        "2",
         "1",
         "1/2",
+        "2",
         "1 1/2"
        ],
        "answer": 3,
        "hint": "Go back two jumps from the term you can see.",
        "explain": "<code>2 1/2 - 2 x 1/2 = 1 1/2</code>."
+      },
+      {
+       "stem": "The first two terms are missing. What was the first term?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "3",
+        "3 1/6"
+       ],
+       "options": [
+        "2 1/3",
+        "2 1/2",
+        "2 2/3",
+        "2 5/6"
+       ],
+       "answer": 2,
+       "hint": "Go back two jumps from the term you can see.",
+       "explain": "<code>3 - 2 x 1/6 = 2 2/3</code>."
+      },
+      {
+       "stem": "The first two terms are missing. What was the first term?",
+       "sub": null,
+       "seq": [
+        "?",
+        "?",
+        "4",
+        "4 3/8"
+       ],
+       "options": [
+        "3 5/8",
+        "2 7/8",
+        "2 1/2",
+        "3 1/4"
+       ],
+       "answer": 3,
+       "hint": "Go back two jumps from the term you can see.",
+       "explain": "<code>4 - 2 x 3/8 = 3 1/4</code>."
       }
      ]
     },
@@ -2869,12 +4554,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "A",
+        "It depends where they start",
         "They grow at the same rate",
         "B",
-        "It depends where they start"
+        "A"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "The bigger the bottom number, the smaller the fraction.",
        "explain": "<code>1/3 > 1/4</code>, so A takes bigger jumps."
       },
@@ -2883,12 +4568,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "B",
-        "It depends where they start",
+        "A",
         "They grow at the same rate",
-        "A"
+        "B",
+        "It depends where they start"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "The bigger the bottom number, the smaller the fraction.",
        "explain": "<code>1/5 < 1/2</code>, so B takes bigger jumps."
       },
@@ -2897,14 +4582,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "It depends where they start",
         "They grow at the same rate",
-        "B",
         "A",
-        "It depends where they start"
+        "B"
+       ],
+       "answer": 3,
+       "hint": "The bigger the bottom number, the smaller the fraction.",
+       "explain": "<code>1/8 < 1/3</code>, so B takes bigger jumps."
+      },
+      {
+       "stem": "Sequence A counts on in 1/6. Sequence B counts on in 1/3. Which grows faster?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "It depends where they start",
+        "B",
+        "They grow at the same rate",
+        "A"
        ],
        "answer": 1,
        "hint": "The bigger the bottom number, the smaller the fraction.",
-       "explain": "<code>1/8 < 1/3</code>, so B takes bigger jumps."
+       "explain": "<code>1/6 < 1/3</code>, so B takes bigger jumps."
+      },
+      {
+       "stem": "Sequence A counts on in 1/4. Sequence B counts on in 1/10. Which grows faster?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "They grow at the same rate",
+        "A",
+        "It depends where they start",
+        "B"
+       ],
+       "answer": 1,
+       "hint": "The bigger the bottom number, the smaller the fraction.",
+       "explain": "<code>1/4 > 1/10</code>, so A takes bigger jumps."
       }
      ]
     }
@@ -2929,10 +4642,10 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "4°C",
+        "-1°C",
         "-4°C",
-        "-7°C",
-        "-1°C"
+        "4°C",
+        "-7°C"
        ],
        "answer": 1,
        "hint": "3 falls of 3 is 9 in total.",
@@ -2965,6 +4678,34 @@ window.QUIZ_DATA = {
        "answer": 1,
        "hint": "2 falls of 4 is 8 in total.",
        "explain": "<code>2 - 8 = -6</code>&deg;C."
+      },
+      {
+       "stem": "The temperature is 4&deg;C and falls 6&deg;C every hour. What is it after 2 hours?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "8°C",
+        "-8°C",
+        "-2°C",
+        "-14°C"
+       ],
+       "answer": 1,
+       "hint": "2 falls of 6 is 12 in total.",
+       "explain": "<code>4 - 12 = -8</code>&deg;C."
+      },
+      {
+       "stem": "The temperature is 7&deg;C and falls 4&deg;C every hour. What is it after 3 hours?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-5°C",
+        "-9°C",
+        "-1°C",
+        "5°C"
+       ],
+       "answer": 0,
+       "hint": "3 falls of 4 is 12 in total.",
+       "explain": "<code>7 - 12 = -5</code>&deg;C."
       }
      ]
     },
@@ -2983,11 +4724,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "-20",
-        "-8",
         "14",
-        "-14"
+        "-14",
+        "-8"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Keep going in the same direction. Negative numbers get further from zero as you subtract.",
        "explain": "<code>-8 - 6 = -14</code>."
       },
@@ -3002,8 +4743,8 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "-12",
-        "12",
         "-19",
+        "12",
         "-5"
        ],
        "answer": 0,
@@ -3020,14 +4761,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-29",
         "-21",
         "-13",
+        "-29",
         "21"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Keep going in the same direction. Negative numbers get further from zero as you subtract.",
        "explain": "<code>-13 - 8 = -21</code>."
+      },
+      {
+       "stem": "Count back in 9s. What comes next?",
+       "sub": null,
+       "seq": [
+        "5",
+        "-4",
+        "-13",
+        "?"
+       ],
+       "options": [
+        "-13",
+        "-31",
+        "22",
+        "-22"
+       ],
+       "answer": 3,
+       "hint": "Keep going in the same direction. Negative numbers get further from zero as you subtract.",
+       "explain": "<code>-13 - 9 = -22</code>."
+      },
+      {
+       "stem": "Count back in 5s. What comes next?",
+       "sub": null,
+       "seq": [
+        "2",
+        "-3",
+        "-8",
+        "?"
+       ],
+       "options": [
+        "-8",
+        "13",
+        "-13",
+        "-18"
+       ],
+       "answer": 2,
+       "hint": "Keep going in the same direction. Negative numbers get further from zero as you subtract.",
+       "explain": "<code>-8 - 5 = -13</code>."
       }
      ]
     },
@@ -3045,12 +4824,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "6",
-        "-4",
         "1",
-        "-9"
+        "6",
+        "-9",
+        "-4"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Adding makes negative numbers move towards zero, then past it.",
        "explain": "<code>-4 + 5 = 1</code>."
       },
@@ -3064,10 +4843,10 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-6",
+        "-12",
         "0",
         "6",
-        "-12"
+        "-6"
        ],
        "answer": 1,
        "hint": "Adding makes negative numbers move towards zero, then past it.",
@@ -3084,13 +4863,51 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "-14",
-        "0",
         "7",
-        "-7"
+        "-7",
+        "0"
+       ],
+       "answer": 3,
+       "hint": "Adding makes negative numbers move towards zero, then past it.",
+       "explain": "<code>-7 + 7 = 0</code>."
+      },
+      {
+       "stem": "Count on in 8s. What comes next?",
+       "sub": null,
+       "seq": [
+        "-24",
+        "-16",
+        "-8",
+        "?"
+       ],
+       "options": [
+        "8",
+        "-8",
+        "-16",
+        "0"
+       ],
+       "answer": 3,
+       "hint": "Adding makes negative numbers move towards zero, then past it.",
+       "explain": "<code>-8 + 8 = 0</code>."
+      },
+      {
+       "stem": "Count on in 4s. What comes next?",
+       "sub": null,
+       "seq": [
+        "-16",
+        "-12",
+        "-8",
+        "?"
+       ],
+       "options": [
+        "-8",
+        "-4",
+        "0",
+        "-12"
        ],
        "answer": 1,
        "hint": "Adding makes negative numbers move towards zero, then past it.",
-       "explain": "<code>-7 + 7 = 0</code>."
+       "explain": "<code>-8 + 4 = -4</code>."
       }
      ]
     },
@@ -3103,12 +4920,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "16",
         "14",
-        "15",
-        "3"
+        "3",
+        "16",
+        "15"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "Count up to zero first, then carry on.",
        "explain": "From -6 up to 0 is 6. From 0 up to 9 is 9. Total <code>6 + 9 = 15</code>."
       },
@@ -3118,11 +4935,11 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "15",
-        "16",
+        "17",
         "-8",
-        "17"
+        "16"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Count up to zero first, then carry on.",
        "explain": "From -12 up to 0 is 12. From 0 up to 4 is 4. Total <code>12 + 4 = 16</code>."
       },
@@ -3131,14 +4948,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "21",
         "8",
         "22",
-        "21",
         "23"
+       ],
+       "answer": 2,
+       "hint": "Count up to zero first, then carry on.",
+       "explain": "From -7 up to 0 is 7. From 0 up to 15 is 15. Total <code>7 + 15 = 22</code>."
+      },
+      {
+       "stem": "How far is it from -9 to 6 on a number line?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "14",
+        "15",
+        "-3",
+        "16"
        ],
        "answer": 1,
        "hint": "Count up to zero first, then carry on.",
-       "explain": "From -7 up to 0 is 7. From 0 up to 15 is 15. Total <code>7 + 15 = 22</code>."
+       "explain": "From -9 up to 0 is 9. From 0 up to 6 is 6. Total <code>9 + 6 = 15</code>."
+      },
+      {
+       "stem": "How far is it from -5 to 11 on a number line?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "15",
+        "16",
+        "17",
+        "6"
+       ],
+       "answer": 1,
+       "hint": "Count up to zero first, then carry on.",
+       "explain": "From -5 up to 0 is 5. From 0 up to 11 is 11. Total <code>5 + 11 = 16</code>."
       }
      ]
     },
@@ -3147,46 +4992,99 @@ window.QUIZ_DATA = {
      "skill": "compare negatives",
      "variants": [
       {
-       "stem": "Which number is smaller: -8 or -3?",
+       "stem": "Which of these numbers is the smallest?",
        "sub": null,
-       "seq": null,
-       "options": [
-        "You cannot compare negatives",
-        "-3",
+       "seq": [
         "-8",
-        "They are equal"
+        "-3",
+        "-11",
+        "-5"
        ],
-       "answer": 2,
-       "hint": "On a number line, further left = smaller.",
-       "explain": "<code>-8</code> is further left on the number line, so it is smaller."
-      },
-      {
-       "stem": "Which number is smaller: -15 or -20?",
-       "sub": null,
-       "seq": null,
        "options": [
-        "-15",
-        "-20",
-        "You cannot compare negatives",
-        "They are equal"
-       ],
-       "answer": 1,
-       "hint": "On a number line, further left = smaller.",
-       "explain": "<code>-20</code> is further left on the number line, so it is smaller."
-      },
-      {
-       "stem": "Which number is smaller: -1 or -9?",
-       "sub": null,
-       "seq": null,
-       "options": [
-        "-1",
-        "You cannot compare negatives",
-        "They are equal",
-        "-9"
+        "-8",
+        "-5",
+        "-3",
+        "-11"
        ],
        "answer": 3,
-       "hint": "On a number line, further left = smaller.",
-       "explain": "<code>-9</code> is further left on the number line, so it is smaller."
+       "hint": "On a number line, further left = smaller. The minus sign flips your usual thinking.",
+       "explain": "All four are below zero. <code>-11</code> sits furthest to the left on the number line, so it is the smallest &mdash; even though 11 is the biggest digit."
+      },
+      {
+       "stem": "Which of these numbers is the smallest?",
+       "sub": null,
+       "seq": [
+        "-2",
+        "-9",
+        "-14",
+        "-6"
+       ],
+       "options": [
+        "-14",
+        "-9",
+        "-6",
+        "-2"
+       ],
+       "answer": 0,
+       "hint": "On a number line, further left = smaller. The minus sign flips your usual thinking.",
+       "explain": "All four are below zero. <code>-14</code> sits furthest to the left on the number line, so it is the smallest &mdash; even though 14 is the biggest digit."
+      },
+      {
+       "stem": "Which of these numbers is the smallest?",
+       "sub": null,
+       "seq": [
+        "-1",
+        "-7",
+        "-4",
+        "-12"
+       ],
+       "options": [
+        "-12",
+        "-4",
+        "-1",
+        "-7"
+       ],
+       "answer": 0,
+       "hint": "On a number line, further left = smaller. The minus sign flips your usual thinking.",
+       "explain": "All four are below zero. <code>-12</code> sits furthest to the left on the number line, so it is the smallest &mdash; even though 12 is the biggest digit."
+      },
+      {
+       "stem": "Which of these numbers is the smallest?",
+       "sub": null,
+       "seq": [
+        "-5",
+        "-13",
+        "-8",
+        "-2"
+       ],
+       "options": [
+        "-8",
+        "-13",
+        "-5",
+        "-2"
+       ],
+       "answer": 1,
+       "hint": "On a number line, further left = smaller. The minus sign flips your usual thinking.",
+       "explain": "All four are below zero. <code>-13</code> sits furthest to the left on the number line, so it is the smallest &mdash; even though 13 is the biggest digit."
+      },
+      {
+       "stem": "Which of these numbers is the smallest?",
+       "sub": null,
+       "seq": [
+        "-16",
+        "-4",
+        "-10",
+        "-7"
+       ],
+       "options": [
+        "-10",
+        "-7",
+        "-16",
+        "-4"
+       ],
+       "answer": 2,
+       "hint": "On a number line, further left = smaller. The minus sign flips your usual thinking.",
+       "explain": "All four are below zero. <code>-16</code> sits furthest to the left on the number line, so it is the smallest &mdash; even though 16 is the biggest digit."
       }
      ]
     },
@@ -3204,12 +5102,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-2.1",
-        "-1.8",
         "-2.4",
-        "2.1"
+        "-2.1",
+        "2.1",
+        "-1.8"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "You are already below zero, so subtracting takes you further down.",
        "explain": "<code>-1.8 - 0.3 = -2.1</code>."
       },
@@ -3223,12 +5121,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-1",
-        "1",
+        "-1.25",
         "-0.75",
-        "-1.25"
+        "1",
+        "-1"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "You are already below zero, so subtracting takes you further down.",
        "explain": "<code>-0.75 - 0.25 = -1</code>."
       },
@@ -3242,14 +5140,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-2.8",
         "-3.6",
         "-3.2",
+        "-2.8",
         "3.2"
        ],
-       "answer": 2,
+       "answer": 1,
        "hint": "You are already below zero, so subtracting takes you further down.",
        "explain": "<code>-2.8 - 0.4 = -3.2</code>."
+      },
+      {
+       "stem": "Count back in 0.4. What comes next?",
+       "sub": null,
+       "seq": [
+        "-0.8",
+        "-1.2",
+        "-1.6",
+        "?"
+       ],
+       "options": [
+        "-2",
+        "-1.6",
+        "-2.4",
+        "2"
+       ],
+       "answer": 0,
+       "hint": "You are already below zero, so subtracting takes you further down.",
+       "explain": "<code>-1.6 - 0.4 = -2</code>."
+      },
+      {
+       "stem": "Count back in 0.15. What comes next?",
+       "sub": null,
+       "seq": [
+        "-0.15",
+        "-0.3",
+        "-0.45",
+        "?"
+       ],
+       "options": [
+        "-0.45",
+        "-0.6",
+        "-0.75",
+        "0.6"
+       ],
+       "answer": 1,
+       "hint": "You are already below zero, so subtracting takes you further down.",
+       "explain": "<code>-0.45 - 0.15 = -0.6</code>."
       }
      ]
     },
@@ -3268,10 +5204,10 @@ window.QUIZ_DATA = {
         "-13"
        ],
        "options": [
+        "3",
         "-8",
-        "7",
         "-3",
-        "3"
+        "7"
        ],
        "answer": 2,
        "hint": "The step never changes, even when you cross zero.",
@@ -3289,9 +5225,9 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "-7",
+        "5",
         "-13",
-        "7",
-        "5"
+        "7"
        ],
        "answer": 0,
        "hint": "The step never changes, even when you cross zero.",
@@ -3308,14 +5244,54 @@ window.QUIZ_DATA = {
         "-10"
        ],
        "options": [
+        "-6",
         "-2",
         "6",
-        "-6",
         "2"
+       ],
+       "answer": 1,
+       "hint": "The step never changes, even when you cross zero.",
+       "explain": "Step is -4: <code>2 + (-4) = -2</code>."
+      },
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "8",
+        "2",
+        "?",
+        "-10",
+        "-16"
+       ],
+       "options": [
+        "-4",
+        "-10",
+        "4",
+        "8"
        ],
        "answer": 0,
        "hint": "The step never changes, even when you cross zero.",
-       "explain": "Step is -4: <code>2 + (-4) = -2</code>."
+       "explain": "Step is -6: <code>2 + (-6) = -4</code>."
+      },
+      {
+       "stem": "Which number fills the gap?",
+       "sub": null,
+       "seq": [
+        "9",
+        "4",
+        "-1",
+        "?",
+        "-11"
+       ],
+       "options": [
+        "4",
+        "-6",
+        "6",
+        "-11"
+       ],
+       "answer": 1,
+       "hint": "The step never changes, even when you cross zero.",
+       "explain": "Step is -5: <code>-1 + (-5) = -6</code>."
       }
      ]
     },
@@ -3324,46 +5300,74 @@ window.QUIZ_DATA = {
      "skill": "depth problem",
      "variants": [
       {
-       "stem": "A submarine is at -30 m and rises 12 m each minute. Where is it after 3 minutes?",
+       "stem": "A submarine is at -30 m and rises 8 m each minute. Where is it after 3 minutes?",
        "sub": null,
        "seq": null,
        "options": [
-        "6 m",
-        "-6 m",
-        "18 m",
-        "-66 m"
+        "2 m",
+        "-14 m",
+        "-54 m",
+        "-6 m"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Rising means adding.",
-       "explain": "<code>3 x 12 = 36</code>, so <code>-30 + 36 = 6</code> m."
+       "explain": "<code>3 x 8 = 24</code>, so <code>-30 + 24 = -6</code> m."
       },
       {
        "stem": "A submarine is at -45 m and rises 15 m each minute. Where is it after 2 minutes?",
        "sub": null,
        "seq": null,
        "options": [
+        "0 m",
         "-75 m",
-        "-15 m",
         "-30 m",
-        "0 m"
+        "-15 m"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Rising means adding.",
        "explain": "<code>2 x 15 = 30</code>, so <code>-45 + 30 = -15</code> m."
       },
       {
-       "stem": "A submarine is at -24 m and rises 8 m each minute. Where is it after 4 minutes?",
+       "stem": "A submarine is at -24 m and rises 5 m each minute. Where is it after 4 minutes?",
        "sub": null,
        "seq": null,
        "options": [
-        "8 m",
-        "0 m",
-        "16 m",
-        "-56 m"
+        "-4 m",
+        "1 m",
+        "-9 m",
+        "-44 m"
        ],
        "answer": 0,
        "hint": "Rising means adding.",
-       "explain": "<code>4 x 8 = 32</code>, so <code>-24 + 32 = 8</code> m."
+       "explain": "<code>4 x 5 = 20</code>, so <code>-24 + 20 = -4</code> m."
+      },
+      {
+       "stem": "A submarine is at -50 m and rises 12 m each minute. Where is it after 4 minutes?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-98 m",
+        "-14 m",
+        "10 m",
+        "-2 m"
+       ],
+       "answer": 3,
+       "hint": "Rising means adding.",
+       "explain": "<code>4 x 12 = 48</code>, so <code>-50 + 48 = -2</code> m."
+      },
+      {
+       "stem": "A submarine is at -28 m and rises 9 m each minute. Where is it after 3 minutes?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-1 m",
+        "-10 m",
+        "8 m",
+        "-55 m"
+       ],
+       "answer": 0,
+       "hint": "Rising means adding.",
+       "explain": "<code>3 x 9 = 27</code>, so <code>-28 + 27 = -1</code> m."
       }
      ]
     },
@@ -3381,12 +5385,12 @@ window.QUIZ_DATA = {
         "-2"
        ],
        "options": [
-        "7",
-        "6",
         "-6",
-        "12"
+        "12",
+        "6",
+        "7"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Second term minus first term. Keep the sign.",
        "explain": "<code>-14 - (-20) = 6</code>."
       },
@@ -3401,11 +5405,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "-3",
+        "-4",
         "4",
-        "-8",
-        "-4"
+        "-8"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Second term minus first term. Keep the sign.",
        "explain": "<code>-13 - (-9) = -4</code>."
       },
@@ -3419,14 +5423,52 @@ window.QUIZ_DATA = {
         "0"
        ],
        "options": [
-        "5",
         "-5",
-        "10",
-        "6"
+        "6",
+        "5",
+        "10"
+       ],
+       "answer": 2,
+       "hint": "Second term minus first term. Keep the sign.",
+       "explain": "<code>-10 - (-15) = 5</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "-30",
+        "-23",
+        "-16",
+        "-9"
+       ],
+       "options": [
+        "7",
+        "14",
+        "8",
+        "-7"
        ],
        "answer": 0,
        "hint": "Second term minus first term. Keep the sign.",
-       "explain": "<code>-10 - (-15) = 5</code>."
+       "explain": "<code>-23 - (-30) = 7</code>."
+      },
+      {
+       "stem": "What is the step size?",
+       "sub": null,
+       "seq": [
+        "-12",
+        "-17",
+        "-22",
+        "-27"
+       ],
+       "options": [
+        "-5",
+        "-4",
+        "-10",
+        "5"
+       ],
+       "answer": 0,
+       "hint": "Second term minus first term. Keep the sign.",
+       "explain": "<code>-17 - (-12) = -5</code>."
       }
      ]
     },
@@ -3439,12 +5481,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "3, 7, 11",
-        "-3, -11, -7",
         "-11, -7, -3",
-        "-3, -7, -11"
+        "-3, -7, -11",
+        "-3, -11, -7",
+        "3, 7, 11"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "The one furthest from zero on the negative side is the smallest.",
        "explain": "Smallest first: <code>-11, -7, -3</code>."
       },
@@ -3453,12 +5495,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "-2, -9, -5",
         "2, 5, 9",
-        "-9, -5, -2",
-        "-2, -5, -9"
+        "-2, -9, -5",
+        "-2, -5, -9",
+        "-9, -5, -2"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "The one furthest from zero on the negative side is the smallest.",
        "explain": "Smallest first: <code>-9, -5, -2</code>."
       },
@@ -3467,14 +5509,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "-14, -6, -20",
         "6, 14, 20",
         "-20, -14, -6",
+        "-14, -6, -20",
         "-6, -14, -20"
+       ],
+       "answer": 1,
+       "hint": "The one furthest from zero on the negative side is the smallest.",
+       "explain": "Smallest first: <code>-20, -14, -6</code>."
+      },
+      {
+       "stem": "Put these in order, smallest first: -5, -13, -8",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "5, 8, 13",
+        "-5, -8, -13",
+        "-13, -8, -5",
+        "-5, -13, -8"
        ],
        "answer": 2,
        "hint": "The one furthest from zero on the negative side is the smallest.",
-       "explain": "Smallest first: <code>-20, -14, -6</code>."
+       "explain": "Smallest first: <code>-13, -8, -5</code>."
+      },
+      {
+       "stem": "Put these in order, smallest first: -4, -16, -10",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "4, 10, 16",
+        "-4, -10, -16",
+        "-4, -16, -10",
+        "-16, -10, -4"
+       ],
+       "answer": 3,
+       "hint": "The one furthest from zero on the negative side is the smallest.",
+       "explain": "Smallest first: <code>-16, -10, -4</code>."
       }
      ]
     },
@@ -3489,10 +5559,10 @@ window.QUIZ_DATA = {
        "options": [
         "8",
         "4",
-        "6",
-        "5"
+        "5",
+        "6"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Find the total distance, then divide by the step.",
        "explain": "<code>12 - (-8) = 20</code>, and <code>20 / 4 = 5</code>."
       },
@@ -3501,12 +5571,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "6",
-        "5",
         "7",
-        "8"
+        "5",
+        "8",
+        "6"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "Find the total distance, then divide by the step.",
        "explain": "<code>10 - (-8) = 18</code>, and <code>18 / 3 = 6</code>."
       },
@@ -3515,14 +5585,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "3",
         "6",
+        "5",
+        "4"
+       ],
+       "answer": 3,
+       "hint": "Find the total distance, then divide by the step.",
+       "explain": "<code>18 - (-6) = 24</code>, and <code>24 / 6 = 4</code>."
+      },
+      {
+       "stem": "Counting back in 5s from 14, how many steps to reach -11?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "11",
+        "6",
+        "4",
+        "5"
+       ],
+       "answer": 3,
+       "hint": "Find the total distance, then divide by the step.",
+       "explain": "<code>14 - (-11) = 25</code>, and <code>25 / 5 = 5</code>."
+      },
+      {
+       "stem": "Counting back in 8s from 20, how many steps to reach -12?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "12",
         "3",
         "4",
         "5"
        ],
        "answer": 2,
        "hint": "Find the total distance, then divide by the step.",
-       "explain": "<code>18 - (-6) = 24</code>, and <code>24 / 6 = 4</code>."
+       "explain": "<code>20 - (-12) = 32</code>, and <code>32 / 8 = 4</code>."
       }
      ]
     },
@@ -3540,12 +5638,12 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "-1",
-        "-1/2",
         "1",
+        "-1/2",
+        "-1",
         "-1 1/2"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "Below zero the fractions keep the same step size.",
        "explain": "<code>-1/2 - 1/2 = -1</code>."
       },
@@ -3559,10 +5657,10 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "2/3",
+        "-1/3",
         "-1",
         "-2/3",
-        "-1/3"
+        "2/3"
        ],
        "answer": 2,
        "hint": "Below zero the fractions keep the same step size.",
@@ -3578,14 +5676,52 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
+        "-3/4",
         "1/2",
         "-1/4",
-        "-3/4",
         "-1/2"
        ],
        "answer": 3,
        "hint": "Below zero the fractions keep the same step size.",
        "explain": "<code>-1/4 - 1/4 = -1/2</code>."
+      },
+      {
+       "stem": "Count back in 1/5. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/5",
+        "0",
+        "-1/5",
+        "?"
+       ],
+       "options": [
+        "2/5",
+        "-2/5",
+        "-3/5",
+        "-1/5"
+       ],
+       "answer": 1,
+       "hint": "Below zero the fractions keep the same step size.",
+       "explain": "<code>-1/5 - 1/5 = -2/5</code>."
+      },
+      {
+       "stem": "Count back in 1/6. What comes next?",
+       "sub": null,
+       "seq": [
+        "1/6",
+        "0",
+        "-1/6",
+        "?"
+       ],
+       "options": [
+        "-1/2",
+        "1/3",
+        "-1/6",
+        "-1/3"
+       ],
+       "answer": 3,
+       "hint": "Below zero the fractions keep the same step size.",
+       "explain": "<code>-1/6 - 1/6 = -1/3</code>."
       }
      ]
     },
@@ -3599,11 +5735,11 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "3°C",
-        "10°C",
         "11°C",
-        "12°C"
+        "12°C",
+        "10°C"
        ],
-       "answer": 2,
+       "answer": 1,
        "hint": "Count up to zero, then keep counting.",
        "explain": "From -4 to 0 is 4, then 0 to 7 is 7: <code>4 + 7 = 11</code>&deg;C."
       },
@@ -3613,11 +5749,11 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "13°C",
-        "-6°C",
         "11°C",
-        "12°C"
+        "12°C",
+        "-6°C"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Count up to zero, then keep counting.",
        "explain": "From -9 to 0 is 9, then 0 to 3 is 3: <code>9 + 3 = 12</code>&deg;C."
       },
@@ -3627,13 +5763,41 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "14°C",
-        "10°C",
         "13°C",
+        "10°C",
         "15°C"
        ],
        "answer": 0,
        "hint": "Count up to zero, then keep counting.",
        "explain": "From -2 to 0 is 2, then 0 to 12 is 12: <code>2 + 12 = 14</code>&deg;C."
+      },
+      {
+       "stem": "At night the temperature is -6&deg;C. By midday it is 5&deg;C. How much did it rise?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "11°C",
+        "-1°C",
+        "12°C",
+        "10°C"
+       ],
+       "answer": 0,
+       "hint": "Count up to zero, then keep counting.",
+       "explain": "From -6 to 0 is 6, then 0 to 5 is 5: <code>6 + 5 = 11</code>&deg;C."
+      },
+      {
+       "stem": "At night the temperature is -3&deg;C. By midday it is 9&deg;C. How much did it rise?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "11°C",
+        "6°C",
+        "12°C",
+        "13°C"
+       ],
+       "answer": 2,
+       "hint": "Count up to zero, then keep counting.",
+       "explain": "From -3 to 0 is 3, then 0 to 9 is 9: <code>3 + 9 = 12</code>&deg;C."
       }
      ]
     },
@@ -3653,9 +5817,9 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "3",
-        "1",
         "5",
-        "-3"
+        "-3",
+        "1"
        ],
        "answer": 0,
        "hint": "A common mistake is bouncing back up instead of going through zero.",
@@ -3672,12 +5836,12 @@ window.QUIZ_DATA = {
         "-14"
        ],
        "options": [
-        "-9",
-        "9",
         "-4",
-        "1"
+        "1",
+        "-9",
+        "9"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "A common mistake is bouncing back up instead of going through zero.",
        "explain": "The sequence should keep dropping by 5, so it should be <code>-9</code>."
       },
@@ -3692,14 +5856,54 @@ window.QUIZ_DATA = {
         "-16"
        ],
        "options": [
-        "5",
-        "-2",
+        "-9",
         "9",
-        "-9"
+        "-2",
+        "5"
+       ],
+       "answer": 1,
+       "hint": "A common mistake is bouncing back up instead of going through zero.",
+       "explain": "The sequence should keep dropping by 7, so it should be <code>-9</code>."
+      },
+      {
+       "stem": "One term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "10",
+        "4",
+        "-2",
+        "8",
+        "-14"
+       ],
+       "options": [
+        "8",
+        "4",
+        "-8",
+        "-2"
+       ],
+       "answer": 0,
+       "hint": "A common mistake is bouncing back up instead of going through zero.",
+       "explain": "The sequence should keep dropping by 6, so it should be <code>-8</code>."
+      },
+      {
+       "stem": "One term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "8",
+        "2",
+        "-4",
+        "10",
+        "-16"
+       ],
+       "options": [
+        "2",
+        "-4",
+        "10",
+        "-10"
        ],
        "answer": 2,
        "hint": "A common mistake is bouncing back up instead of going through zero.",
-       "explain": "The sequence should keep dropping by 7, so it should be <code>-9</code>."
+       "explain": "The sequence should keep dropping by 6, so it should be <code>-10</code>."
       }
      ]
     },
@@ -3719,11 +5923,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "0.2",
-        "-0.4",
         "-0.7",
-        "-0.1"
+        "-0.1",
+        "-0.4"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "7 jumps from the start.",
        "explain": "<code>2 + 7 x (-0.3) = -0.1</code>."
       },
@@ -3740,10 +5944,10 @@ window.QUIZ_DATA = {
        "options": [
         "-1",
         "-0.75",
-        "-0.25",
-        "-0.5"
+        "-0.5",
+        "-0.25"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "6 jumps from the start.",
        "explain": "<code>1 + 6 x (-0.25) = -0.5</code>."
       },
@@ -3758,14 +5962,54 @@ window.QUIZ_DATA = {
         "..."
        ],
        "options": [
-        "-0.2",
-        "-0.6",
         "-1",
-        "0.2"
+        "0.2",
+        "-0.6",
+        "-0.2"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "8 jumps from the start.",
        "explain": "<code>3 + 8 x (-0.4) = -0.2</code>."
+      },
+      {
+       "stem": "What is the 9th term?",
+       "sub": null,
+       "seq": [
+        "2",
+        "1.75",
+        "1.5",
+        "1.25",
+        "..."
+       ],
+       "options": [
+        "-0.25",
+        "-0.5",
+        "0.25",
+        "0"
+       ],
+       "answer": 3,
+       "hint": "8 jumps from the start.",
+       "explain": "<code>2 + 8 x (-0.25) = 0</code>."
+      },
+      {
+       "stem": "What is the 10th term?",
+       "sub": null,
+       "seq": [
+        "4",
+        "3.5",
+        "3",
+        "2.5",
+        "..."
+       ],
+       "options": [
+        "-0.5",
+        "-1.5",
+        "0",
+        "-1"
+       ],
+       "answer": 0,
+       "hint": "9 jumps from the start.",
+       "explain": "<code>4 + 9 x (-0.5) = -0.5</code>."
       }
      ]
     },
@@ -3778,12 +6022,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "6, 5, 4, 3",
         "6, 2, -2, -6",
         "46, 42, 38, 34",
-        "6, 10, 14, 18",
-        "6, 5, 4, 3"
+        "6, 10, 14, 18"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "Check the direction and whether the last term is negative.",
        "explain": "<code>6, 2, -2, -6</code> drops by 4 each time and finishes below zero."
       },
@@ -3792,12 +6036,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "8, 13, 18, 23",
-        "8, 7, 6, 5",
         "8, 3, -2, -7",
-        "48, 43, 38, 33"
+        "48, 43, 38, 33",
+        "8, 7, 6, 5",
+        "8, 13, 18, 23"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Check the direction and whether the last term is negative.",
        "explain": "<code>8, 3, -2, -7</code> drops by 5 each time and finishes below zero."
       },
@@ -3807,13 +6051,41 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "45, 42, 39, 36",
+        "5, 4, 3, 2",
         "5, 8, 11, 14",
-        "5, 2, -1, -4",
-        "5, 4, 3, 2"
+        "5, 2, -1, -4"
+       ],
+       "answer": 3,
+       "hint": "Check the direction and whether the last term is negative.",
+       "explain": "<code>5, 2, -1, -4</code> drops by 3 each time and finishes below zero."
+      },
+      {
+       "stem": "Which sequence counts back in 6s and ends up below zero?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "50, 44, 38, 32",
+        "10, 16, 22, 28",
+        "10, 4, -2, -8",
+        "10, 9, 8, 7"
        ],
        "answer": 2,
        "hint": "Check the direction and whether the last term is negative.",
-       "explain": "<code>5, 2, -1, -4</code> drops by 3 each time and finishes below zero."
+       "explain": "<code>10, 4, -2, -8</code> drops by 6 each time and finishes below zero."
+      },
+      {
+       "stem": "Which sequence counts back in 7s and ends up below zero?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "52, 45, 38, 31",
+        "12, 11, 10, 9",
+        "12, 19, 26, 33",
+        "12, 5, -2, -9"
+       ],
+       "answer": 3,
+       "hint": "Check the direction and whether the last term is negative.",
+       "explain": "<code>12, 5, -2, -9</code> drops by 7 each time and finishes below zero."
       }
      ]
     }
@@ -3845,9 +6117,9 @@ window.QUIZ_DATA = {
         "32"
        ],
        "options": [
-        "Multiply the position by 8, then add 1",
-        "Multiply the position by 8",
         "Add 8 to the position",
+        "Multiply the position by 8",
+        "Multiply the position by 8, then add 1",
         "Multiply the position by 9"
        ],
        "answer": 1,
@@ -3864,12 +6136,12 @@ window.QUIZ_DATA = {
         "24"
        ],
        "options": [
-        "Multiply the position by 6",
+        "Add 6 to the position",
         "Multiply the position by 7",
-        "Multiply the position by 6, then add 1",
-        "Add 6 to the position"
+        "Multiply the position by 6",
+        "Multiply the position by 6, then add 1"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "Ask: what do I do to the position (1, 2, 3, 4) to get the term?",
        "explain": "Position 1 gives 6, position 2 gives 12. Every term is the position times 6. Rule: <b>multiply the position by 6</b>."
       },
@@ -3883,14 +6155,52 @@ window.QUIZ_DATA = {
         "36"
        ],
        "options": [
-        "Multiply the position by 9",
         "Add 9 to the position",
         "Multiply the position by 9, then add 1",
+        "Multiply the position by 9",
         "Multiply the position by 10"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "Ask: what do I do to the position (1, 2, 3, 4) to get the term?",
        "explain": "Position 1 gives 9, position 2 gives 18. Every term is the position times 9. Rule: <b>multiply the position by 9</b>."
+      },
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": "Positions are 1st, 2nd, 3rd, 4th.",
+       "seq": [
+        "7",
+        "14",
+        "21",
+        "28"
+       ],
+       "options": [
+        "Add 7 to the position",
+        "Multiply the position by 8",
+        "Multiply the position by 7",
+        "Multiply the position by 7, then add 1"
+       ],
+       "answer": 2,
+       "hint": "Ask: what do I do to the position (1, 2, 3, 4) to get the term?",
+       "explain": "Position 1 gives 7, position 2 gives 14. Every term is the position times 7. Rule: <b>multiply the position by 7</b>."
+      },
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": "Positions are 1st, 2nd, 3rd, 4th.",
+       "seq": [
+        "12",
+        "24",
+        "36",
+        "48"
+       ],
+       "options": [
+        "Multiply the position by 12, then add 1",
+        "Multiply the position by 12",
+        "Add 12 to the position",
+        "Multiply the position by 13"
+       ],
+       "answer": 1,
+       "hint": "Ask: what do I do to the position (1, 2, 3, 4) to get the term?",
+       "explain": "Position 1 gives 12, position 2 gives 24. Every term is the position times 12. Rule: <b>multiply the position by 12</b>."
       }
      ]
     },
@@ -3908,9 +6218,9 @@ window.QUIZ_DATA = {
         "32"
        ],
        "options": [
-        "72",
-        "88",
         "18",
+        "88",
+        "72",
         "80"
        ],
        "answer": 3,
@@ -3927,12 +6237,12 @@ window.QUIZ_DATA = {
         "28"
        ],
        "options": [
-        "77",
         "19",
+        "84",
         "91",
-        "84"
+        "77"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "The rule is multiply the position by 7.",
        "explain": "<code>12 x 7 = 84</code>."
       },
@@ -3946,14 +6256,52 @@ window.QUIZ_DATA = {
         "36"
        ],
        "options": [
+        "108",
         "99",
         "20",
-        "108",
         "90"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "The rule is multiply the position by 9.",
        "explain": "<code>11 x 9 = 99</code>."
+      },
+      {
+       "stem": "What is the value of the term in the 13th position?",
+       "sub": null,
+       "seq": [
+        "6",
+        "12",
+        "18",
+        "24"
+       ],
+       "options": [
+        "19",
+        "72",
+        "84",
+        "78"
+       ],
+       "answer": 3,
+       "hint": "The rule is multiply the position by 6.",
+       "explain": "<code>13 x 6 = 78</code>."
+      },
+      {
+       "stem": "What is the value of the term in the 9th position?",
+       "sub": null,
+       "seq": [
+        "11",
+        "22",
+        "33",
+        "44"
+       ],
+       "options": [
+        "99",
+        "20",
+        "88",
+        "110"
+       ],
+       "answer": 0,
+       "hint": "The rule is multiply the position by 11.",
+       "explain": "<code>9 x 11 = 99</code>."
       }
      ]
     },
@@ -3971,12 +6319,12 @@ window.QUIZ_DATA = {
         "32"
        ],
        "options": [
-        "11th",
         "12th",
         "96th",
-        "13th"
+        "13th",
+        "11th"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Do the opposite of the rule: divide instead of multiply.",
        "explain": "<code>96 / 8 = 12</code>, so it is the 12th term."
       },
@@ -3990,12 +6338,12 @@ window.QUIZ_DATA = {
         "24"
        ],
        "options": [
-        "15th",
+        "14th",
         "16th",
-        "90th",
-        "14th"
+        "15th",
+        "90th"
        ],
-       "answer": 0,
+       "answer": 2,
        "hint": "Do the opposite of the rule: divide instead of multiply.",
        "explain": "<code>90 / 6 = 15</code>, so it is the 15th term."
       },
@@ -4009,14 +6357,52 @@ window.QUIZ_DATA = {
         "36"
        ],
        "options": [
-        "126th",
         "14th",
         "15th",
+        "126th",
         "13th"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Do the opposite of the rule: divide instead of multiply.",
        "explain": "<code>126 / 9 = 14</code>, so it is the 14th term."
+      },
+      {
+       "stem": "What is the position of the term with a value of 91?",
+       "sub": null,
+       "seq": [
+        "7",
+        "14",
+        "21",
+        "28"
+       ],
+       "options": [
+        "14th",
+        "12th",
+        "91th",
+        "13th"
+       ],
+       "answer": 3,
+       "hint": "Do the opposite of the rule: divide instead of multiply.",
+       "explain": "<code>91 / 7 = 13</code>, so it is the 13th term."
+      },
+      {
+       "stem": "What is the position of the term with a value of 132?",
+       "sub": null,
+       "seq": [
+        "12",
+        "24",
+        "36",
+        "48"
+       ],
+       "options": [
+        "132th",
+        "10th",
+        "12th",
+        "11th"
+       ],
+       "answer": 3,
+       "hint": "Do the opposite of the rule: divide instead of multiply.",
+       "explain": "<code>132 / 12 = 11</code>, so it is the 11th term."
       }
      ]
     },
@@ -4034,12 +6420,12 @@ window.QUIZ_DATA = {
         "14"
        ],
        "options": [
-        "Multiply the position by 3, then add 2",
-        "Multiply the position by 3",
         "Multiply the position by 3, then subtract 2",
-        "Multiply the position by 4, then add 2"
+        "Multiply the position by 3",
+        "Multiply the position by 4, then add 2",
+        "Multiply the position by 3, then add 2"
        ],
-       "answer": 0,
+       "answer": 3,
        "hint": "The terms go up in 3s, so start with 'multiply by 3'. Then check what to add or subtract.",
        "explain": "Position 1 x 3 = 3, but the term is 5. So you also add 2."
       },
@@ -4053,12 +6439,12 @@ window.QUIZ_DATA = {
         "17"
        ],
        "options": [
-        "Multiply the position by 4",
-        "Multiply the position by 4, then subtract 1",
         "Multiply the position by 4, then add 1",
+        "Multiply the position by 4, then subtract 1",
+        "Multiply the position by 4",
         "Multiply the position by 5, then add 1"
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "The terms go up in 4s, so start with 'multiply by 4'. Then check what to add or subtract.",
        "explain": "Position 1 x 4 = 4, but the term is 5. So you also add 1."
       },
@@ -4072,14 +6458,52 @@ window.QUIZ_DATA = {
         "19"
        ],
        "options": [
+        "Multiply the position by 6, then subtract 1",
         "Multiply the position by 5, then subtract 1",
         "Multiply the position by 5, then add 1",
-        "Multiply the position by 5",
-        "Multiply the position by 6, then subtract 1"
+        "Multiply the position by 5"
        ],
-       "answer": 0,
+       "answer": 1,
        "hint": "The terms go up in 5s, so start with 'multiply by 5'. Then check what to add or subtract.",
        "explain": "Position 1 x 5 = 5, but the term is 4. So you also subtract 1."
+      },
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "5",
+        "7",
+        "9",
+        "11"
+       ],
+       "options": [
+        "Multiply the position by 2, then add 3",
+        "Multiply the position by 2, then subtract 3",
+        "Multiply the position by 2",
+        "Multiply the position by 3, then add 3"
+       ],
+       "answer": 0,
+       "hint": "The terms go up in 2s, so start with 'multiply by 2'. Then check what to add or subtract.",
+       "explain": "Position 1 x 2 = 2, but the term is 5. So you also add 3."
+      },
+      {
+       "stem": "What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "8",
+        "14",
+        "20",
+        "26"
+       ],
+       "options": [
+        "Multiply the position by 6, then subtract 2",
+        "Multiply the position by 6, then add 2",
+        "Multiply the position by 6",
+        "Multiply the position by 7, then add 2"
+       ],
+       "answer": 1,
+       "hint": "The terms go up in 6s, so start with 'multiply by 6'. Then check what to add or subtract.",
+       "explain": "Position 1 x 6 = 6, but the term is 8. So you also add 2."
       }
      ]
     },
@@ -4092,8 +6516,8 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "30",
         "35",
+        "30",
         "32",
         "15"
        ],
@@ -4106,12 +6530,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "53",
         "48",
         "49",
-        "53",
         "17"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Multiply first, then add or subtract. Order matters.",
        "explain": "<code>12 x 4 = 48</code>, then <code>48 + 1 = 49</code>."
       },
@@ -4120,14 +6544,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "54",
-        "58",
         "13",
-        "52"
+        "54",
+        "52",
+        "58"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Multiply first, then add or subtract. Order matters.",
        "explain": "<code>9 x 6 = 54</code>, then <code>54 - 2 = 52</code>."
+      },
+      {
+       "stem": "The rule is: multiply the position by 7, then add 3. What is the 8th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "59",
+        "66",
+        "18",
+        "56"
+       ],
+       "answer": 0,
+       "hint": "Multiply first, then add or subtract. Order matters.",
+       "explain": "<code>8 x 7 = 56</code>, then <code>56 + 3 = 59</code>."
+      },
+      {
+       "stem": "The rule is: multiply the position by 2, then add 6. What is the 15th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "36",
+        "30",
+        "38",
+        "23"
+       ],
+       "answer": 0,
+       "hint": "Multiply first, then add or subtract. Order matters.",
+       "explain": "<code>15 x 2 = 30</code>, then <code>30 + 6 = 36</code>."
       }
      ]
     },
@@ -4140,12 +6592,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "19th",
-        "20th",
         "21th",
-        "22th"
+        "22th",
+        "19th",
+        "20th"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Undo the rule backwards: first undo the add/subtract, then undo the multiply.",
        "explain": "<code>62 - 2 = 60</code>, then <code>60 / 3 = 20</code>."
       },
@@ -4156,8 +6608,8 @@ window.QUIZ_DATA = {
        "options": [
         "16th",
         "14th",
-        "13th",
-        "15th"
+        "15th",
+        "13th"
        ],
        "answer": 1,
        "hint": "Undo the rule backwards: first undo the add/subtract, then undo the multiply.",
@@ -4169,13 +6621,41 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "17th",
+        "18th",
         "16th",
-        "15th",
-        "18th"
+        "15th"
+       ],
+       "answer": 2,
+       "hint": "Undo the rule backwards: first undo the add/subtract, then undo the multiply.",
+       "explain": "<code>61 + 3 = 64</code>, then <code>64 / 4 = 16</code>."
+      },
+      {
+       "stem": "The rule is: multiply the position by 6, then add 2. Which position has the value 74?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "11th",
+        "12th",
+        "13th",
+        "14th"
        ],
        "answer": 1,
        "hint": "Undo the rule backwards: first undo the add/subtract, then undo the multiply.",
-       "explain": "<code>61 + 3 = 64</code>, then <code>64 / 4 = 16</code>."
+       "explain": "<code>74 - 2 = 72</code>, then <code>72 / 6 = 12</code>."
+      },
+      {
+       "stem": "The rule is: multiply the position by 8, then add 3. Which position has the value 75?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "10th",
+        "9th",
+        "11th",
+        "8th"
+       ],
+       "answer": 1,
+       "hint": "Undo the rule backwards: first undo the add/subtract, then undo the multiply.",
+       "explain": "<code>75 - 3 = 72</code>, then <code>72 / 8 = 9</code>."
       }
      ]
     },
@@ -4185,45 +6665,103 @@ window.QUIZ_DATA = {
      "variants": [
       {
        "stem": "The rule is: multiply the position by 8. Is 96 a term in this sequence?",
-       "sub": null,
-       "seq": null,
+       "sub": "The first four terms are shown. The sequence carries on for ever.",
+       "seq": [
+        "8",
+        "16",
+        "24",
+        "32",
+        "..."
+       ],
        "options": [
-        "No",
-        "Only if the sequence is long enough",
-        "Yes",
-        "There is not enough information"
+        "No &mdash; the sequence stops at 32",
+        "No &mdash; 96 is not in the 8 times table",
+        "Yes &mdash; it is the 12th term",
+        "Yes &mdash; it is the 96th term"
        ],
        "answer": 2,
-       "hint": "Divide 96 by 8. If you get a whole number, it is a term.",
-       "explain": "<code>96 / 8 = 12</code> exactly, so yes &mdash; it is the 12th term."
+       "hint": "Divide 96 by 8. A whole-number answer means it IS a term, and tells you its position.",
+       "explain": "<code>96 &divide; 8 = 12</code> exactly, so 96 is the 12th term. The rule keeps going for ever, so the sequence does not stop at the four terms shown."
       },
       {
        "stem": "The rule is: multiply the position by 7. Is 50 a term in this sequence?",
-       "sub": null,
-       "seq": null,
-       "options": [
-        "There is not enough information",
-        "Only if the sequence is long enough",
-        "Yes",
-        "No"
+       "sub": "The first four terms are shown. The sequence carries on for ever.",
+       "seq": [
+        "7",
+        "14",
+        "21",
+        "28",
+        "..."
        ],
-       "answer": 3,
-       "hint": "Divide 50 by 7. If you get a whole number, it is a term.",
-       "explain": "<code>50 / 7 = 7.14</code>, not a whole number, so no."
+       "options": [
+        "Yes &mdash; it is the 7th term",
+        "Yes &mdash; it is the 50th term",
+        "No &mdash; 50 is not in the 7 times table",
+        "No &mdash; 50 is too big for this sequence"
+       ],
+       "answer": 2,
+       "hint": "Divide 50 by 7. A whole-number answer means it IS a term, and tells you its position.",
+       "explain": "<code>50 &divide; 7 = 7.14</code>, which is not a whole number, so no position gives 50. Size is not the problem &mdash; the sequence goes on for ever."
       },
       {
        "stem": "The rule is: multiply the position by 6. Is 84 a term in this sequence?",
-       "sub": null,
-       "seq": null,
-       "options": [
-        "There is not enough information",
-        "No",
-        "Yes",
-        "Only if the sequence is long enough"
+       "sub": "The first four terms are shown. The sequence carries on for ever.",
+       "seq": [
+        "6",
+        "12",
+        "18",
+        "24",
+        "..."
        ],
-       "answer": 2,
-       "hint": "Divide 84 by 6. If you get a whole number, it is a term.",
-       "explain": "<code>84 / 6 = 14</code> exactly, so yes &mdash; it is the 14th term."
+       "options": [
+        "Yes &mdash; it is the 84th term",
+        "No &mdash; the sequence stops at 24",
+        "No &mdash; 84 is not in the 6 times table",
+        "Yes &mdash; it is the 14th term"
+       ],
+       "answer": 3,
+       "hint": "Divide 84 by 6. A whole-number answer means it IS a term, and tells you its position.",
+       "explain": "<code>84 &divide; 6 = 14</code> exactly, so 84 is the 14th term. The rule keeps going for ever, so the sequence does not stop at the four terms shown."
+      },
+      {
+       "stem": "The rule is: multiply the position by 9. Is 60 a term in this sequence?",
+       "sub": "The first four terms are shown. The sequence carries on for ever.",
+       "seq": [
+        "9",
+        "18",
+        "27",
+        "36",
+        "..."
+       ],
+       "options": [
+        "Yes &mdash; it is the 9th term",
+        "No &mdash; 60 is not in the 9 times table",
+        "Yes &mdash; it is the 60th term",
+        "No &mdash; 60 is too big for this sequence"
+       ],
+       "answer": 1,
+       "hint": "Divide 60 by 9. A whole-number answer means it IS a term, and tells you its position.",
+       "explain": "<code>60 &divide; 9 = 6.67</code>, which is not a whole number, so no position gives 60. Size is not the problem &mdash; the sequence goes on for ever."
+      },
+      {
+       "stem": "The rule is: multiply the position by 4. Is 72 a term in this sequence?",
+       "sub": "The first four terms are shown. The sequence carries on for ever.",
+       "seq": [
+        "4",
+        "8",
+        "12",
+        "16",
+        "..."
+       ],
+       "options": [
+        "Yes &mdash; it is the 72th term",
+        "No &mdash; 72 is not in the 4 times table",
+        "No &mdash; the sequence stops at 16",
+        "Yes &mdash; it is the 18th term"
+       ],
+       "answer": 3,
+       "hint": "Divide 72 by 4. A whole-number answer means it IS a term, and tells you its position.",
+       "explain": "<code>72 &divide; 4 = 18</code> exactly, so 72 is the 18th term. The rule keeps going for ever, so the sequence does not stop at the four terms shown."
       }
      ]
     },
@@ -4236,12 +6774,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "808",
         "800",
         "108",
+        "808",
         "792"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "The rule works for any position, however large. No need to list them.",
        "explain": "<code>100 x 8 = 800</code>."
       },
@@ -4250,12 +6788,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "150",
-        "151",
         "154",
-        "148"
+        "150",
+        "148",
+        "151"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "The rule works for any position, however large. No need to list them.",
        "explain": "<code>50 x 3 = 150</code>, then + 1 gives <code>151</code>."
       },
@@ -4265,13 +6803,41 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "203",
+        "200",
         "198",
-        "193",
-        "200"
+        "193"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "The rule works for any position, however large. No need to list them.",
        "explain": "<code>40 x 5 = 200</code>, then - 2 gives <code>198</code>."
+      },
+      {
+       "stem": "Using the rule multiply the position by 4, what is the 200th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "800",
+        "796",
+        "204",
+        "804"
+       ],
+       "answer": 0,
+       "hint": "The rule works for any position, however large. No need to list them.",
+       "explain": "<code>200 x 4 = 800</code>."
+      },
+      {
+       "stem": "Using the rule multiply the position by 7, then add 2, what is the 60th term?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "422",
+        "429",
+        "420",
+        "415"
+       ],
+       "answer": 0,
+       "hint": "The rule works for any position, however large. No need to list them.",
+       "explain": "<code>60 x 7 = 420</code>, then + 2 gives <code>422</code>."
       }
      ]
     },
@@ -4284,12 +6850,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "3, 7, 11, 15",
         "6, 11, 16, 21",
-        "5, 9, 13, 17",
-        "4, 8, 12, 16"
+        "4, 8, 12, 16",
+        "3, 7, 11, 15",
+        "5, 9, 13, 17"
        ],
-       "answer": 2,
+       "answer": 3,
        "hint": "Test position 1 and position 2 on each option.",
        "explain": "Position 1: <code>1 x 4 + 1 = 5</code>. Only <code>5, 9, 13, 17</code> starts there."
       },
@@ -4298,12 +6864,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "9, 13, 17, 21",
-        "8, 11, 14, 17",
+        "3, 6, 9, 12",
         "-2, 1, 4, 7",
-        "3, 6, 9, 12"
+        "9, 13, 17, 21",
+        "8, 11, 14, 17"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Test position 1 and position 2 on each option.",
        "explain": "Position 1: <code>1 x 3 + 5 = 8</code>. Only <code>8, 11, 14, 17</code> starts there."
       },
@@ -4320,6 +6886,34 @@ window.QUIZ_DATA = {
        "answer": 3,
        "hint": "Test position 1 and position 2 on each option.",
        "explain": "Position 1: <code>1 x 6 - 1 = 5</code>. Only <code>5, 11, 17, 23</code> starts there."
+      },
+      {
+       "stem": "Which sequence follows the rule: multiply the position by 5, then add 2?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "3, 8, 13, 18",
+        "7, 12, 17, 22",
+        "8, 14, 20, 26",
+        "5, 10, 15, 20"
+       ],
+       "answer": 1,
+       "hint": "Test position 1 and position 2 on each option.",
+       "explain": "Position 1: <code>1 x 5 + 2 = 7</code>. Only <code>7, 12, 17, 22</code> starts there."
+      },
+      {
+       "stem": "Which sequence follows the rule: multiply the position by 2, then add 7?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "-5, -3, -1, 1",
+        "10, 13, 16, 19",
+        "9, 11, 13, 15",
+        "2, 4, 6, 8"
+       ],
+       "answer": 2,
+       "hint": "Test position 1 and position 2 on each option.",
+       "explain": "Position 1: <code>1 x 2 + 7 = 9</code>. Only <code>9, 11, 13, 15</code> starts there."
       }
      ]
     },
@@ -4334,8 +6928,8 @@ window.QUIZ_DATA = {
        "options": [
         "Each term is 8 more than the one before it.",
         "Each term is 7 more than the one before it.",
-        "Each term is 7 times the one before it.",
-        "Each term is 7 less than the one before it."
+        "Each term is 7 less than the one before it.",
+        "Each term is 7 times the one before it."
        ],
        "answer": 1,
        "hint": "Work out the first two terms and compare them.",
@@ -4346,12 +6940,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "Each term is 10 more than the one before it.",
-        "Each term is 9 times the one before it.",
         "Each term is 9 more than the one before it.",
-        "Each term is 9 less than the one before it."
+        "Each term is 9 less than the one before it.",
+        "Each term is 9 times the one before it.",
+        "Each term is 10 more than the one before it."
        ],
-       "answer": 2,
+       "answer": 0,
        "hint": "Work out the first two terms and compare them.",
        "explain": "Terms are 9, 18, 27, 36. The gap between them is 9 every time."
       },
@@ -4360,14 +6954,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "Each term is 4 less than the one before it.",
-        "Each term is 4 more than the one before it.",
         "Each term is 4 times the one before it.",
-        "Each term is 5 more than the one before it."
+        "Each term is 5 more than the one before it.",
+        "Each term is 4 more than the one before it.",
+        "Each term is 4 less than the one before it."
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Work out the first two terms and compare them.",
        "explain": "Terms are 4, 8, 12, 16. The gap between them is 4 every time."
+      },
+      {
+       "stem": "A sequence has the rule: multiply the position by 6. Which statement is also true?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "Each term is 7 more than the one before it.",
+        "Each term is 6 times the one before it.",
+        "Each term is 6 more than the one before it.",
+        "Each term is 6 less than the one before it."
+       ],
+       "answer": 2,
+       "hint": "Work out the first two terms and compare them.",
+       "explain": "Terms are 6, 12, 18, 24. The gap between them is 6 every time."
+      },
+      {
+       "stem": "A sequence has the rule: multiply the position by 8. Which statement is also true?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "Each term is 9 more than the one before it.",
+        "Each term is 8 times the one before it.",
+        "Each term is 8 less than the one before it.",
+        "Each term is 8 more than the one before it."
+       ],
+       "answer": 3,
+       "hint": "Work out the first two terms and compare them.",
+       "explain": "Terms are 8, 16, 24, 32. The gap between them is 8 every time."
       }
      ]
     },
@@ -4385,12 +7007,12 @@ window.QUIZ_DATA = {
         "37"
        ],
        "options": [
-        "Multiply the position by 10",
         "Multiply the position by 11, then subtract 4",
-        "Multiply the position by 11, then add 10",
-        "Multiply the position by 10, then subtract 3"
+        "Multiply the position by 10",
+        "Multiply the position by 10, then subtract 3",
+        "Multiply the position by 11, then add 10"
        ],
-       "answer": 3,
+       "answer": 2,
        "hint": "Check the gap between terms first &mdash; that gives you the multiplier.",
        "explain": "The terms go up in 10s so the rule starts 'multiply by 10'. Position 1 x 10 = 10, and the first term is 7, so you subtract 3."
       },
@@ -4404,12 +7026,12 @@ window.QUIZ_DATA = {
         "13"
        ],
        "options": [
-        "Multiply the position by 5, then add 2",
         "Multiply the position by 2, then add 5",
-        "Multiply the position by 3, then add 4",
-        "Multiply the position by 2"
+        "Multiply the position by 5, then add 2",
+        "Multiply the position by 2",
+        "Multiply the position by 3, then add 4"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Check the gap between terms first &mdash; that gives you the multiplier.",
        "explain": "The terms go up in 2s so the rule starts 'multiply by 2'. Position 1 x 2 = 2, and the first term is 7, so you add 5."
       },
@@ -4423,14 +7045,52 @@ window.QUIZ_DATA = {
         "30"
        ],
        "options": [
-        "Multiply the position by 7, then add 2",
-        "Multiply the position by 8, then add 1",
         "Multiply the position by 2, then add 7",
-        "Multiply the position by 7"
+        "Multiply the position by 7",
+        "Multiply the position by 8, then add 1",
+        "Multiply the position by 7, then add 2"
+       ],
+       "answer": 3,
+       "hint": "Check the gap between terms first &mdash; that gives you the multiplier.",
+       "explain": "The terms go up in 7s so the rule starts 'multiply by 7'. Position 1 x 7 = 7, and the first term is 9, so you add 2."
+      },
+      {
+       "stem": "These are the first four terms. What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "7",
+        "11",
+        "15",
+        "19"
+       ],
+       "options": [
+        "Multiply the position by 4, then add 3",
+        "Multiply the position by 3, then add 4",
+        "Multiply the position by 5, then add 2",
+        "Multiply the position by 4"
        ],
        "answer": 0,
        "hint": "Check the gap between terms first &mdash; that gives you the multiplier.",
-       "explain": "The terms go up in 7s so the rule starts 'multiply by 7'. Position 1 x 7 = 7, and the first term is 9, so you add 2."
+       "explain": "The terms go up in 4s so the rule starts 'multiply by 4'. Position 1 x 4 = 4, and the first term is 7, so you add 3."
+      },
+      {
+       "stem": "These are the first four terms. What is the position-to-term rule?",
+       "sub": null,
+       "seq": [
+        "7",
+        "16",
+        "25",
+        "34"
+       ],
+       "options": [
+        "Multiply the position by 9",
+        "Multiply the position by 10, then subtract 3",
+        "Multiply the position by 9, then subtract 2",
+        "Multiply the position by 10, then add 9"
+       ],
+       "answer": 2,
+       "hint": "Check the gap between terms first &mdash; that gives you the multiplier.",
+       "explain": "The terms go up in 9s so the rule starts 'multiply by 9'. Position 1 x 9 = 9, and the first term is 7, so you subtract 2."
       }
      ]
     },
@@ -4450,10 +7110,10 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "32",
         "41",
+        "48",
         "40",
-        "48"
+        "32"
        ],
        "answer": 2,
        "hint": "Use the rule directly with position 5.",
@@ -4471,10 +7131,10 @@ window.QUIZ_DATA = {
         "?"
        ],
        "options": [
-        "25",
+        "18",
         "19",
         "22",
-        "18"
+        "25"
        ],
        "answer": 2,
        "hint": "Use the rule directly with position 6.",
@@ -4493,13 +7153,55 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "35",
-        "33",
+        "38",
         "43",
-        "38"
+        "33"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Use the rule directly with position 7.",
        "explain": "<code>7 x 5 + 3 = 38</code>."
+      },
+      {
+       "stem": "The rule is multiply the position by 6. What is the 8th term?",
+       "sub": null,
+       "seq": [
+        "6",
+        "12",
+        "18",
+        "24",
+        "...",
+        "?"
+       ],
+       "options": [
+        "54",
+        "42",
+        "48",
+        "49"
+       ],
+       "answer": 2,
+       "hint": "Use the rule directly with position 8.",
+       "explain": "<code>8 x 6  = 48</code>."
+      },
+      {
+       "stem": "The rule is multiply the position by 4, then add 5. What is the 9th term?",
+       "sub": null,
+       "seq": [
+        "9",
+        "13",
+        "17",
+        "21",
+        "...",
+        "?"
+       ],
+       "options": [
+        "45",
+        "36",
+        "41",
+        "37"
+       ],
+       "answer": 2,
+       "hint": "Use the rule directly with position 9.",
+       "explain": "<code>9 x 4 + 5 = 41</code>."
       }
      ]
     },
@@ -4513,8 +7215,8 @@ window.QUIZ_DATA = {
        "seq": null,
        "options": [
         "50",
-        "18",
         "48",
+        "18",
         "54"
        ],
        "answer": 0,
@@ -4526,12 +7228,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "18",
         "57",
         "54",
-        "63"
+        "63",
+        "18"
        ],
-       "answer": 1,
+       "answer": 0,
        "hint": "Tiles = position x 6 + 3.",
        "explain": "<code>9 x 6 = 54</code>, plus 3 = <code>57</code>."
       },
@@ -4540,14 +7242,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "81",
         "75",
         "76",
-        "81",
+        "21"
+       ],
+       "answer": 2,
+       "hint": "Tiles = position x 5 + 1.",
+       "explain": "<code>15 x 5 = 75</code>, plus 1 = <code>76</code>."
+      },
+      {
+       "stem": "A pattern of tiles uses 3 tiles for each step plus 4 extra tiles at the start. How many tiles in pattern number 14?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "49",
+        "46",
+        "42",
         "21"
        ],
        "answer": 1,
-       "hint": "Tiles = position x 5 + 1.",
-       "explain": "<code>15 x 5 = 75</code>, plus 1 = <code>76</code>."
+       "hint": "Tiles = position x 3 + 4.",
+       "explain": "<code>14 x 3 = 42</code>, plus 4 = <code>46</code>."
+      },
+      {
+       "stem": "A pattern of tiles uses 7 tiles for each step plus 2 extra tiles at the start. How many tiles in pattern number 10?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "72",
+        "79",
+        "19",
+        "70"
+       ],
+       "answer": 0,
+       "hint": "Tiles = position x 7 + 2.",
+       "explain": "<code>10 x 7 = 70</code>, plus 2 = <code>72</code>."
       }
      ]
     },
@@ -4560,12 +7290,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
+        "14th",
         "12th",
         "11th",
-        "14th",
         "10th"
        ],
-       "answer": 1,
+       "answer": 2,
        "hint": "Undo the last operation first.",
        "explain": "<code>103 - 4 = 99</code>, and <code>99 / 9 = 11</code>."
       },
@@ -4574,12 +7304,12 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "12th",
         "16th",
+        "13th",
         "14th",
-        "13th"
+        "12th"
        ],
-       "answer": 3,
+       "answer": 1,
        "hint": "Undo the last operation first.",
        "explain": "<code>86 + 5 = 91</code>, and <code>91 / 7 = 13</code>."
       },
@@ -4588,14 +7318,42 @@ window.QUIZ_DATA = {
        "sub": null,
        "seq": null,
        "options": [
-        "11th",
         "7th",
         "8th",
-        "9th"
+        "9th",
+        "11th"
        ],
-       "answer": 2,
+       "answer": 1,
        "hint": "Undo the last operation first.",
        "explain": "<code>102 - 6 = 96</code>, and <code>96 / 12 = 8</code>."
+      },
+      {
+       "stem": "Rule: multiply the position by 6, then add 5. A term has the value 89. What is its position?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "14th",
+        "13th",
+        "17th",
+        "15th"
+       ],
+       "answer": 0,
+       "hint": "Undo the last operation first.",
+       "explain": "<code>89 - 5 = 84</code>, and <code>84 / 6 = 14</code>."
+      },
+      {
+       "stem": "Rule: multiply the position by 8, then subtract 3. A term has the value 93. What is its position?",
+       "sub": null,
+       "seq": null,
+       "options": [
+        "11th",
+        "12th",
+        "13th",
+        "15th"
+       ],
+       "answer": 1,
+       "hint": "Undo the last operation first.",
+       "explain": "<code>93 + 3 = 96</code>, and <code>96 / 8 = 12</code>."
       }
      ]
     },
@@ -4604,46 +7362,74 @@ window.QUIZ_DATA = {
      "skill": "compare rules",
      "variants": [
       {
-       "stem": "Sequence A: multiply the position by 3, then add 5. Sequence B: multiply the position by 4, then add 1. Which has the bigger 6th term?",
-       "sub": null,
+       "stem": "Sequence A: multiply the position by 3, then add 5. Sequence B: multiply the position by 4, then add 1. How much bigger is the larger 8th term?",
+       "sub": "Both sequences start at position 1.",
        "seq": null,
        "options": [
-        "Sequence A",
-        "They are equal",
-        "There is not enough information",
-        "Sequence B"
+        "12",
+        "4",
+        "29",
+        "33"
        ],
-       "answer": 3,
-       "hint": "Work out both terms, then compare.",
-       "explain": "A: <code>6 x 3 + 5 = 23</code>. B: <code>6 x 4 + 1 = 25</code>."
+       "answer": 1,
+       "hint": "Work out the 8th term of each sequence first, then subtract the smaller from the bigger.",
+       "explain": "A: <code>8 &times; 3 + 5 = 29</code>. B: <code>8 &times; 4 + 1 = 33</code>. The gap is <code>33 &minus; 29 = 4</code>."
       },
       {
-       "stem": "Sequence A: multiply the position by 5, then add 2. Sequence B: multiply the position by 6, then subtract 2. Which has the bigger 5th term?",
-       "sub": null,
+       "stem": "Sequence A: multiply the position by 5, then add 2. Sequence B: multiply the position by 6, then subtract 2. How much bigger is the larger 7th term?",
+       "sub": "Both sequences start at position 1.",
        "seq": null,
        "options": [
-        "There is not enough information",
-        "They are equal",
-        "Sequence A",
-        "Sequence B"
+        "37",
+        "3",
+        "40",
+        "10"
        ],
-       "answer": 3,
-       "hint": "Work out both terms, then compare.",
-       "explain": "A: <code>5 x 5 + 2 = 27</code>. B: <code>5 x 6 - 2 = 28</code>."
+       "answer": 1,
+       "hint": "Work out the 7th term of each sequence first, then subtract the smaller from the bigger.",
+       "explain": "A: <code>7 &times; 5 + 2 = 37</code>. B: <code>7 &times; 6 &minus; 2 = 40</code>. The gap is <code>40 &minus; 37 = 3</code>."
       },
       {
-       "stem": "Sequence A: multiply the position by 2, then add 9. Sequence B: multiply the position by 3, then add 1. Which has the bigger 7th term?",
-       "sub": null,
+       "stem": "Sequence A: multiply the position by 2, then add 9. Sequence B: multiply the position by 3, then add 1. How much bigger is the larger 10th term?",
+       "sub": "Both sequences start at position 1.",
        "seq": null,
        "options": [
-        "Sequence B",
-        "They are equal",
-        "Sequence A",
-        "There is not enough information"
+        "31",
+        "2",
+        "29",
+        "12"
        ],
-       "answer": 2,
-       "hint": "Work out both terms, then compare.",
-       "explain": "A: <code>7 x 2 + 9 = 23</code>. B: <code>7 x 3 + 1 = 22</code>."
+       "answer": 1,
+       "hint": "Work out the 10th term of each sequence first, then subtract the smaller from the bigger.",
+       "explain": "A: <code>10 &times; 2 + 9 = 29</code>. B: <code>10 &times; 3 + 1 = 31</code>. The gap is <code>31 &minus; 29 = 2</code>."
+      },
+      {
+       "stem": "Sequence A: multiply the position by 4, then add 3. Sequence B: multiply the position by 6, then subtract 5. How much bigger is the larger 6th term?",
+       "sub": "Both sequences start at position 1.",
+       "seq": null,
+       "options": [
+        "4",
+        "27",
+        "31",
+        "10"
+       ],
+       "answer": 0,
+       "hint": "Work out the 6th term of each sequence first, then subtract the smaller from the bigger.",
+       "explain": "A: <code>6 &times; 4 + 3 = 27</code>. B: <code>6 &times; 6 &minus; 5 = 31</code>. The gap is <code>31 &minus; 27 = 4</code>."
+      },
+      {
+       "stem": "Sequence A: multiply the position by 7, then add 1. Sequence B: multiply the position by 5, then add 9. How much bigger is the larger 5th term?",
+       "sub": "Both sequences start at position 1.",
+       "seq": null,
+       "options": [
+        "34",
+        "7",
+        "36",
+        "2"
+       ],
+       "answer": 3,
+       "hint": "Work out the 5th term of each sequence first, then subtract the smaller from the bigger.",
+       "explain": "A: <code>5 &times; 7 + 1 = 36</code>. B: <code>5 &times; 5 + 9 = 34</code>. The gap is <code>36 &minus; 34 = 2</code>."
       }
      ]
     },
@@ -4662,12 +7448,12 @@ window.QUIZ_DATA = {
         "40"
        ],
        "options": [
-        "16",
-        "24",
+        "34",
         "32",
-        "34"
+        "24",
+        "16"
        ],
-       "answer": 3,
+       "answer": 0,
        "hint": "Apply the rule to each position in turn.",
        "explain": "Position 4 should be <code>4 x 8  = 32</code>, not 34."
       },
@@ -4683,11 +7469,11 @@ window.QUIZ_DATA = {
        ],
        "options": [
         "7",
-        "17",
         "11",
-        "15"
+        "15",
+        "17"
        ],
-       "answer": 1,
+       "answer": 3,
        "hint": "Apply the rule to each position in turn.",
        "explain": "Position 3 should be <code>3 x 4 + 3 = 15</code>, not 17."
       },
@@ -4702,14 +7488,54 @@ window.QUIZ_DATA = {
         "33"
        ],
        "options": [
-        "25",
+        "31",
         "33",
         "19",
-        "31"
+        "25"
        ],
        "answer": 1,
        "hint": "Apply the rule to each position in turn.",
        "explain": "Position 5 should be <code>5 x 6 + 1 = 31</code>, not 33."
+      },
+      {
+       "stem": "The rule is multiply the position by 7, but one term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "7",
+        "14",
+        "21",
+        "30",
+        "35"
+       ],
+       "options": [
+        "21",
+        "14",
+        "28",
+        "30"
+       ],
+       "answer": 3,
+       "hint": "Apply the rule to each position in turn.",
+       "explain": "Position 4 should be <code>4 x 7  = 28</code>, not 30."
+      },
+      {
+       "stem": "The rule is multiply the position by 5, then add 2, but one term is wrong. Which one?",
+       "sub": null,
+       "seq": [
+        "7",
+        "12",
+        "19",
+        "22",
+        "27"
+       ],
+       "options": [
+        "12",
+        "19",
+        "7",
+        "17"
+       ],
+       "answer": 1,
+       "hint": "Apply the rule to each position in turn.",
+       "explain": "Position 3 should be <code>3 x 5 + 2 = 17</code>, not 19."
       }
      ]
     }

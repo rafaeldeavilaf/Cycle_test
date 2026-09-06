@@ -69,7 +69,7 @@ Llevan el CSS, el motor y las 240 preguntas dentro.
 | Niveles | 5 (uno por día) |
 | Duración objetivo | ~30 min por nivel |
 | Familias de preguntas por nivel | 16 mínimo |
-| Variantes por familia | 3 mínimo |
+| Variantes por familia | 5 mínimo |
 | Formato | Selección múltiple, 4 opciones, siempre |
 | Progresión | Creciente entre niveles y dentro de cada nivel |
 | Nivel curricular | Year 6 británico, edad 10-11 |
@@ -78,6 +78,13 @@ Llevan el CSS, el motor y las 240 preguntas dentro.
 idéntica. El motor la devuelve al final de la cola y sirve otra variante de la misma
 familia, con números o datos distintos. Samuel tiene que razonar otra vez, no recordar
 qué botón pulsó.
+
+El motor da dos garantías, verificadas con tests: (1) agota **todas** las variantes de una
+familia antes de reutilizar ninguna; (2) al reiniciar el ciclo nunca sirve la última vista,
+así que es imposible ver la misma pregunta dos veces seguidas. Con 5 variantes por familia
+hace falta fallar 5 veces la misma para que algo se repita, y aun así no será consecutivo.
+
+**Andamiaje:** al reintentar una familia ya fallada, la pista se muestra automáticamente.
 
 **Distractores:** cada opción incorrecta debe ser un error real que un chico de esa edad
 cometería —dirección invertida, un paso de más, olvidar cruzar el cero, confundir la
@@ -112,7 +119,7 @@ que usa `fractions.Fraction` para aritmética exacta y que falla con `assert` si
 
 - una variante no tiene exactamente 4 opciones,
 - las 4 opciones no son únicas como texto,
-- una familia tiene menos de 3 variantes,
+- una familia tiene menos de 4 variantes,
 - un nivel tiene menos de 15 familias.
 
 Motivo: escribir 240 preguntas a mano garantiza errores aritméticos, y una respuesta mal

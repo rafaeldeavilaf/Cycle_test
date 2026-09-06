@@ -44,7 +44,7 @@ index.html                            ← el menú
 y6-maths-counting-sequences.html      ← el juego completo
 ```
 
-Cada uno lleva dentro el CSS, el motor y las 240 preguntas. **No dependen de ninguna
+Cada uno lleva dentro el CSS, el motor y las 400 preguntas. **No dependen de ninguna
 carpeta.**
 
 > **Por qué:** en el primer despliegue, el arrastrar-y-soltar de GitHub descartó
@@ -77,6 +77,7 @@ Ahí vive el diseño compartido. Ver [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) y
 - Si falla una pregunta, esa pregunta **vuelve más tarde con números distintos**: tiene
   que razonar de nuevo, no le sirve recordar la respuesta.
 - El nivel termina cuando ha resuelto bien las 16 preguntas. Ahí se desbloquea el siguiente.
+- Al reintentar una pregunta que ya falló, **la pista aparece sola**: la segunda vez viene con andamiaje.
 - Estrellas según aciertos al primer intento: 3 si ≥90%, 2 si ≥70%, 1 en el resto.
 - El progreso se guarda en el navegador de Samuel. Nada sale de su equipo.
 
@@ -101,11 +102,11 @@ Regenerar contenido y reconstruir los publicables:
 
 ```bash
 python3 tools/gen_y6_maths_counting.py subjects/y6-maths-counting-sequences
-# OK -> ... levels=5 families=80 variants=240
+# OK -> ... levels=5 families=80 variants=400
 
 python3 tools/build.py
-# index.html                          16.2 KB
-# y6-maths-counting-sequences.html   145.7 KB
+# index.html                          18.1 KB
+# y6-maths-counting-sequences.html   227.5 KB
 ```
 
 El generador usa `fractions.Fraction`, así que decimales y fracciones son exactos, y falla

@@ -219,7 +219,7 @@ h3 { font-size: 12px; }
 .mate__sprite .avatar { width: 56px; height: 56px; }
 .mate__msg {
   font-family: var(--font-ui);
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.7;
   color: var(--ink-dim);
 }
@@ -278,6 +278,8 @@ h3 { font-size: 12px; }
 .seq {
   display: flex; flex-wrap: wrap; gap: 10px;
   margin: 18px 0 22px;
+  overflow-x: auto;          /* fracciones largas nunca empujan la página */
+  padding-bottom: 4px;
 }
 .tile {
   min-width: 62px;
@@ -415,4 +417,15 @@ footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top:
   .level-card { grid-template-columns: 52px 1fr; }
   .level-card__num { width: 52px; height: 52px; font-size: 18px; }
   .stars { grid-column: 1 / -1; }
+  .mate { min-width: 0; width: 100%; }
+  .hud { justify-content: flex-start; }
+  .hud__group { width: 100%; }
+  .btn { padding: 14px 14px; }          /* objetivo táctil >= 44px de alto */
+}
+
+@media (max-width: 380px) {
+  .mate__sprite, .mate__sprite .avatar { width: 44px; height: 44px; }
+  .mate__msg { font-size: 10px; }
+  .tile { min-width: 52px; padding: 10px 8px; font-size: 12px; }
+  .q-stem { font-size: 17px; }
 }

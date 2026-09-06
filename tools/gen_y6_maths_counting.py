@@ -75,7 +75,7 @@ def mk(stem, correct, wrongs, hint, explain, seq=None, sub=None):
     }
 
 def fam(fid, skill, variants):
-    assert len(variants) >= 3, fid
+    assert len(variants) >= 4, fid
     return {"id": fid, "skill": skill, "variants": variants}
 
 def seq_of(start, step, n, mode, blanks=()):
@@ -92,7 +92,7 @@ L1 = []
 
 # 1. continue counting back (whole)
 v = []
-for start, step, shown in [(10, -5, 3), (20, -4, 3), (45, -9, 3)]:
+for start, step, shown in [(10, -5, 3), (20, -4, 3), (45, -9, 3), (24, -6, 3), (36, -8, 3)]:
     f = FMT["int"]
     nxt = F(start) + shown * F(step)
     v.append(mk(
@@ -107,7 +107,7 @@ L1.append(fam("L1F1", "count back", v))
 
 # 2. continue counting on (whole)
 v = []
-for start, step, shown in [(7, 7, 3), (25, 25, 3), (11, 11, 3)]:
+for start, step, shown in [(7, 7, 3), (25, 25, 3), (11, 11, 3), (9, 9, 3), (15, 15, 3)]:
     f = FMT["int"]
     nxt = F(start) + shown * F(step)
     v.append(mk(
@@ -122,7 +122,7 @@ L1.append(fam("L1F2", "count on", v))
 
 # 3. find the step size
 v = []
-for start, step in [(3, 6), (4, 7), (9, 8)]:
+for start, step in [(3, 6), (4, 7), (9, 8), (5, 9), (2, 12)]:
     f = FMT["int"]
     v.append(mk(
         "What is the step size in this sequence?",
@@ -136,7 +136,7 @@ L1.append(fam("L1F3", "find the step", v))
 
 # 4. missing middle term
 v = []
-for start, step, gap in [(12, 6, 1), (30, -7, 2), (14, 9, 1)]:
+for start, step, gap in [(12, 6, 1), (30, -7, 2), (14, 9, 1), (20, 8, 2), (40, -6, 1)]:
     f = FMT["int"]
     val = F(start) + gap * F(step)
     v.append(mk(
@@ -151,7 +151,7 @@ L1.append(fam("L1F4", "missing term", v))
 
 # 5. missing FIRST term
 v = []
-for second, step in [(14, 7), (36, 12), (22, 11)]:
+for second, step in [(14, 7), (36, 12), (22, 11), (18, 9), (30, 15)]:
     f = FMT["int"]
     first = F(second) - F(step)
     v.append(mk(
@@ -166,7 +166,7 @@ L1.append(fam("L1F5", "missing first term", v))
 
 # 6. odd one out
 v = []
-for start, step, bad_pos, off in [(6, 6, 3, 1), (8, 8, 2, 2), (9, 9, 4, 1)]:
+for start, step, bad_pos, off in [(6, 6, 3, 1), (8, 8, 2, 2), (9, 9, 4, 1), (7, 7, 3, 2), (12, 12, 2, 1)]:
     f = FMT["int"]
     s = [F(start) + i * F(step) for i in range(5)]
     bad = s[bad_pos] + off
@@ -184,7 +184,7 @@ L1.append(fam("L1F6", "spot the error", v))
 
 # 7. two steps ahead
 v = []
-for start, step, shown in [(9, 9, 3), (13, 6, 3), (40, -8, 3)]:
+for start, step, shown in [(9, 9, 3), (13, 6, 3), (40, -8, 3), (11, 7, 3), (50, -6, 3)]:
     f = FMT["int"]
     val = F(start) + (shown + 1) * F(step)
     v.append(mk(
@@ -199,7 +199,7 @@ L1.append(fam("L1F7", "two steps ahead", v))
 
 # 8. which sequence counts back in N
 v = []
-for step, base in [(8, 80), (6, 54), (9, 90)]:
+for step, base in [(8, 80), (6, 54), (9, 90), (7, 70), (12, 96)]:
     f = FMT["int"]
     good = ", ".join(f(F(base) - i * F(step)) for i in range(4))
     w1 = ", ".join(f(F(base) + i * F(step)) for i in range(4))
@@ -215,7 +215,7 @@ L1.append(fam("L1F8", "identify the rule", v))
 
 # 9. counting back through zero
 v = []
-for start, step, shown in [(6, -3, 3), (10, -5, 3), (8, -4, 3)]:
+for start, step, shown in [(6, -3, 3), (10, -5, 3), (8, -4, 3), (12, -6, 3), (14, -7, 3)]:
     f = FMT["int"]
     nxt = F(start) + shown * F(step)
     v.append(mk(
@@ -230,7 +230,7 @@ L1.append(fam("L1F9", "crossing zero", v))
 
 # 10. word problem: lift / stairs
 v = []
-for floors, step, jumps in [(30, 4, 3), (24, 3, 4), (45, 5, 3)]:
+for floors, step, jumps in [(30, 4, 3), (24, 3, 4), (45, 5, 3), (36, 6, 4), (50, 10, 3)]:
     f = FMT["int"]
     end = floors - step * jumps
     v.append(mk(
@@ -244,7 +244,7 @@ L1.append(fam("L1F10", "word problem", v))
 
 # 11. how many steps between two terms
 v = []
-for a, step, jumps in [(12, 6, 5), (7, 7, 6), (20, 4, 7)]:
+for a, step, jumps in [(12, 6, 5), (7, 7, 6), (20, 4, 7), (15, 5, 8), (9, 3, 9)]:
     b = a + step * jumps
     v.append(mk(
         f"A sequence counts on in steps of {step}. How many steps are there from {a} to {b}?",
@@ -257,7 +257,7 @@ L1.append(fam("L1F11", "count the steps", v))
 
 # 12. nth term of a simple counting sequence
 v = []
-for start, step, n in [(6, 6, 8), (4, 4, 9), (5, 5, 7)]:
+for start, step, n in [(6, 6, 8), (4, 4, 9), (5, 5, 7), (3, 3, 10), (7, 7, 6)]:
     f = FMT["int"]
     val = F(start) + (n - 1) * F(step)
     v.append(mk(
@@ -272,7 +272,7 @@ L1.append(fam("L1F12", "nth number", v))
 
 # 13. step size from non-adjacent terms
 v = []
-for start, step in [(5, 5), (6, 7), (10, 9)]:
+for start, step in [(5, 5), (6, 7), (10, 9), (4, 6), (8, 11)]:
     f = FMT["int"]
     v.append(mk(
         "Two numbers are missing. What is the step size?",
@@ -286,7 +286,7 @@ L1.append(fam("L1F13", "step from a gap", v))
 
 # 14. counting back in large steps
 v = []
-for start, step, shown in [(100, -12, 3), (200, -25, 3), (150, -15, 3)]:
+for start, step, shown in [(100, -12, 3), (200, -25, 3), (150, -15, 3), (120, -20, 3), (300, -50, 3)]:
     f = FMT["int"]
     nxt = F(start) + shown * F(step)
     v.append(mk(
@@ -301,7 +301,7 @@ L1.append(fam("L1F14", "large steps", v))
 
 # 15. describe the rule in words
 v = []
-for start, step in [(11, 11), (60, -12), (7, 13)]:
+for start, step in [(11, 11), (60, -12), (7, 13), (14, 14), (80, -16)]:
     f = FMT["int"]
     word = f"count on in steps of {step}" if step > 0 else f"count back in steps of {abs(step)}"
     v.append(mk(
@@ -318,7 +318,7 @@ L1.append(fam("L1F15", "rule in words", v))
 
 # 16. fill two blanks at once
 v = []
-for start, step in [(18, 9), (33, -11), (16, 8)]:
+for start, step in [(18, 9), (33, -11), (16, 8), (21, 7), (48, -12)]:
     f = FMT["int"]
     a, b = F(start) + 3 * F(step), F(start) + 4 * F(step)
     v.append(mk(
@@ -355,7 +355,7 @@ L2 = []
 
 # 1-2. count on / back in decimal steps
 v = []
-for start, step, shown in [(F(21,10), F(3,10), 3), (F(45,10), F(2,10), 3), (F(12,10), F(4,10), 3)]:
+for start, step, shown in [(F(21,10), F(3,10), 3), (F(45,10), F(2,10), 3), (F(12,10), F(4,10), 3), (F(35,10), F(5,10), 3), (F(105,100), F(15,100), 3)]:
     f = FMT["dec"]
     nxt = start + shown * step
     v.append(mk(
@@ -369,7 +369,7 @@ for start, step, shown in [(F(21,10), F(3,10), 3), (F(45,10), F(2,10), 3), (F(12
 L2.append(fam("L2F1", "decimal count on", v))
 
 v = []
-for start, step, shown in [(F(52,10), F(-3,10), 3), (F(8,1), F(-25,100), 3), (F(41,10), F(-7,10), 3)]:
+for start, step, shown in [(F(52,10), F(-3,10), 3), (F(8,1), F(-25,100), 3), (F(41,10), F(-7,10), 3), (F(63,10), F(-4,10), 3), (F(5,1), F(-15,100), 3)]:
     f = FMT["dec"]
     nxt = start + shown * step
     v.append(mk(
@@ -384,7 +384,7 @@ L2.append(fam("L2F2", "decimal count back", v))
 
 # 3. crossing a whole number
 v = []
-for start, step, shown in [(F(88,100), F(6,100), 4), (F(96,10), F(3,10), 3), (F(185,100), F(5,100), 4)]:
+for start, step, shown in [(F(88,100), F(6,100), 4), (F(96,10), F(3,10), 3), (F(185,100), F(5,100), 4), (F(94,100), F(4,100), 3), (F(88,10), F(6,10), 3)]:
     f = FMT["dec"]
     nxt = start + shown * step
     v.append(mk(
@@ -399,7 +399,7 @@ L2.append(fam("L2F3", "crossing a whole", v))
 
 # 4. find the decimal step
 v = []
-for start, step in [(F(13,10), F(4,10), ), (F(25,100), F(15,100)), (F(6,1), F(-45,100))]:
+for start, step in [(F(13,10), F(4,10), ), (F(25,100), F(15,100)), (F(6,1), F(-45,100)), (F(24,10), F(7,10)), (F(45,100), F(25,100))]:
     f = FMT["dec"]
     v.append(mk(
         "What is the step size?",
@@ -413,7 +413,7 @@ L2.append(fam("L2F4", "find decimal step", v))
 
 # 5. missing decimal term
 v = []
-for start, step, gap in [(F(34,10), F(6,10), 2), (F(9,10), F(-15,100), 1), (F(72,100), F(9,100), 2)]:
+for start, step, gap in [(F(34,10), F(6,10), 2), (F(9,10), F(-15,100), 1), (F(72,100), F(9,100), 2), (F(52,10), F(-4,10), 2), (F(15,100), F(12,100), 1)]:
     f = FMT["dec"]
     val = start + gap * step
     v.append(mk(
@@ -428,7 +428,7 @@ L2.append(fam("L2F5", "missing decimal", v))
 
 # 6. decimal odd one out
 v = []
-for start, step, bad_pos, off in [(F(2,10), F(3,10), 3, F(1,10)), (F(15,10), F(25,100), 2, F(5,100)), (F(4,1), F(-4,10), 3, F(1,10))]:
+for start, step, bad_pos, off in [(F(2,10), F(3,10), 3, F(1,10)), (F(15,10), F(25,100), 2, F(5,100)), (F(4,1), F(-4,10), 3, F(1,10)), (F(3,10), F(2,10), 3, F(1,10)), (F(25,10), F(5,10), 2, F(2,10))]:
     f = FMT["dec"]
     s = [start + i * step for i in range(5)]
     disp = [f(x) for x in s]; disp[bad_pos] = f(s[bad_pos] + off)
@@ -444,7 +444,7 @@ L2.append(fam("L2F6", "decimal error", v))
 
 # 7. decimals below zero
 v = []
-for start, step, shown in [(F(6,10), F(-3,10), 3), (F(1,1), F(-4,10), 3), (F(75,100), F(-25,100), 4)]:
+for start, step, shown in [(F(6,10), F(-3,10), 3), (F(1,1), F(-4,10), 3), (F(75,100), F(-25,100), 4), (F(8,10), F(-4,10), 3), (F(5,10), F(-25,100), 3)]:
     f = FMT["dec"]
     nxt = start + shown * step
     v.append(mk(
@@ -459,7 +459,7 @@ L2.append(fam("L2F7", "negative decimals", v))
 
 # 8. nth decimal term
 v = []
-for start, step, n in [(F(5,10), F(5,10), 8), (F(2,10), F(3,10), 7), (F(11,10), F(2,10), 9)]:
+for start, step, n in [(F(5,10), F(5,10), 8), (F(2,10), F(3,10), 7), (F(11,10), F(2,10), 9), (F(4,10), F(4,10), 6), (F(15,10), F(25,100), 8)]:
     f = FMT["dec"]
     val = start + (n - 1) * step
     v.append(mk(
@@ -474,7 +474,7 @@ L2.append(fam("L2F8", "nth decimal", v))
 
 # 9. money context
 v = []
-for start, step, weeks in [(F(1250,100), F(-175,100), 3), (F(2,1), F(45,100), 4), (F(30,1), F(-25,10), 5)]:
+for start, step, weeks in [(F(1250,100), F(-175,100), 3), (F(2,1), F(45,100), 4), (F(30,1), F(-25,10), 5), (F(2050,100), F(-250,100), 4), (F(5,1), F(125,100), 3)]:
     f = FMT["dec"]
     end = start + weeks * step
     word = "spends" if step < 0 else "saves"
@@ -489,7 +489,7 @@ L2.append(fam("L2F9", "decimal word problem", v))
 
 # 10. two decimal gaps
 v = []
-for start, step in [(F(14,10), F(3,10)), (F(5,1), F(-15,100)), (F(23,100), F(11,100))]:
+for start, step in [(F(14,10), F(3,10)), (F(5,1), F(-15,100)), (F(23,100), F(11,100)), (F(26,10), F(4,10)), (F(8,1), F(-25,100))]:
     f = FMT["dec"]
     a, b = start + 3 * step, start + 4 * step
     v.append(mk(
@@ -504,7 +504,7 @@ L2.append(fam("L2F10", "fill two gaps", v))
 
 # 11. which sequence has the given step
 v = []
-for step, base in [(F(25,100), F(1,1)), (F(6,10), F(2,1)), (F(-15,100), F(3,1))]:
+for step, base in [(F(25,100), F(1,1)), (F(6,10), F(2,1)), (F(-15,100), F(3,1)), (F(5,10), F(1,1)), (F(-2,10), F(4,1))]:
     f = FMT["dec"]
     good = ", ".join(f(base + i * step) for i in range(4))
     w1 = ", ".join(f(base + i * (step + F(5,100))) for i in range(4))
@@ -520,7 +520,7 @@ L2.append(fam("L2F11", "match the step", v))
 
 # 12. backwards to find the start
 v = []
-for third, step in [(F(46,10), F(4,10)), (F(2,1), F(-3,10)), (F(125,100), F(15,100))]:
+for third, step in [(F(46,10), F(4,10)), (F(2,1), F(-3,10)), (F(125,100), F(15,100)), (F(52,10), F(6,10)), (F(3,1), F(-25,100))]:
     f = FMT["dec"]
     first = third - 2 * step
     v.append(mk(
@@ -535,7 +535,7 @@ L2.append(fam("L2F12", "find the start", v))
 
 # 13. how many steps
 v = []
-for a, step, jumps in [(F(15,10), F(5,10), 6), (F(2,1), F(25,100), 8), (F(10,1), F(-4,10), 5)]:
+for a, step, jumps in [(F(15,10), F(5,10), 6), (F(2,1), F(25,100), 8), (F(10,1), F(-4,10), 5), (F(3,1), F(5,10), 7), (F(12,1), F(-25,100), 6)]:
     f = FMT["dec"]
     b = a + jumps * step
     v.append(mk(
@@ -549,21 +549,29 @@ L2.append(fam("L2F13", "count decimal steps", v))
 
 # 14. measurement context
 v = []
-for start, step, n in [(F(125,100), F(15,100), 4), (F(3,1), F(-35,100), 4), (F(48,10), F(6,10), 3)]:
+for start, step, n in [(F(125,100), F(15,100), 4), (F(3,1), F(-35,100), 4), (F(48,10), F(6,10), 3), (F(1,1), F(25,100), 4), (F(24,10), F(3,10), 5)]:
     f = FMT["dec"]
     end = start + n * step
+    if step > 0:
+        stem = (f"A plant is {f(start)} m tall and grows {f(step)} m each month. "
+                f"How tall is it after {n} months?")
+    else:
+        stem = (f"A candle is {f(start)} cm long and burns down {f(-step)} cm every hour. "
+                f"How long is it after {n} hours?")
+    unit = " m" if step > 0 else " cm"
     v.append(mk(
-        f"A plant is {f(start)} m tall and changes by {f(step)} m each month. How tall after {n} months?",
-        f(end) + " m",
-        [f(end - step) + " m", f(end + step) + " m", f(start + step) + " m"],
-        f"{n} equal changes of {f(step)}.",
-        f"<code>{n} x {f(step)} = {f(n*step)}</code>, so <code>{f(start)} + {f(n*step)} = {f(end)}</code> m.",
+        stem,
+        f(end) + unit,
+        [f(end - step) + unit, f(end + step) + unit, f(start + step) + unit],
+        f"That is {n} equal changes of {f(abs(step))}.",
+        f"<code>{n} &times; {f(abs(step))} = {f(n*abs(step))}</code>, so "
+        f"<code>{f(start)} {'+' if step>0 else '&minus;'} {f(n*abs(step))} = {f(end)}</code>{unit}.",
     ))
 L2.append(fam("L2F14", "measures", v))
 
 # 15. mixed step sizes trap
 v = []
-for start, step in [(F(3,10), F(3,10)), (F(7,10), F(2,10)), (F(105,100), F(5,100))]:
+for start, step in [(F(3,10), F(3,10)), (F(7,10), F(2,10)), (F(105,100), F(5,100)), (F(6,10), F(6,10)), (F(25,100), F(25,100))]:
     f = FMT["dec"]
     v.append(mk(
         "Which statement is true about this sequence?",
@@ -579,7 +587,7 @@ L2.append(fam("L2F15", "true statement", v))
 
 # 16. count on 3 steps
 v = []
-for start, step in [(F(19,10), F(4,10)), (F(52,100), F(13,100)), (F(9,1), F(-45,100))]:
+for start, step in [(F(19,10), F(4,10)), (F(52,100), F(13,100)), (F(9,1), F(-45,100)), (F(25,10), F(6,10)), (F(4,1), F(-35,100))]:
     f = FMT["dec"]
     val = start + 3 * step
     v.append(mk(
@@ -617,7 +625,7 @@ def frac_word(step):
 
 # 1. count back in thirds (from the study guide)
 v = []
-for start, den, shown in [(F(3), 3, 3), (F(4), 4, 3), (F(5), 5, 3)]:
+for start, den, shown in [(F(3), 3, 3), (F(4), 4, 3), (F(5), 5, 3), (F(2), 2, 3), (F(4), 8, 3)]:
     f = FMT["frac"]; step = F(-1, den)
     nxt = start + shown * step
     v.append(mk(
@@ -632,7 +640,7 @@ L3.append(fam("L3F1", "count back in fractions", v))
 
 # 2. count on in fractions
 v = []
-for start, num, den, shown in [(F(1,2), 1, 2, 3), (F(1,4), 1, 4, 4), (F(2,5), 1, 5, 4)]:
+for start, num, den, shown in [(F(1,2), 1, 2, 3), (F(1,4), 1, 4, 4), (F(2,5), 1, 5, 4), (F(1,3), 1, 3, 3), (F(1,8), 3, 8, 3)]:
     f = FMT["frac"]; step = F(num, den)
     nxt = start + shown * step
     v.append(mk(
@@ -647,7 +655,7 @@ L3.append(fam("L3F2", "count on in fractions", v))
 
 # 3. find the fraction step
 v = []
-for start, num, den in [(F(1,3), 1, 3), (F(1,4), 3, 4), (F(2,5), 2, 5)]:
+for start, num, den in [(F(1,3), 1, 3), (F(1,4), 3, 4), (F(2,5), 2, 5), (F(1,6), 1, 6), (F(1,8), 3, 8)]:
     f = FMT["frac"]; step = F(num, den)
     v.append(mk(
         "What is the step size?",
@@ -661,7 +669,7 @@ L3.append(fam("L3F3", "find fraction step", v))
 
 # 4. crossing a whole number with fractions
 v = []
-for start, num, den, shown in [(F(2,3), 1, 3, 2), (F(3,4), 1, 4, 2), (F(4,5), 2, 5, 2)]:
+for start, num, den, shown in [(F(2,3), 1, 3, 2), (F(3,4), 1, 4, 2), (F(4,5), 2, 5, 2), (F(5,6), 1, 6, 2), (F(7,8), 1, 8, 2)]:
     f = FMT["frac"]; step = F(num, den)
     nxt = start + shown * step
     v.append(mk(
@@ -676,7 +684,7 @@ L3.append(fam("L3F4", "fractions past a whole", v))
 
 # 5. missing fraction term
 v = []
-for start, num, den, gap in [(F(1,2), 1, 2, 2), (F(1,3), 2, 3, 1), (F(3,4), 1, 4, 2)]:
+for start, num, den, gap in [(F(1,2), 1, 2, 2), (F(1,3), 2, 3, 1), (F(3,4), 1, 4, 2), (F(1,6), 1, 6, 2), (F(1,8), 3, 8, 1)]:
     f = FMT["frac"]; step = F(num, den)
     val = start + gap * step
     v.append(mk(
@@ -691,7 +699,7 @@ L3.append(fam("L3F5", "missing fraction", v))
 
 # 6. fractions below zero
 v = []
-for start, den, shown in [(F(2,3), 3, 3), (F(1,2), 2, 2), (F(3,4), 4, 4)]:
+for start, den, shown in [(F(2,3), 3, 3), (F(1,2), 2, 2), (F(3,4), 4, 4), (F(1,3), 3, 3), (F(2,5), 5, 4)]:
     f = FMT["frac"]; step = F(-1, den)
     nxt = start + shown * step
     v.append(mk(
@@ -706,7 +714,7 @@ L3.append(fam("L3F6", "negative fractions", v))
 
 # 7. nth fraction term
 v = []
-for start, num, den, n in [(F(1,4), 1, 4, 9), (F(1,3), 1, 3, 7), (F(1,5), 2, 5, 6)]:
+for start, num, den, n in [(F(1,4), 1, 4, 9), (F(1,3), 1, 3, 7), (F(1,5), 2, 5, 6), (F(1,6), 1, 6, 7), (F(1,2), 1, 2, 8)]:
     f = FMT["frac"]; step = F(num, den)
     val = start + (n - 1) * step
     v.append(mk(
@@ -721,7 +729,7 @@ L3.append(fam("L3F7", "nth fraction", v))
 
 # 8. equivalent step spotted differently
 v = []
-for start, num, den, alt in [(F(0), 2, 4, "1/2"), (F(0), 2, 6, "1/3"), (F(0), 5, 10, "1/2")]:
+for start, num, den, alt in [(F(0), 2, 4, "1/2"), (F(0), 2, 6, "1/3"), (F(0), 5, 10, "1/2"), (F(0), 3, 6, "1/2"), (F(0), 4, 8, "1/2")]:
     f = FMT["frac"]; step = F(num, den)
     v.append(mk(
         f"The step is written as {num}/{den}. Which is the same size?",
@@ -734,7 +742,7 @@ L3.append(fam("L3F8", "equivalent steps", v))
 
 # 9. fraction odd one out
 v = []
-for start, num, den, bad_pos in [(F(1,3), 1, 3, 3), (F(1,4), 1, 4, 2), (F(2,5), 1, 5, 3)]:
+for start, num, den, bad_pos in [(F(1,3), 1, 3, 3), (F(1,4), 1, 4, 2), (F(2,5), 1, 5, 3), (F(1,6), 1, 6, 3), (F(1,2), 1, 2, 2)]:
     f = FMT["frac"]; step = F(num, den)
     s = [start + i * step for i in range(5)]
     bad = s[bad_pos] + F(1, den)
@@ -751,7 +759,7 @@ L3.append(fam("L3F9", "fraction error", v))
 
 # 10. mixed number subtraction
 v = []
-for whole, num, den in [(3, 1, 3), (4, 1, 4), (5, 2, 5)]:
+for whole, num, den in [(3, 1, 3), (4, 1, 4), (5, 2, 5), (6, 1, 6), (2, 1, 2)]:
     f = FMT["frac"]
     start = F(whole)
     step = F(-num, den)
@@ -767,7 +775,7 @@ L3.append(fam("L3F10", "four fraction jumps", v))
 
 # 11. pizza / cake context
 v = []
-for den, eaten, start_whole in [(4, 3, 2), (3, 2, 3), (8, 5, 2)]:
+for den, eaten, start_whole in [(4, 3, 2), (3, 2, 3), (8, 5, 2), (6, 4, 2), (5, 3, 3)]:
     f = FMT["frac"]
     left = F(start_whole) - F(eaten, den)
     v.append(mk(
@@ -781,7 +789,7 @@ L3.append(fam("L3F11", "fraction word problem", v))
 
 # 12. how many fraction steps
 v = []
-for den, jumps in [(3, 6), (4, 7), (5, 8)]:
+for den, jumps in [(3, 6), (4, 7), (5, 8), (6, 4), (8, 5)]:
     f = FMT["frac"]
     a = F(0); b = F(jumps, den)
     v.append(mk(
@@ -795,7 +803,7 @@ L3.append(fam("L3F12", "count fraction steps", v))
 
 # 13. two fraction gaps
 v = []
-for start, num, den in [(F(1,2), 1, 2), (F(1,3), 1, 3), (F(1,4), 3, 4)]:
+for start, num, den in [(F(1,2), 1, 2), (F(1,3), 1, 3), (F(1,4), 3, 4), (F(1,6), 1, 6), (F(1,8), 3, 8)]:
     f = FMT["frac"]; step = F(num, den)
     a, b = start + 3 * step, start + 4 * step
     v.append(mk(
@@ -810,7 +818,7 @@ L3.append(fam("L3F13", "fill two gaps", v))
 
 # 14. fraction vs decimal step
 v = []
-for den, dec in [(2, "0.5"), (4, "0.25"), (5, "0.2")]:
+for den, dec in [(2, "0.5"), (4, "0.25"), (5, "0.2"), (8, "0.125"), (25, "0.04")]:
     v.append(mk(
         f"A sequence counts on in steps of 1/{den}. What is the same step as a decimal?",
         dec,
@@ -822,7 +830,7 @@ L3.append(fam("L3F14", "fraction to decimal", v))
 
 # 15. find the start
 v = []
-for third, num, den in [(F(2), 1, 3), (F(3), 1, 4), (F(5,2), 1, 2)]:
+for third, num, den in [(F(2), 1, 3), (F(3), 1, 4), (F(5,2), 1, 2), (F(3), 1, 6), (F(4), 3, 8)]:
     f = FMT["frac"]; step = F(num, den)
     first = third - 2 * step
     v.append(mk(
@@ -837,7 +845,7 @@ L3.append(fam("L3F15", "find the start", v))
 
 # 16. compare two fraction sequences
 v = []
-for den_a, den_b in [(3, 4), (5, 2), (8, 3)]:
+for den_a, den_b in [(3, 4), (5, 2), (8, 3), (6, 3), (4, 10)]:
     f = FMT["frac"]
     v.append(mk(
         f"Sequence A counts on in 1/{den_a}. Sequence B counts on in 1/{den_b}. Which grows faster?",
@@ -871,7 +879,7 @@ L4 = []
 
 # 1. temperature drop
 v = []
-for start, step, n in [(5, -3, 3), (8, -5, 3), (2, -4, 2)]:
+for start, step, n in [(5, -3, 3), (8, -5, 3), (2, -4, 2), (4, -6, 2), (7, -4, 3)]:
     f = FMT["int"]
     end = F(start) + n * F(step)
     v.append(mk(
@@ -885,7 +893,7 @@ L4.append(fam("L4F1", "temperature", v))
 
 # 2. continue into negatives
 v = []
-for start, step, shown in [(4, -6, 3), (9, -7, 3), (3, -8, 3)]:
+for start, step, shown in [(4, -6, 3), (9, -7, 3), (3, -8, 3), (5, -9, 3), (2, -5, 3)]:
     f = FMT["int"]
     nxt = F(start) + shown * F(step)
     v.append(mk(
@@ -900,7 +908,7 @@ L4.append(fam("L4F2", "into the negatives", v))
 
 # 3. counting UP from a negative
 v = []
-for start, step, shown in [(-14, 5, 3), (-18, 6, 3), (-21, 7, 3)]:
+for start, step, shown in [(-14, 5, 3), (-18, 6, 3), (-21, 7, 3), (-24, 8, 3), (-16, 4, 3)]:
     f = FMT["int"]
     nxt = F(start) + shown * F(step)
     v.append(mk(
@@ -915,7 +923,7 @@ L4.append(fam("L4F3", "up from negatives", v))
 
 # 4. difference across zero
 v = []
-for a, b in [(-6, 9), (-12, 4), (-7, 15)]:
+for a, b in [(-6, 9), (-12, 4), (-7, 15), (-9, 6), (-5, 11)]:
     v.append(mk(
         f"How far is it from {a} to {b} on a number line?",
         str(b - a),
@@ -925,21 +933,26 @@ for a, b in [(-6, 9), (-12, 4), (-7, 15)]:
     ))
 L4.append(fam("L4F4", "distance across zero", v))
 
-# 5. which is smaller
+# 5. which is smallest (cuatro numeros reales, sin opciones de relleno)
 v = []
-for a, b in [(-8, -3), (-15, -20), (-1, -9)]:
+for quad in [[-8, -3, -11, -5], [-2, -9, -14, -6], [-1, -7, -4, -12],
+             [-5, -13, -8, -2], [-16, -4, -10, -7]]:
+    lo = min(quad)
+    others = [str(x) for x in quad if x != lo]
     v.append(mk(
-        f"Which number is smaller: {a} or {b}?",
-        str(min(a, b)),
-        [str(max(a, b)), "They are equal", "You cannot compare negatives"],
-        "On a number line, further left = smaller.",
-        f"<code>{min(a,b)}</code> is further left on the number line, so it is smaller.",
+        "Which of these numbers is the smallest?",
+        str(lo),
+        others,
+        "On a number line, further left = smaller. The minus sign flips your usual thinking.",
+        f"All four are below zero. <code>{lo}</code> sits furthest to the left on the number line, "
+        f"so it is the smallest &mdash; even though {abs(lo)} is the biggest digit.",
+        seq=[str(x) for x in quad],
     ))
 L4.append(fam("L4F5", "compare negatives", v))
 
 # 6. negative decimals
 v = []
-for start, step, shown in [(F(-12,10), F(-3,10), 3), (F(-25,100), F(-25,100), 3), (F(-2,1), F(-4,10), 3)]:
+for start, step, shown in [(F(-12,10), F(-3,10), 3), (F(-25,100), F(-25,100), 3), (F(-2,1), F(-4,10), 3), (F(-8,10), F(-4,10), 3), (F(-15,100), F(-15,100), 3)]:
     f = FMT["dec"]
     nxt = start + shown * step
     v.append(mk(
@@ -954,7 +967,7 @@ L4.append(fam("L4F6", "negative decimals", v))
 
 # 7. missing term crossing zero
 v = []
-for start, step, gap in [(7, -5, 2), (11, -6, 3), (6, -4, 2)]:
+for start, step, gap in [(7, -5, 2), (11, -6, 3), (6, -4, 2), (8, -6, 2), (9, -5, 3)]:
     f = FMT["int"]
     val = F(start) + gap * F(step)
     v.append(mk(
@@ -969,7 +982,7 @@ L4.append(fam("L4F7", "gap across zero", v))
 
 # 8. depth / sea level context
 v = []
-for start, step, n in [(-30, 12, 3), (-45, 15, 2), (-24, 8, 4)]:
+for start, step, n in [(-30, 8, 3), (-45, 15, 2), (-24, 5, 4), (-50, 12, 4), (-28, 9, 3)]:
     f = FMT["int"]
     end = F(start) + n * F(step)
     v.append(mk(
@@ -983,7 +996,7 @@ L4.append(fam("L4F8", "depth problem", v))
 
 # 9. find the step in a negative sequence
 v = []
-for start, step in [(-20, 6), (-9, -4), (-15, 5)]:
+for start, step in [(-20, 6), (-9, -4), (-15, 5), (-30, 7), (-12, -5)]:
     f = FMT["int"]
     v.append(mk(
         "What is the step size?",
@@ -997,7 +1010,7 @@ L4.append(fam("L4F9", "step with negatives", v))
 
 # 10. order negatives
 v = []
-for trio in [[-3, -11, -7], [-2, -9, -5], [-14, -6, -20]]:
+for trio in [[-3, -11, -7], [-2, -9, -5], [-14, -6, -20], [-5, -13, -8], [-4, -16, -10]]:
     good = ", ".join(str(x) for x in sorted(trio))
     w1 = ", ".join(str(x) for x in sorted(trio, reverse=True))
     w2 = ", ".join(str(abs(x)) for x in sorted(trio, key=abs))
@@ -1012,7 +1025,7 @@ L4.append(fam("L4F10", "ordering", v))
 
 # 11. how many steps to reach a negative
 v = []
-for start, step, jumps in [(12, -4, 5), (10, -3, 6), (18, -6, 4)]:
+for start, step, jumps in [(12, -4, 5), (10, -3, 6), (18, -6, 4), (14, -5, 5), (20, -8, 4)]:
     end = start + step * jumps
     v.append(mk(
         f"Counting back in {abs(step)}s from {start}, how many steps to reach {end}?",
@@ -1025,7 +1038,7 @@ L4.append(fam("L4F11", "steps to a negative", v))
 
 # 12. negative fractions
 v = []
-for start, den, shown in [(F(1,2), 2, 3), (F(1,3), 3, 3), (F(1,4), 4, 3)]:
+for start, den, shown in [(F(1,2), 2, 3), (F(1,3), 3, 3), (F(1,4), 4, 3), (F(1,5), 5, 3), (F(1,6), 6, 3)]:
     f = FMT["frac"]; step = F(-1, den)
     nxt = start + shown * step
     v.append(mk(
@@ -1040,7 +1053,7 @@ L4.append(fam("L4F12", "negative fractions", v))
 
 # 13. temperature rise/fall difference
 v = []
-for morning, night in [(-4, 7), (-9, 3), (-2, 12)]:
+for morning, night in [(-4, 7), (-9, 3), (-2, 12), (-6, 5), (-3, 9)]:
     v.append(mk(
         f"At night the temperature is {morning}&deg;C. By midday it is {night}&deg;C. How much did it rise?",
         str(night - morning) + "°C",
@@ -1052,7 +1065,7 @@ L4.append(fam("L4F13", "temperature rise", v))
 
 # 14. spot the error across zero
 v = []
-for start, step, bad_pos in [(9, -4, 3), (6, -5, 3), (12, -7, 3)]:
+for start, step, bad_pos in [(9, -4, 3), (6, -5, 3), (12, -7, 3), (10, -6, 3), (8, -6, 3)]:
     f = FMT["int"]
     s = [F(start) + i * F(step) for i in range(5)]
     bad = -s[bad_pos] if s[bad_pos] < 0 else s[bad_pos] + 1
@@ -1069,7 +1082,7 @@ L4.append(fam("L4F14", "error across zero", v))
 
 # 15. mixed: negative decimal nth term
 v = []
-for start, step, n in [(F(2,1), F(-3,10), 8), (F(1,1), F(-25,100), 7), (F(3,1), F(-4,10), 9)]:
+for start, step, n in [(F(2,1), F(-3,10), 8), (F(1,1), F(-25,100), 7), (F(3,1), F(-4,10), 9), (F(2,1), F(-25,100), 9), (F(4,1), F(-5,10), 10)]:
     f = FMT["dec"]
     val = start + (n - 1) * step
     v.append(mk(
@@ -1084,7 +1097,7 @@ L4.append(fam("L4F15", "negative nth term", v))
 
 # 16. which sequence crosses zero
 v = []
-for step, base in [(4, 6), (5, 8), (3, 5)]:
+for step, base in [(4, 6), (5, 8), (3, 5), (6, 10), (7, 12)]:
     f = FMT["int"]
     good = ", ".join(f(F(base) - i * F(step)) for i in range(4))
     w1 = ", ".join(f(F(base) + i * F(step)) for i in range(4))
@@ -1130,7 +1143,7 @@ def terms(m, c, n=4):
 
 # 1. identify the rule (multiples only) - from the study guide
 v = []
-for m in [8, 6, 9]:
+for m in [8, 6, 9, 7, 12]:
     good = rule_text(m, 0)
     v.append(mk(
         "What is the position-to-term rule?",
@@ -1145,7 +1158,7 @@ L5.append(fam("L5F1", "find the rule", v))
 
 # 2. value at a position (multiples)
 v = []
-for m, n in [(8, 10), (7, 12), (9, 11)]:
+for m, n in [(8, 10), (7, 12), (9, 11), (6, 13), (11, 9)]:
     v.append(mk(
         f"What is the value of the term in the {n}th position?",
         str(m * n),
@@ -1158,7 +1171,7 @@ L5.append(fam("L5F2", "value at position", v))
 
 # 3. position of a value (multiples)
 v = []
-for m, pos in [(8, 12), (6, 15), (9, 14)]:
+for m, pos in [(8, 12), (6, 15), (9, 14), (7, 13), (12, 11)]:
     val = m * pos
     v.append(mk(
         f"What is the position of the term with a value of {val}?",
@@ -1172,7 +1185,7 @@ L5.append(fam("L5F3", "position of a value", v))
 
 # 4. two-step rule identification
 v = []
-for m, c in [(3, 2), (4, 1), (5, -1)]:
+for m, c in [(3, 2), (4, 1), (5, -1), (2, 3), (6, 2)]:
     good = rule_text(m, c)
     v.append(mk(
         "What is the position-to-term rule?",
@@ -1186,7 +1199,7 @@ L5.append(fam("L5F4", "two-step rule", v))
 
 # 5. value at position (two-step)
 v = []
-for m, c, n in [(3, 2, 10), (4, 1, 12), (6, -2, 9)]:
+for m, c, n in [(3, 2, 10), (4, 1, 12), (6, -2, 9), (7, 3, 8), (2, 6, 15)]:
     val = m * n + c
     v.append(mk(
         f"The rule is: {rule_text(m, c).lower()}. What is the {n}th term?",
@@ -1199,7 +1212,7 @@ L5.append(fam("L5F5", "two-step value", v))
 
 # 6. position from value (two-step)
 v = []
-for m, c, pos in [(3, 2, 20), (5, 1, 14), (4, -3, 16)]:
+for m, c, pos in [(3, 2, 20), (5, 1, 14), (4, -3, 16), (6, 2, 12), (8, 3, 9)]:
     val = m * pos + c
     v.append(mk(
         f"The rule is: {rule_text(m, c).lower()}. Which position has the value {val}?",
@@ -1210,24 +1223,37 @@ for m, c, pos in [(3, 2, 20), (5, 1, 14), (4, -3, 16)]:
     ))
 L5.append(fam("L5F6", "two-step position", v))
 
-# 7. is N a term in this sequence?
+# 7. is N a term in this sequence? (con razon, no solo si/no)
 v = []
-for m, test, yes in [(8, 96, True), (7, 50, False), (6, 84, True)]:
-    ans = "Yes" if yes else "No"
+for m, test, yes in [(8, 96, True), (7, 50, False), (6, 84, True), (9, 60, False), (4, 72, True)]:
+    pos = test // m
+    if yes:
+        correct = f"Yes &mdash; it is the {pos}th term"
+        wrongs = [f"Yes &mdash; it is the {test}th term",
+                  f"No &mdash; {test} is not in the {m} times table",
+                  f"No &mdash; the sequence stops at {m*4}"]
+        why = (f"<code>{test} &divide; {m} = {pos}</code> exactly, so {test} is the {pos}th term. "
+               f"The rule keeps going for ever, so the sequence does not stop at the four terms shown.")
+    else:
+        correct = f"No &mdash; {test} is not in the {m} times table"
+        wrongs = [f"Yes &mdash; it is the {test}th term",
+                  f"Yes &mdash; it is the {m}th term",
+                  f"No &mdash; {test} is too big for this sequence"]
+        why = (f"<code>{test} &divide; {m} = {test/m:.2f}</code>, which is not a whole number, "
+               f"so no position gives {test}. Size is not the problem &mdash; the sequence goes on for ever.")
     v.append(mk(
         f"The rule is: multiply the position by {m}. Is {test} a term in this sequence?",
-        ans,
-        ["Yes" if not yes else "No", "Only if the sequence is long enough", "There is not enough information"],
-        f"Divide {test} by {m}. If you get a whole number, it is a term.",
-        (f"<code>{test} / {m} = {test//m}</code> exactly, so yes &mdash; it is the {test//m}th term."
-         if yes else
-         f"<code>{test} / {m} = {test/m:.2f}</code>, not a whole number, so no."),
+        correct, wrongs,
+        f"Divide {test} by {m}. A whole-number answer means it IS a term, and tells you its position.",
+        why,
+        seq=[str(t) for t in terms(m, 0)] + ["..."],
+        sub="The first four terms are shown. The sequence carries on for ever.",
     ))
 L5.append(fam("L5F7", "is it a term", v))
 
 # 8. large position
 v = []
-for m, c, n in [(8, 0, 100), (3, 1, 50), (5, -2, 40)]:
+for m, c, n in [(8, 0, 100), (3, 1, 50), (5, -2, 40), (4, 0, 200), (7, 2, 60)]:
     val = m * n + c
     v.append(mk(
         f"Using the rule {rule_text(m, c).lower()}, what is the {n}th term?",
@@ -1240,7 +1266,7 @@ L5.append(fam("L5F8", "far position", v))
 
 # 9. match sequence to rule
 v = []
-for m, c in [(4, 1), (3, 5), (6, -1)]:
+for m, c in [(4, 1), (3, 5), (6, -1), (5, 2), (2, 7)]:
     good = ", ".join(str(t) for t in terms(m, c))
     w1 = ", ".join(str(t) for t in terms(m, 0))
     w2 = ", ".join(str(t) for t in terms(m, -c if c else 2))
@@ -1255,7 +1281,7 @@ L5.append(fam("L5F9", "match rule", v))
 
 # 10. position-to-term vs term-to-term
 v = []
-for m in [7, 9, 4]:
+for m in [7, 9, 4, 6, 8]:
     v.append(mk(
         f"A sequence has the rule: multiply the position by {m}. Which statement is also true?",
         f"Each term is {m} more than the one before it.",
@@ -1269,7 +1295,7 @@ L5.append(fam("L5F10", "rule types", v))
 
 # 11. build the rule from a described sequence
 v = []
-for m, c in [(10, -3, ), (2, 5), (7, 2)]:
+for m, c in [(10, -3, ), (2, 5), (7, 2), (4, 3), (9, -2)]:
     good = rule_text(m, c)
     v.append(mk(
         "These are the first four terms. What is the position-to-term rule?",
@@ -1283,7 +1309,7 @@ L5.append(fam("L5F11", "build the rule", v))
 
 # 12. missing term using the rule
 v = []
-for m, c, gap in [(8, 0, 5), (3, 4, 6), (5, 3, 7)]:
+for m, c, gap in [(8, 0, 5), (3, 4, 6), (5, 3, 7), (6, 0, 8), (4, 5, 9)]:
     val = m * gap + c
     shown = [str(t) for t in terms(m, c, 4)] + ["..."] + ["?"]
     v.append(mk(
@@ -1298,7 +1324,7 @@ L5.append(fam("L5F12", "term from rule", v))
 
 # 13. word problem with a rule
 v = []
-for m, c, n in [(4, 2, 12), (6, 3, 9), (5, 1, 15)]:
+for m, c, n in [(4, 2, 12), (6, 3, 9), (5, 1, 15), (3, 4, 14), (7, 2, 10)]:
     val = m * n + c
     v.append(mk(
         f"A pattern of tiles uses {m} tiles for each step plus {c} extra tiles at the start. How many tiles in pattern number {n}?",
@@ -1311,7 +1337,7 @@ L5.append(fam("L5F13", "pattern problem", v))
 
 # 14. which position gives a value (two-step, harder)
 v = []
-for m, c, pos in [(9, 4, 11), (7, -5, 13), (12, 6, 8)]:
+for m, c, pos in [(9, 4, 11), (7, -5, 13), (12, 6, 8), (6, 5, 14), (8, -3, 12)]:
     val = m * pos + c
     v.append(mk(
         f"Rule: {rule_text(m, c).lower()}. A term has the value {val}. What is its position?",
@@ -1323,22 +1349,30 @@ for m, c, pos in [(9, 4, 11), (7, -5, 13), (12, 6, 8)]:
 L5.append(fam("L5F14", "reverse the rule", v))
 
 # 15. compare two rules
+# 15. dos reglas: cuanto se separan (respuesta numerica, sin opciones de relleno)
 v = []
-for (m1, c1), (m2, c2), n in [((3, 5), (4, 1), 6), ((5, 2), (6, -2), 5), ((2, 9), (3, 1), 7)]:
+for (m1, c1), (m2, c2), n in [((3, 5), (4, 1), 8), ((5, 2), (6, -2), 7), ((2, 9), (3, 1), 10),
+                              ((4, 3), (6, -5), 6), ((7, 1), (5, 9), 5)]:
     a, b = m1 * n + c1, m2 * n + c2
-    bigger = "Sequence A" if a > b else ("Sequence B" if b > a else "They are equal")
+    assert a != b, ("los dos terminos coinciden", m1, c1, m2, c2, n)
+    diff = abs(a - b)
     v.append(mk(
-        f"Sequence A: {rule_text(m1,c1).lower()}. Sequence B: {rule_text(m2,c2).lower()}. Which has the bigger {n}th term?",
-        bigger,
-        [("Sequence B" if bigger == "Sequence A" else "Sequence A"), "They are equal", "There is not enough information"],
-        "Work out both terms, then compare.",
-        f"A: <code>{n} x {m1} {'+' if c1>0 else '-'} {abs(c1)} = {a}</code>. B: <code>{n} x {m2} {'+' if c2>0 else '-'} {abs(c2)} = {b}</code>.",
+        f"Sequence A: {rule_text(m1,c1).lower()}. "
+        f"Sequence B: {rule_text(m2,c2).lower()}. "
+        f"How much bigger is the larger {n}th term?",
+        str(diff),
+        [str(a), str(b), str(diff + n)],
+        f"Work out the {n}th term of each sequence first, then subtract the smaller from the bigger.",
+        f"A: <code>{n} &times; {m1} {'+' if c1>0 else '&minus;'} {abs(c1)} = {a}</code>. "
+        f"B: <code>{n} &times; {m2} {'+' if c2>0 else '&minus;'} {abs(c2)} = {b}</code>. "
+        f"The gap is <code>{max(a,b)} &minus; {min(a,b)} = {diff}</code>.",
+        sub=f"Both sequences start at position 1.",
     ))
 L5.append(fam("L5F15", "compare rules", v))
 
 # 16. spot the wrong term using the rule
 v = []
-for m, c, bad_pos in [(8, 0, 3), (4, 3, 2), (6, 1, 4)]:
+for m, c, bad_pos in [(8, 0, 3), (4, 3, 2), (6, 1, 4), (7, 0, 3), (5, 2, 2)]:
     t = terms(m, c, 5)
     bad = t[bad_pos] + 2
     disp = [str(x) for x in t]; disp[bad_pos] = str(bad)
