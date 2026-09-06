@@ -353,6 +353,67 @@ h3 { font-size: 12px; }
 .stars { font-family: var(--font-ui); font-size: 16px; color: var(--warn); white-space: nowrap; }
 .stars .off { color: #333c72; }
 
+/* ---------- 7b. PROGRESO, MEDALLAS Y PERFIL (v2) ----------
+   Todo lo de aqui mide al nino contra si mismo. No hay nada comparativo con
+   otros ninos: eso exigiria un servidor con datos de menores. */
+.progress { margin: 18px 0 4px; }
+.progress__head {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  font-family: var(--font-ui); font-size: 9px;
+  color: var(--ink-dim);
+  margin-bottom: 8px;
+}
+
+.medal-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+.medal {
+  display: inline-block;
+  padding: 8px 10px;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  line-height: 1.6;
+  background: var(--bg-0);
+  border: 2px solid var(--line);
+  color: var(--ink-dim);
+}
+.medal--1 { border-color: #b87333; color: #e0a06a; }   /* bronce */
+.medal--2 { border-color: #b9c4d6; color: #dce6f5; }   /* plata  */
+.medal--3 { border-color: var(--warn); color: var(--warn); }
+.medal--0 { opacity: .55; }
+
+.medals-new {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  align-items: center;
+  margin: 18px 0;
+}
+.medals-new__tag {
+  font-family: var(--font-ui); font-size: 9px; color: var(--warn);
+  width: 100%;
+}
+
+.score-lines { margin: 16px 0; font-size: 15px; display: grid; gap: 6px; }
+.score-best { color: var(--warn); font-weight: 700; }
+.score-up   { color: var(--good); font-weight: 700; }
+.score-down { color: var(--ink-dim); }
+
+.prof-lv { margin: 20px 0 10px; color: var(--accent); }
+.prof-scroll { overflow-x: auto; }
+.prof-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  line-height: 1.8;
+}
+.prof-table th, .prof-table td {
+  border: 2px solid var(--line);
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+.prof-table th { color: var(--ink-dim); background: var(--bg-0); }
+.prof-table td { color: var(--ink); }
+
 /* ---------- 8. QUESTION SCREEN ---------- */
 .stage { margin-top: 20px; padding: 22px; }
 

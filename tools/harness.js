@@ -395,13 +395,12 @@ async function main() {
   check('los 7 fallos quedan contados', histF.misses === 7, 'misses=' + histF.misses);
   check('el contador de "primer intento" descuenta esa familia y solo esa',
         histF.first === totalF - 1, 'first=' + histF.first + '/' + totalF);
-  /* HALLAZGO (no es Fase 0): stars() mide aciertos al primer intento POR FAMILIA.
-     Fallar una familia siete veces seguidas cuesta 1/16 = sigue dando 3 estrellas.
-     Es coherente con v1 pero contradice el criterio del plan ("no domina = falla
-     la misma familia 3 veces"). Decision para la Fase 3 (§4 Puntuacion).
-     El test fija el comportamiento ACTUAL para que un cambio futuro sea visible. */
-  check('[v1] tres estrellas pese a machacar una familia — comportamiento conocido',
-        savedF.levels[lvIdF].stars === 3, 'stars=' + savedF.levels[lvIdF].stars);
+  /* ARREGLADO EN LA FASE 3. Antes, fallar una familia siete veces costaba 1/16
+     y aun daba 3 estrellas: la media tapaba el atasco. Ahora hay un tope, segun
+     el criterio del plan ("no domina = falla la misma familia 3 veces"). */
+  check('atascarse en UNA familia impide las 3 estrellas',
+        savedF.levels[lvIdF].stars === 2, 'stars=' + savedF.levels[lvIdF].stars);
+  check('...pero el nivel se supera igual', savedF.levels[lvIdF].done === true);
   rf.dom.window.close();
 
   /* ---------- 3. Doble clic en NEXT no cuenta la partida dos veces ---------- */
@@ -510,6 +509,15 @@ async function main() {
   check('ofrece dos siluetas', cards.length === 2, 'siluetas=' + cards.length);
   check('las siluetas son botones de radio accesibles',
         Array.from(cards).every(c => c.getAttribute('role') === 'radio' && c.getAttribute('aria-label')));
+  /* Si las dos siluetas se parecen, elegir deja de ser una eleccion. Se compara
+     el path del pelo: es lo que las distingue en miniatura. */
+  check('las dos siluetas se distinguen de verdad',
+        (function () {
+          const p = Array.from(cards).map(c => (c.querySelector('svg path[fill="#2b1a12"]') || {}).outerHTML || '');
+          if (p[0] === p[1]) return false;
+          // Diferencia real, no un pixel: al menos 20 caracteres de path distintos.
+          return Math.abs(p[0].length - p[1].length) >= 20;
+        })());
   check('la logica no habla de genero: solo cuerpos a y b',
         !/\b(girl|boy|female|male|chica|chico)\b/i.test(fs.readFileSync(path.join(ROOT, 'assets', 'engine.js'), 'utf8')));
 
@@ -650,6 +658,130 @@ async function main() {
   check('el contenido usa el token {hero}', /\{hero\}/.test(gameSrc));
   check('la clave de guardado sigue siendo samuel-quest (no se renombra)',
         gameSrc.indexOf("'samuel-quest:'") !== -1 && gameSrc.indexOf("'samuel-quest:hero'") !== -1);
+
+  /* ============================================================
+     9. PUNTUACION v2 (Fase 3)
+     ============================================================ */
+  section('9. Tres partidas del mismo nivel: historial, delta y medallas');
+  const store = {};                       // localStorage compartido entre partidas
+  /* `after`: cuantas se aciertan antes de empezar a fallar. Importa, porque el
+     XP premia la racha: fallar la PRIMERA no rompe ninguna racha y sale gratis. */
+  function playAgain(wrongs, after) {
+    after = after || 0;
+    const d = openGame(slug, store.save, { hero: heroDone() });
+    const w = d.window, doc = w.document;
+    doc.querySelectorAll('#levelList .level-card')[0].dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+    doc.getElementById('briefGo').click();
+    const failed = {};
+    let done = 0, seen = 0;
+    while (visible(doc, 'scrPlay')) {
+      const f = findVariant(w, doc);
+      if (!f) break;
+      const fi = f.pick.fi, ans = f.pick.v.answer;
+      let choice = ans;
+      if (seen >= after && done < wrongs && !failed[fi]) {
+        choice = f.opts.map(o => o.orig).find(o => o !== ans);
+        failed[fi] = true; done++;
+      }
+      seen++;
+      clickOption(doc, choice);
+      doc.getElementById('btnNext').click();
+    }
+    store.save = JSON.parse(w.localStorage.getItem('samuel-quest:' + slug));
+    const winText = doc.getElementById('winBody').textContent;
+    w.close();
+    return { save: store.save, winText };
+  }
+
+  const lvId1 = subs[0] && 1;
+  const r1 = playAgain(2, 3);         // falla a mitad: rompe la racha
+  const r2 = playAgain(0);            // partida perfecta: debe batir el record
+  const r3 = playAgain(5, 3);         // peor: no debe bajar el record
+
+  const L1 = r3.save.levels[1];
+  check('el historial guarda las 3 partidas', L1.history.length === 3, 'entradas=' + L1.history.length);
+  check('el historial nunca pasa de 5 entradas', L1.history.length <= 5);
+  check('plays cuenta 3 partidas', L1.plays === 3, 'plays=' + L1.plays);
+  check('el record es el XP de la mejor partida, no el de la ultima',
+        L1.best === Math.max.apply(null, L1.history.map(h => h.xp)),
+        'best=' + L1.best + ' historial=' + L1.history.map(h => h.xp).join(','));
+  check('una partida peor NO baja el record', L1.best >= r2.save.levels[1].best);
+  check('la partida perfecta anuncia record personal', /NEW PERSONAL BEST/.test(r2.winText));
+  check('el delta contra la partida anterior se muestra',
+        /better than last time|below last time|Same score/.test(r3.winText), r3.winText.slice(0, 0));
+  check('la primera partida dice que es la primera', /First time through/.test(r1.winText));
+
+  /* COMPORTAMIENTO CONOCIDO, no un fallo del test: el XP premia la racha, y
+     fallar la PRIMERA pregunta no rompe ninguna racha porque el combo ya
+     estaba a cero. Una partida que falla las dos primeras saca el mismo XP
+     que una perfecta. Las estrellas y las medallas si lo penalizan, que es
+     donde se mide el dominio. Si algun dia se cambia, este test lo dira. */
+  const early = playAgain(2, 0);
+  check('[conocido] fallar las primeras preguntas no cuesta XP',
+        early.save.levels[1].history.slice(-1)[0].xp === r2.save.levels[1].best,
+        'xp con 2 fallos iniciales=' + early.save.levels[1].history.slice(-1)[0].xp +
+        ' vs perfecta=' + r2.save.levels[1].best);
+  check('...pero si cuesta estrellas y medallas',
+        early.save.levels[1].history.slice(-1)[0].first < r2.save.levels[1].history.slice(-1)[0].first);
+
+  // Antiinflacion de medallas.
+  const skills = r3.save.skills;
+  const tags = Object.keys(skills);
+  check('se registran habilidades', tags.length > 0, 'habilidades=' + tags.length);
+  check('ninguna habilidad supera 1 acierto contado por partida',
+        tags.every(t => skills[t].hits <= 3 && skills[t].firstHits <= 3),
+        JSON.stringify(skills[tags[0]]));
+  check('tras 2 partidas limpias ninguna medalla llega a plata (exige 3)',
+        (function () {
+          const two = r2.save.skills;
+          return Object.keys(two).every(t => two[t].firstHits < 3);
+        })());
+  check('tras 3 partidas alguna habilidad ya es plata',
+        tags.some(t => skills[t].firstHits >= 3), JSON.stringify(skills[tags[0]]));
+  check('ninguna llega a oro en 3 partidas (exige 5)',
+        tags.every(t => skills[t].firstHits < 5));
+  check('el save sigue por debajo de 10 KB tras 3 partidas',
+        JSON.stringify(r3.save).length < 10240, JSON.stringify(r3.save).length + ' bytes');
+
+  section('9b. Perfil y progreso en el mapa');
+  const pf = openGame(slug, store.save, { hero: heroDone() });
+  const fw = pf.window, fd = fw.document;
+  check('el mapa muestra la barra de progreso', !!fd.querySelector('#mapProgress .bar__fill'));
+  const pct = fd.querySelector('#mapProgress .bar__fill').style.width;
+  check('la barra no esta vacia tras jugar', pct && pct !== '0%', 'ancho=' + pct);
+  fd.getElementById('btnProf').click();
+  check('el perfil se abre desde el mapa', visible(fd, 'scrProf'));
+  const prof = fd.getElementById('profBody').textContent;
+  check('el perfil lista medallas', /MEDALS/.test(prof));
+  /* Un perfil con 60 "NOT YET" es una lista de carencias, no una vitrina. */
+  check('el perfil no lista las habilidades que aun no tiene', !/NOT YET/.test(prof));
+  check('...pero si dice cuantas quedan', /still to unlock/.test(prof));
+  /* 16 medallas de bronce de golpe en la primera partida son ruido. */
+  check('la victoria no vuelca todas las medallas de golpe',
+        (r1.winText.match(/BRONZE/g) || []).length <= 4,
+        (r1.winText.match(/BRONZE/g) || []).length + ' medallas listadas');
+  check('...y cuenta las que no muestra', /\+\d+ more/.test(r1.winText));
+  check('el perfil muestra la mejor racha', /BEST STREAK EVER/.test(prof));
+  check('el perfil muestra el historial', /LAST RUNS/.test(prof));
+  const wantRows = store.save.levels[1].history.length;
+  check('el historial del perfil tiene una fila por partida guardada',
+        fd.querySelectorAll('#profBody .prof-table tbody tr').length === wantRows,
+        'filas=' + fd.querySelectorAll('#profBody .prof-table tbody tr').length + ' esperadas=' + wantRows);
+  check('el perfil no muestra fechas, solo el orden de las partidas',
+        !/\b(20\d\d|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/.test(prof));
+  check('nada del perfil compara con otros ninos',
+        !/rank|leaderboard|others|class average/i.test(prof));
+  fd.getElementById('profBack').click();
+  check('DONE vuelve al mapa', visible(fd, 'scrMap'));
+  pf.window.close();
+
+  /* Un jugador nuevo no puede ver un perfil lleno de datos vacios. */
+  const pf2 = openGame(slug, null, { hero: heroDone() });
+  pf2.window.document.getElementById('btnProf').click();
+  check('sin partidas, el perfil lo dice en vez de mostrar tablas vacias',
+        /Nothing played yet/.test(pf2.window.document.getElementById('profBody').textContent));
+  pf2.window.close();
+  void lvId1;
 
   /* ---------- resumen ---------- */
   console.log('\n' + '-'.repeat(56));

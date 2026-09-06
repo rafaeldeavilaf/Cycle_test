@@ -127,7 +127,9 @@ window.GAME_UI = {
   armoury: {
     title:      'ARMOURY',
     intro:      'Paint your armour. Four pieces, eight colours.',
-    pieceHelm:  'HELMET',
+    /* Es una cinta/visor sobre la frente, no un casco: en dorado se leia como
+       pelo rubio y el nino no entendia que estaba pintando. */
+    pieceHelm:  'HEADBAND',
     pieceBody:  'BODY',
     pieceGlove: 'GLOVES',
     pieceBoot:  'BOOTS',
@@ -192,8 +194,42 @@ window.GAME_UI = {
     verdict3:   'Perfect run. You have this topic locked in.',
     verdict2:   'Strong. Replay to hunt the third star.',
     verdict1:   'Cleared it. Play it again &mdash; the questions come back with new numbers.',
+    /* Se muestra cuando la 3.a estrella se pierde por atascarse en UNA
+       habilidad, no por la puntuacion general. El nino debe saber por que. */
+    verdictStuck: 'One question type caught you out three times. Beat that one and the third star is yours.',
+    newBest:    '&#127942; NEW PERSONAL BEST &mdash; +{n} XP over your old record',
+    overBest:   '{n} XP short of your best',
+    upFrom:     '&#9650; {n} XP better than last time',
+    downFrom:   '&#9660; {n} XP below last time',
+    sameAs:     'Same score as last time',
+    firstPlay:  'First time through this level.',
+    medalsNew:  'NEW MEDALS',
+    medalsMore: '+{n} more',
     unlocked:   '&#128275; UNLOCKED: LEVEL {n} &mdash; {name}',
     btnReplay:  'REPLAY',
     btnMap:     'BACK TO MAP &gt;'
+  },
+
+  /* ---------- PROGRESO Y MEDALLAS ---------- */
+  score: {
+    btnProfile:   'PROFILE',
+    title:        'YOUR RECORD',
+    progressLabel:'SKILLS LEARNED',
+    progressBar:  '{done} of {total} question types',
+    bestCombo:    'BEST STREAK EVER',
+    noPlays:      'Nothing played yet. Clear a level and your record shows up here.',
+    medalsTitle:  'MEDALS',
+    medalsHelp:   'Bronze: you got it right. Silver: right first try in 3 different runs. Gold: in 5.',
+    medalBronze:  'BRONZE',
+    medalSilver:  'SILVER',
+    medalGold:    'GOLD',
+    medalNone:    'NOT YET',
+    medalLine:    '{skill} &mdash; {medal}',
+    medalsLocked: '{n} more question types still to unlock.',
+    historyTitle: 'LAST RUNS',
+    historyLevel: 'LEVEL {n}',
+    historyHead:  ['RUN', 'XP', 'FIRST TRY', 'MISSES', 'STREAK'],
+    cardBestLine: 'best {xp} XP &middot; {first}/{total} first try',
+    btnBack:      '&lt; MAP'
   }
 };

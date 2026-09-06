@@ -371,6 +371,60 @@
     return !!levelSave(prev.id).done;
   }
 
+  /* ---------- MEDALLAS POR HABILIDAD ----------
+     0 nada · 1 bronce · 2 plata · 3 oro.
+
+     Antiinflacion (PLAN-V2 §4.3): plata y oro exigen aciertos al primer
+     intento EN PARTIDAS DISTINTAS, no dentro de la misma. Por eso `firstHits`
+     se incrementa como mucho una vez por partida, al terminar el nivel, y no
+     en cada respuesta. Sin esta regla todo seria oro en dos semanas. */
+  var MEDAL_SILVER = 3, MEDAL_GOLD = 5;
+
+  function skillRec(tag) {
+    var r = STATE.skills[tag];
+    if (!r || typeof r !== 'object') { r = STATE.skills[tag] = { hits: 0, firstHits: 0 }; }
+    if (typeof r.hits !== 'number' || r.hits < 0) r.hits = 0;
+    if (typeof r.firstHits !== 'number' || r.firstHits < 0) r.firstHits = 0;
+    return r;
+  }
+  function medalOf(tag) {
+    var r = STATE.skills[tag];
+    if (!r) return 0;
+    if (r.firstHits >= MEDAL_GOLD) return 3;
+    if (r.firstHits >= MEDAL_SILVER) return 2;
+    if (r.hits >= 1) return 1;
+    return 0;
+  }
+  function medalName(m) {
+    return m === 3 ? UI.score.medalGold
+         : m === 2 ? UI.score.medalSilver
+         : m === 1 ? UI.score.medalBronze
+         : UI.score.medalNone;
+  }
+  /* Todas las habilidades del juego, en el orden en que aparecen. */
+  function allSkills() {
+    var seen = {}, out = [];
+    DATA.levels.forEach(function (lv) {
+      lv.questions.forEach(function (f) {
+        if (!seen[f.skill]) { seen[f.skill] = true; out.push(f.skill); }
+      });
+    });
+    return out;
+  }
+  function skillLabel(tag) { return String(tag).toUpperCase().replace(/-/g, ' '); }
+
+  /* Progreso total: familias cuya habilidad ya tiene medalla (>= bronce). */
+  function progressTotals() {
+    var done = 0, total = 0;
+    DATA.levels.forEach(function (lv) {
+      lv.questions.forEach(function (f) {
+        total++;
+        if (medalOf(f.skill) >= 1) done++;
+      });
+    });
+    return { done: done, total: total, pct: total ? Math.round(done / total * 100) : 0 };
+  }
+
   /* ---------- SPRITE (inline pixel-art hero) ----------
      Ensamblado POR PARTES, no un string por mood. Con 3 moods x 2 cuerpos,
      escribir el SVG entero cada vez son 6 strings casi identicos que se
@@ -386,14 +440,21 @@
      Asi un solo string sirve para todas las combinaciones y las animaciones
      CSS no cambian.
   -------------------------------------------------------- */
+  /* Las dos siluetas tienen que distinguirse A SIMPLE VISTA y en miniatura.
+     En la primera version se diferenciaban en 5 pixeles de pelo lateral y en
+     pantalla parecian el mismo personaje: elegir dejaba de ser una eleccion.
+     Ahora 'a' lleva el pelo corto al ras y 'b' una melena que baja hasta los
+     hombros, con una segunda capa mas ancha. */
   var BODIES = {
     a: {
-      hair:  'M4 1h9v2H4z M3 2h1v4H3z M13 2h1v4h-1z M4 2h9v2H4z',
+      hair:  'M4 1h9v2H4z M4 2h9v2H4z M3 2h1v3H3z M13 2h1v3h-1z',
       torso: 'M5 12h7v6H5z',
       boots: 'M5 18h3v2H5z M9 18h3v2H9z'
     },
     b: {
-      hair:  'M4 1h9v2H4z M4 2h9v2H4z M3 2h1v9H3z M13 2h1v9h-1z M2 4h1v6H2z M14 4h1v6h-1z',
+      hair:  'M4 1h9v2H4z M4 2h9v2H4z' +                 // corona
+             ' M3 2h1v11H3z M13 2h1v11h-1z' +            // melena hasta el hombro
+             ' M2 4h1v9H2z M14 4h1v9h-1z',               // segunda capa, mas ancha
       torso: 'M5 12h7v3H5z M6 15h5v3H6z',
       boots: 'M6 18h2v2H6z M9 18h2v2H9z'
     }
@@ -401,12 +462,14 @@
 
   /* Brazos y manos van separados: en v1 los brazos llevaban el color del
      torso y no habia guantes que pintar. */
+  /* Las manos ocupan 2 pixeles de alto, no 1: con uno solo, pintar los guantes
+     en la armeria no se notaba y la pieza parecia rota. */
   var LIMBS = {
-    idle:   { arms: 'M3 13h2v3H3z M12 13h2v3h-2z', hands: 'M3 16h2v1H3z M12 16h2v1h-2z' },
-    happy:  { arms: 'M3 9h2v4H3z M12 9h2v4h-2z',   hands: 'M3 8h2v1H3z M12 8h2v1h-2z'   },
-    sad:    { arms: 'M3 14h2v3H3z M12 14h2v3h-2z', hands: 'M3 17h2v1H3z M12 17h2v1h-2z' },
+    idle:   { arms: 'M3 13h2v2H3z M12 13h2v2h-2z', hands: 'M3 15h2v2H3z M12 15h2v2h-2z' },
+    happy:  { arms: 'M3 10h2v3H3z M12 10h2v3h-2z', hands: 'M3 8h2v2H3z M12 8h2v2h-2z'   },
+    sad:    { arms: 'M3 14h2v2H3z M12 14h2v2h-2z', hands: 'M3 16h2v2H3z M12 16h2v2h-2z' },
     // summon: brazo derecho vertical, el izquierdo en reposo (PLAN-V2 §6.2).
-    summon: { arms: 'M3 13h2v3H3z M12 7h2v6h-2z',  hands: 'M3 16h2v1H3z M12 6h2v1h-2z'  }
+    summon: { arms: 'M3 13h2v2H3z M12 8h2v5h-2z',  hands: 'M3 15h2v2H3z M12 6h2v2h-2z'  }
   };
 
   var FACES = {
@@ -680,6 +743,12 @@
     this.lastVar = {};   // familia -> ultima variante servida
     this.answered = {};
     this.startedAt = Date.now();
+
+    // Puntuacion v2: para el tope de estrellas y para las medallas.
+    this.famFails = {};     // familia -> fallos en esta partida
+    this.maxFamFails = 0;   // el peor atasco de la partida
+    this.hitSkills = {};    // skill -> acertada alguna vez en ESTA partida
+    this.firstSkills = {};  // skill -> acertada al primer intento en ESTA partida
   }
   Runner.prototype.current = function () {
     if (!this.queue.length) return null;
@@ -710,6 +779,7 @@
   };
   Runner.prototype.resolve = function (correct) {
     var fi = this.queue.shift();
+    var skill = this.level.questions[fi].skill;
     this.attempts++;
     if (correct) {
       this.cleared++;
@@ -718,21 +788,33 @@
       var base = 100;
       var bonus = Math.min(this.combo, 8) * 20;
       this.xp += base + bonus;
-      if (this.tries[fi] === 1) this.firstTry++;
+      this.hitSkills[skill] = true;
+      if (this.tries[fi] === 1) { this.firstTry++; this.firstSkills[skill] = true; }
       this.answered[fi] = true;
     } else {
       this.misses++;
       this.combo = 0;
+      this.famFails[fi] = (this.famFails[fi] || 0) + 1;
+      if (this.famFails[fi] > this.maxFamFails) this.maxFamFails = this.famFails[fi];
       this.queue.push(fi);   // al final de la cola, con otra variante
     }
   };
   Runner.prototype.progress = function () { return this.cleared / this.total; };
+  /* Estrellas = aciertos al primer intento, con UN tope.
+
+     El tope existe porque la media miente: con 16 familias, atascarse siete
+     veces en una sola cuesta 1/16 y seguia dando 3 estrellas. El criterio del
+     proyecto es explicito: "no domina = falla la misma familia 3 veces". Tres
+     estrellas tienen que significar que domina el nivel entero, no 15/16 de el.
+     Lo encontro el harness jugando, no leyendo el codigo. */
+  Runner.prototype.STUCK_AT = 3;
   Runner.prototype.stars = function () {
     var acc = this.firstTry / this.total;
-    if (acc >= 0.9) return 3;
-    if (acc >= 0.7) return 2;
-    return 1;
+    var s = acc >= 0.9 ? 3 : acc >= 0.7 ? 2 : 1;
+    if (this.stuck() && s > 2) s = 2;
+    return s;
   };
+  Runner.prototype.stuck = function () { return this.maxFamFails >= this.STUCK_AT; };
   Runner.prototype.minutes = function () { return Math.max(1, Math.round((Date.now() - this.startedAt) / 60000)); };
 
   /* ---------- RENDER: SHELL ---------- */
@@ -755,6 +837,7 @@
             '<span class="hud__stat">' + UI.map.statLevels + ' <b id="mapDone">0/0</b></span>' +
           '</div>' +
           '<div class="hud__group">' +
+            '<button class="btn btn--ghost" id="btnProf" type="button">' + UI.score.btnProfile + '</button>' +
             '<button class="btn btn--ghost" id="btnHero" type="button">' + UI.hero.btnHero + '</button>' +
             '<button class="btn btn--ghost" id="btnArm" type="button">' + UI.hero.btnArmoury + '</button>' +
             '<button class="btn btn--ghost" id="btnMusic" type="button"></button>' +
@@ -763,6 +846,7 @@
           '</div>' +
         '</div>' +
         '<p class="text-dim" style="font-size:15px">' + UI.map.intro + '</p>' +
+        '<div id="mapProgress"></div>' +
         '<div class="levels" id="levelList"></div>' +
         '<div id="allDone"></div>' +
       '</section>' +
@@ -803,6 +887,14 @@
           '<div class="row row--end mt-lg">' +
             '<button class="btn btn--primary" id="armDone" type="button">' + UI.armoury.btnDone + '</button>' +
           '</div>' +
+        '</div>' +
+      '</section>' +
+
+      /* PERFIL */
+      '<section id="scrProf" class="screen">' +
+        '<div class="pixel-box brief" id="profBody"></div>' +
+        '<div class="row row--end mt">' +
+          '<button class="btn btn--primary" id="profBack" type="button">' + UI.score.btnBack + '</button>' +
         '</div>' +
       '</section>' +
 
@@ -860,7 +952,7 @@
     '<div class="combo" id="comboPop"></div>';
 
   var screens = {
-    hero: el('scrHero'), arm: el('scrArm'), map: el('scrMap'),
+    hero: el('scrHero'), arm: el('scrArm'), map: el('scrMap'), prof: el('scrProf'),
     brief: el('scrBrief'), play: el('scrPlay'), win: el('scrWin')
   };
   function show(name) {
@@ -873,6 +965,29 @@
     var s = '';
     for (var i = 0; i < 3; i++) s += (i < n ? '<span>&#9733;</span>' : '<span class="off">&#9733;</span>');
     return s;
+  }
+
+  /* Marca personal del nivel. Si la mejor partida sigue en el historial se
+     anade cuantas acerto al primer intento; si es mas vieja que las ultimas 5,
+     solo el XP. Nunca se inventa un dato que no se tiene. */
+  function bestLine(ls, lv) {
+    var bestRun = null;
+    ls.history.forEach(function (h) { if (!bestRun || h.xp > bestRun.xp) bestRun = h; });
+    if (bestRun && bestRun.xp === ls.best) {
+      return fmt(UI.score.cardBestLine, { xp: ls.best, first: bestRun.first, total: lv.questions.length });
+    }
+    return fmt(UI.map.cardBest, { xp: ls.best }).replace(/^\s*&middot;\s*/, '');
+  }
+
+  function progressBox() {
+    var pr = progressTotals();
+    return '<div class="progress">' +
+      '<div class="progress__head">' +
+        '<span>' + UI.score.progressLabel + '</span>' +
+        '<span>' + fmt(UI.score.progressBar, { done: pr.done, total: pr.total }) + '</span>' +
+      '</div>' +
+      '<div class="bar"><div class="bar__fill" style="width:' + pr.pct + '%"></div></div>' +
+    '</div>';
   }
 
   function renderMap() {
@@ -892,7 +1007,7 @@
           '<div class="level-card__sub">' + esc(lv.subtitle) + '</div>' +
           '<div class="level-card__sub text-dim" style="margin-top:6px;font-size:13px">' +
             fmt(UI.map.cardMeta, { n: lv.id, count: lv.questions.length }) +
-            (ls.done ? fmt(UI.map.cardBest, { xp: ls.best }) : '') +
+            (ls.done ? ' &middot; ' + bestLine(ls, lv) : '') +
           '</div>' +
         '</div>' +
         '<div class="stars">' + starStr(ls.stars) + '</div>';
@@ -907,6 +1022,7 @@
     });
     el('mapXP').textContent = STATE.totalXP;
     el('mapDone').textContent = done + '/' + DATA.levels.length;
+    el('mapProgress').innerHTML = progressBox();
     el('btnSound').textContent = STATE.sound ? UI.map.btnSoundOn : UI.map.btnSoundOff;
     el('btnMusic').textContent = STATE.music ? UI.map.btnMusicOn : UI.map.btnMusicOff;
     el('allDone').innerHTML = (done === DATA.levels.length)
@@ -1013,6 +1129,58 @@
     if (next) next.focus();
   });
 
+  /* ---------- PERFIL ----------
+     Todo lo que se ve aqui es del propio nino: su record, sus medallas, su
+     historial. No hay nada de nadie mas, ni sale nada del navegador. */
+  function renderProfile() {
+    var html = '<h2>' + UI.score.title + '</h2>' + progressBox() +
+      '<p class="text-dim mt">' + UI.score.bestCombo + ': <b class="text-accent">' + (STATE.bestComboEver || 0) + '</b></p>';
+
+    var played = DATA.levels.some(function (lv) { return levelSave(lv.id).plays > 0; });
+    if (!played) {
+      html += '<p class="text-dim mt-lg">' + UI.score.noPlays + '</p>';
+      el('profBody').innerHTML = html;
+      return;
+    }
+
+    html += '<h3 class="mt-lg">' + UI.score.medalsTitle + '</h3>' +
+            '<p class="text-dim" style="font-size:14px">' + UI.score.medalsHelp + '</p>' +
+            '<div class="medal-list">';
+    /* Solo las ganadas, de mas valor a menos. Listar tambien las 60 que aun
+       no tiene convierte su vitrina en una lista de carencias. Las que faltan
+       se cuentan en una linea. */
+    var earned = allSkills()
+      .map(function (tag) { return { tag: tag, medal: medalOf(tag) }; })
+      .filter(function (x) { return x.medal > 0; })
+      .sort(function (a, b) { return b.medal - a.medal; });
+    earned.forEach(function (x) {
+      html += '<span class="medal medal--' + x.medal + '">' +
+        fmt(UI.score.medalLine, { skill: esc(skillLabel(x.tag)), medal: medalName(x.medal) }) + '</span>';
+    });
+    html += '</div>';
+    var locked = allSkills().length - earned.length;
+    if (locked > 0) {
+      html += '<p class="text-dim mt" style="font-size:14px">' + fmt(UI.score.medalsLocked, { n: locked }) + '</p>';
+    }
+
+    html += '<h3 class="mt-lg">' + UI.score.historyTitle + '</h3>';
+    DATA.levels.forEach(function (lv) {
+      var ls = levelSave(lv.id);
+      if (!ls.history.length) return;
+      html += '<h4 class="prof-lv">' + fmt(UI.score.historyLevel, { n: lv.id }) + ' &middot; ' + esc(lv.name) + '</h4>' +
+        '<div class="prof-scroll"><table class="prof-table"><thead><tr>' +
+        UI.score.historyHead.map(function (h) { return '<th>' + h + '</th>'; }).join('') +
+        '</tr></thead><tbody>';
+      ls.history.forEach(function (h, i) {
+        html += '<tr><td>' + (i + 1) + '</td><td>' + h.xp + '</td><td>' +
+                h.first + '/' + lv.questions.length + '</td><td>' + h.misses + '</td><td>' + h.combo + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    });
+
+    el('profBody').innerHTML = html;
+  }
+
   function openHero() {
     el('heroAlias').value = HERO.alias || '';
     renderHeroPick();
@@ -1043,6 +1211,8 @@
   });
   el('btnHero').addEventListener('click', function () { SFX.click(); openHero(); });
   el('btnArm').addEventListener('click', function () { SFX.click(); openArmoury('map'); });
+  el('btnProf').addEventListener('click', function () { SFX.click(); renderProfile(); show('prof'); });
+  el('profBack').addEventListener('click', function () { SFX.click(); renderMap(); show('map'); });
 
   /* ---------- BRIEFING ---------- */
   var currentIdx = 0, run = null;
@@ -1252,15 +1422,41 @@
     var stars = run.stars();
     var wasNew = !ls.done;
 
+    // Se leen ANTES de actualizar: son las marcas contra las que se compara.
+    var prevBest = ls.best;
+    var prevRun  = ls.history.length ? ls.history[ls.history.length - 1] : null;
+
+    /* Medallas. `hits` y `firstHits` suben como mucho UNA vez por partida,
+       aqui y no en cada respuesta: es lo que hace que plata exija 3 partidas
+       distintas y oro 5. */
+    var newMedals = [];
+    Object.keys(run.hitSkills).forEach(function (tag) {
+      var before = medalOf(tag);
+      skillRec(tag).hits++;
+      if (run.firstSkills[tag]) skillRec(tag).firstHits++;
+      var after = medalOf(tag);
+      if (after > before) newMedals.push({ tag: tag, medal: after });
+    });
+
     ls.done = true;
     ls.plays++;
     if (stars > ls.stars) ls.stars = stars;
     if (run.xp > ls.best) { STATE.totalXP += (run.xp - ls.best); ls.best = run.xp; }
-    // Historial: ultimas 5 partidas de este nivel (lo consume la Fase 3).
     ls.history.push({ xp: run.xp, first: run.firstTry, misses: run.misses, combo: run.bestCombo, at: Date.now() });
     if (ls.history.length > 5) ls.history = ls.history.slice(-5);
     if (run.bestCombo > (STATE.bestComboEver || 0)) STATE.bestComboEver = run.bestCombo;
     save();
+
+    /* Competir contra uno mismo: cuanto sobre el record, y cuanto sobre la
+       partida anterior. Son cosas distintas y el nino ve las dos. */
+    var beatBest = run.xp > prevBest;
+    var recordLine = beatBest
+      ? fmt(UI.win.newBest, { n: run.xp - prevBest })
+      : (prevBest ? fmt(UI.win.overBest, { n: prevBest - run.xp }) : '');
+    var trendLine = !prevRun ? UI.win.firstPlay
+      : run.xp > prevRun.xp ? fmt(UI.win.upFrom,   { n: run.xp - prevRun.xp })
+      : run.xp < prevRun.xp ? fmt(UI.win.downFrom, { n: prevRun.xp - run.xp })
+      : UI.win.sameAs;
 
     SFX.level();
     MUSIC.duck(2600);
@@ -1275,8 +1471,30 @@
         '<div><span>' + UI.win.statCombo  + '</span>' + run.bestCombo + '</div>' +
         '<div><span>' + UI.win.statMisses + '</span>' + run.misses + '</div>' +
       '</div>' +
+      '<div class="score-lines">' +
+        (recordLine ? '<p class="' + (beatBest ? 'score-best' : 'text-dim') + '">' + recordLine + '</p>' : '') +
+        '<p class="' + (prevRun && run.xp > prevRun.xp ? 'score-up' :
+                        prevRun && run.xp < prevRun.xp ? 'score-down' : 'text-dim') + '">' + trendLine + '</p>' +
+      '</div>' +
+      /* La primera partida de un nivel da bronce en TODAS sus habilidades a la
+         vez: 16 medallas de golpe no son un premio, son ruido. Se muestran las
+         mejores 4 y se cuenta el resto. Las de mas valor van primero. */
+      (function () {
+        if (!newMedals.length) return '';
+        var top = newMedals.slice().sort(function (a, b) { return b.medal - a.medal; });
+        var shown = top.slice(0, 4), rest = top.length - shown.length;
+        return '<div class="medals-new"><span class="medals-new__tag">' + UI.win.medalsNew + '</span>' +
+          shown.map(function (m) {
+            return '<span class="medal medal--' + m.medal + '">' +
+              fmt(UI.score.medalLine, { skill: esc(skillLabel(m.tag)), medal: medalName(m.medal) }) + '</span>';
+          }).join('') +
+          (rest > 0 ? '<span class="medal">' + fmt(UI.win.medalsMore, { n: rest }) + '</span>' : '') +
+          '</div>';
+      })() +
       '<p class="text-dim" style="font-size:15px">' +
-        (stars === 3 ? UI.win.verdict3 : stars === 2 ? UI.win.verdict2 : UI.win.verdict1) +
+        (stars === 3 ? UI.win.verdict3
+         : run.stuck() ? UI.win.verdictStuck
+         : stars === 2 ? UI.win.verdict2 : UI.win.verdict1) +
       '</p>' +
       (nextLv && wasNew
         ? '<p class="mt" style="color:var(--good);font-family:var(--font-ui);font-size:11px">' +

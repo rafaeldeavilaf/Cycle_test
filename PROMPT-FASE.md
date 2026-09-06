@@ -15,7 +15,7 @@ knowledge del proyecto.
 | 0 — Limpieza, `ui.js`, migración v3, harness | **Hecha y publicada** |
 | 1 — Escena `doors` sobre los 5 niveles v1 | **Hecha y publicada** |
 | 2 — HERO + armería + animación de la calculadora | **Hecha** |
-| 3 — Puntuación v2 | Pendiente (los datos ya se guardan, ver abajo) |
+| 3 — Puntuación v2 | **Hecha** |
 | 4 — Generador v2: 7 niveles, `mech`, jefes | Pendiente |
 | 5 — Escenas `bridge`/`ruler`/`planks`/`lift`/`rule`/`machine`/`smash` | Pendiente |
 | 6 — Sistema de jefes | Pendiente |
@@ -42,7 +42,7 @@ El nombre visible del juego vive en `GAME_UI.brand` y no toca la clave.
 `tools/build.py` lee `brand` de `ui.js` con un regex; si no lo encuentra, aborta.
 
 **3. `STATE.version` es 3.** La migración en `load()` **solo añade** campos con
-valores por defecto; nunca borra. Ya se guarda, listo para la Fase 3:
+valores por defecto; nunca borra:
 
 ```js
 STATE = { version: 3, sound, music, totalXP, skills: {}, bestComboEver,
@@ -128,10 +128,10 @@ node tools/harness.js
 ```
 
 `tools/harness.js` abre el `.html` **ya construido** en jsdom y juega niveles
-completos con aciertos y errores. Hoy son 103 comprobaciones. Encontró la
+completos con aciertos y errores. Hoy son 135 comprobaciones. Encontró la
 repetición de variantes, el doble conteo al pulsar NEXT dos veces, un texto con
-"daily" colado en `ui.js`, y tres filas de la armería que arrancaban sin ningún
-color marcado.
+"daily" colado en `ui.js`, tres filas de la armería que arrancaban sin ningún
+color marcado, y que fallar la primera pregunta no costaba XP.
 
 Al añadir una pieza, **añade sus comprobaciones al harness**, y no borres las
 que ya están. Para una escena nueva, como mínimo: el nivel termina; solo con
@@ -143,13 +143,32 @@ publicado no usa npm ni build step).
 
 ---
 
+**7c. Puntuación: el niño compite contra sí mismo, nunca contra otros.**
+Récord personal por nivel, delta contra la partida anterior, medallas por
+habilidad, historial de 5 y barra de progreso. Reglas que no se relajan:
+
+- **Antiinflación:** `hits` y `firstHits` suben como mucho **una vez por
+  partida**, al terminar el nivel — nunca por respuesta. Plata exige 3 partidas
+  distintas al primer intento, oro 5. Sin esto todo es oro en dos semanas.
+- **Tope de estrellas:** fallar la misma familia 3 veces impide la tercera
+  estrella, aunque la media salga alta. Tres estrellas significan dominar el
+  nivel entero, no 15/16 de él.
+- **Nada comparativo entre niños, ni fechas en pantalla.** Un ranking exigiría
+  un servidor con datos de menores (Ley 1581/2012); está fuera del plan y su
+  coste real está en el anexo de `PLAN-V2.md`.
+- No volcar todas las medallas de golpe: la primera partida de un nivel da
+  bronce en todas sus habilidades a la vez y eso es ruido, no premio.
+
+---
+
 ## Hallazgos abiertos
 
-- **Las estrellas no castigan atascarse en una habilidad.** `stars()` mide
-  aciertos al primer intento por familia: fallar la misma familia 7 veces
-  seguidas cuesta 1/16 y aún da 3 estrellas. Contradice el criterio del plan
-  ("no domina = falla la misma familia 3 veces"). **Decisión de la Fase 3.**
-  El harness fija el comportamiento actual para que el cambio se vea.
+- **El XP premia la racha, así que fallar la PRIMERA pregunta sale gratis:**
+  una partida que falla las dos primeras saca el mismo XP que una perfecta,
+  porque el combo ya estaba a cero. Las estrellas y las medallas sí lo
+  penalizan, que es donde se mide el dominio. Cambiarlo invalidaría los récords
+  ya guardados, así que se dejó como está; el harness lo fija con un test
+  marcado `[conocido]` para que cualquier cambio futuro sea visible.
 - **`README.md`, `PRIMEROS-PASOS.md`, `PROJECT_INSTRUCTIONS.md` y
   `DESIGN_SYSTEM.md` siguen describiendo v1** (nombre viejo, 5 niveles, sin
   escenas). **Fase 7.**
