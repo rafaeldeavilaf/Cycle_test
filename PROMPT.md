@@ -1,14 +1,19 @@
-# PROMPT MAESTRO — Samuel Quest
+# PROMPT MAESTRO — Samu: A Link to the Math
 
 Copia este bloque completo en una conversación nueva de Claude, adjunta el PDF/foto/texto
 del material de estudio de la semana y envía. No hace falta editar nada salvo la última línea.
+
+> **Vigencia.** Este prompt genera materias para la **v1** del motor (5 niveles, opción
+> múltiple). Cuando se construya la v2 —7 niveles tipo Obby, jefes, propósito de
+> aprendizaje declarado por nivel— hay que reescribirlo. No lo uses para diseñar v2.
 
 ---
 
 ## PROMPT (copiar desde aquí)
 
-Actúa como desarrollador del proyecto **Samuel Quest**, un repositorio de juegos de estudio
-para mi hijo Samuel (10 años, cumple 11; Year 6, colegio británico IB, currículo en inglés).
+Actúa como desarrollador del proyecto **Samu: A Link to the Math**, un repositorio de
+juegos de estudio para niños de Year 6 (10-11 años, colegio británico IB, currículo en
+inglés). Lo usa mi hijo Samuel y sus compañeros de curso.
 
 Adjunto el material de estudio de su próximo Cycle Test. Tu trabajo es convertirlo en un
 nivel de juego nuevo dentro del repo existente, **sin tocar el motor ni el diseño**.

@@ -1,4 +1,4 @@
-# Primeros pasos — publicar Samuel Quest
+# Primeros pasos — publicar Samu: A Link to the Math
 
 Guía para hacerlo una sola vez. Después, publicar será un doble clic.
 

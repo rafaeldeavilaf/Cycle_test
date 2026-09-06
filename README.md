@@ -1,12 +1,18 @@
-# Samuel Quest
+# Samu: A Link to the Math
 
-Juegos de estudio para los Cycle Tests de Samuel (Year 6, colegio británico IB).
-Cada test es un juego de 5 niveles; cada nivel es un día de estudio de ~30 minutos.
+Juegos de estudio para los Cycle Tests de Year 6 (colegio británico IB).
+Cada test es un juego de niveles; cada nivel es un día de estudio.
 
 - **Juego actual:** Maths — Counting and Sequences (Cycle Test #1)
-- **Link de Samuel:** <https://rafaeldeavilaf.github.io/Cycle_test/>
+- **Link del juego:** <https://rafaeldeavilaf.github.io/Cycle_test/>
 - **Repositorio:** <https://github.com/rafaeldeavilaf/Cycle_test>
 - **Stack:** HTML plano. Sin dependencias, sin backend. Infraestructura: USD 0/mes.
+
+> **Estado.** Lo publicado hoy es la v1: 5 niveles de opción múltiple, y el HTML todavía
+> dice "Samuel Quest" por dentro. La v2 —7 niveles tipo Obby, jefes, personaje
+> configurable, puntuación visible y el nombre nuevo— está en fase de plan, sin construir.
+> Ver [`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md) y
+> [`PROMPT-PLAN-MEJORA.md`](PROMPT-PLAN-MEJORA.md).
 
 ---
 
@@ -79,7 +85,7 @@ Ahí vive el diseño compartido. Ver [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) y
 - El nivel termina cuando ha resuelto bien las 16 preguntas. Ahí se desbloquea el siguiente.
 - Al reintentar una pregunta que ya falló, **la pista aparece sola**: la segunda vez viene con andamiaje.
 - Estrellas según aciertos al primer intento: 3 si ≥90%, 2 si ≥70%, 1 en el resto.
-- El progreso se guarda en el navegador de Samuel. Nada sale de su equipo.
+- El progreso se guarda en el navegador de cada niño. Nada sale de su equipo.
 
 ---
 

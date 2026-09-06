@@ -1,4 +1,4 @@
-# DESIGN SYSTEM — Samuel Quest
+# DESIGN SYSTEM — Samu: A Link to the Math
 
 Este documento es la memoria visual del proyecto. **Todas las materias deben verse como
 el mismo juego.** Lo único que cambia entre materias es el color de acento.
@@ -6,14 +6,21 @@ el mismo juego.** Lo único que cambia entre materias es el color de acento.
 Si una materia futura se ve distinta, el error está aquí: alguien editó `assets/engine.css`
 en vez de añadir un `data-accent`.
 
+> **Alcance.** Lo que sigue describe la v1 publicada (5 niveles, opción múltiple). El
+> rediseño v2 —Obby, 7 niveles, jefes, personaje configurable— cambiará varias de estas
+> reglas; cuando se apruebe el plan, este documento se actualiza **antes** de escribir
+> código, no después.
+
 ---
 
 ## 1. Concepto
 
 Un juego de consola retro de 8 bits. Pantalla CRT oscura, bordes gruesos sin esquinas
 redondeadas, tipografía de píxeles para la interfaz y una tipografía legible para el
-contenido. El protagonista es **Samuel**, un sprite pixel-art de 17x20 dibujado en SVG
-inline dentro de `engine.js` (función `samuelSVG`), sin archivos de imagen.
+contenido. El protagonista es un sprite pixel-art de 17x20 dibujado en SVG inline dentro
+de `engine.js` (función `samuelSVG`), sin archivos de imagen. En v2 el jugador elegirá su
+género y los colores de su armadura, así que el sprite deja de ser un personaje fijo y
+pasa a ser una plantilla parametrizable.
 
 La regla de oro: **la interfaz es el arcade, el contenido es legible.** Press Start 2P
 en textos largos es ilegible para un chico de 10 años; se usa solo en chrome, títulos,
@@ -92,7 +99,7 @@ Ambas se cargan por `@import` desde Google Fonts, con fallback a monospace y sys
 | `.feedback` | panel de explicación; `--good` / `--bad` |
 | `.brief` | pantalla de mini-lección; `.example` para el bloque de ejemplo |
 | `.victory` | pantalla de fin de nivel con estrellas y estadísticas |
-| `.avatar` | sprite de Samuel; `--sm`, `--lg`, `--bob`, `--cheer`, `--down` |
+| `.avatar` | sprite del jugador; `--sm`, `--lg`, `--bob`, `--cheer`, `--down` |
 | `.mate` | compañero en el HUD de juego: sprite + mensaje reactivo |
 
 ---
@@ -122,7 +129,8 @@ Nunca se añade una pantalla nueva sin actualizar este documento.
 - El orden de las opciones se baraja en cada aparición.
 - XP: 100 base + 20 por cada eslabón de combo (tope 8) = máximo 260 por acierto.
 - Estrellas por aciertos al primer intento: ≥90% = 3, ≥70% = 2, resto = 1.
-- Guardado en `localStorage`, clave `samuel-quest:<slug>`.
+- Guardado en `localStorage`, clave `samuel-quest:<slug>`. **La clave no se renombra**
+  aunque el juego cambie de nombre: hacerlo borra el progreso de quien ya venía jugando.
 - Sonido 8-bit generado con WebAudio (osciladores square), sin archivos, con interruptor.
 - Teclado: `A B C D` o `1 2 3 4` para responder, `Enter` para avanzar.
 

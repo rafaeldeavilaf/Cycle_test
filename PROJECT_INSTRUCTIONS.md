@@ -1,20 +1,33 @@
-# PROJECT INSTRUCTIONS — Samuel Quest
+# PROJECT INSTRUCTIONS — Samu: A Link to the Math
 
 Memoria del proyecto. Pega este archivo en las *instrucciones del proyecto* de Claude
 (o súbelo al knowledge del proyecto) para que cualquier conversación futura arranque
 con el contexto completo.
 
+**Este documento describe dos cosas y no hay que confundirlas:**
+
+- **v1 — lo que está publicado y funcionando hoy.** 5 niveles, preguntas de opción
+  múltiple en pantalla estática. Se llama todavía "Samuel Quest" dentro del HTML.
+- **v2 — el rediseño aprobado, todavía sin construir.** 7 niveles tipo Obby, jefes,
+  personaje configurable, puntuación visible, nombre "Samu: A Link to the Math".
+
+Las secciones marcadas **[v2]** son objetivo, no realidad. No las describas como hechas.
+
 ---
 
 ## Qué es
 
-Un repositorio de juegos web para que **Samuel** (10 años, cumple 11; Year 6, colegio
-británico IB) estudie para sus Cycle Tests. Cada test es un juego de 5 niveles; cada
-nivel es un día de estudio de ~30 minutos. Se publica en GitHub Pages y Samuel entra
-por un link desde su PC.
+Un juego web para estudiar para los Cycle Tests de un colegio británico IB, Year 6
+(niños de 10-11 años). Nació para **Samuel** y a partir de v2 **se comparte con sus
+compañeros de curso**: cada niño abre el mismo link y juega en su propio navegador.
 
 Todo el contenido del juego está **en inglés**. La documentación y la conversación
 conmigo, en español.
+
+**Consecuencia de que lo usen otros niños [v2]:** el juego ya no puede hablarle a Samuel
+por su nombre ni asumir que un adulto está al lado explicando. Tiene que ser
+autoexplicativo desde el primer clic, con los mensajes del compañero de pantalla
+genéricos o dirigidos al alias que cada niño elija.
 
 ---
 
@@ -37,10 +50,11 @@ con dos variables de color para una materia nueva.
 ## Estructura
 
 ```
-samuel-quest/
-│  ── PUBLICABLE (lo único que va a GitHub) ──
+samu-link-to-the-math/
+│  ── PUBLICABLE (lo único que necesita el navegador) ──
 ├── index.html            hub autocontenido            GENERADO
 ├── <slug>.html           un juego completo por materia GENERADO
+├── publicar.bat          doble clic para publicar
 │
 │  ── FUENTE (para mantenimiento) ──
 ├── subjects.js           registro de materias (añadir 1 objeto por materia)
@@ -52,32 +66,36 @@ samuel-quest/
 │   ├── gen_<slug>.py     generador de data.js con validación
 │   └── build.py          inlina motor+datos en los .html de la raíz
 ├── PROMPT.md             prompt maestro para materias nuevas
+├── PROMPT-PLAN-MEJORA.md prompt para el plan de rediseño v2
 ├── DESIGN_SYSTEM.md      reglas visuales inviolables
 └── PROJECT_INSTRUCTIONS.md
 ```
 
 **Los archivos de la raíz no referencian nada externo** salvo la hoja de fuentes de Google.
-Llevan el CSS, el motor y las 240 preguntas dentro.
+Llevan el CSS, el motor y las preguntas dentro.
+
+`publicar.bat` es el único mecanismo de despliegue: doble clic, hace `add`, `commit` y
+`push`. Claude **no puede hacer `git push`** (no tiene acceso a credenciales de GitHub);
+siempre soy yo quien ejecuta el script.
 
 ---
 
 ## Reglas de contenido
 
-| Regla | Valor |
-|---|---|
-| Idioma del juego | Inglés |
-| Niveles | 5 (uno por día) |
-| Duración objetivo | ~30 min por nivel |
-| Familias de preguntas por nivel | 16 mínimo |
-| Variantes por familia | 5 mínimo |
-| Formato | Selección múltiple, 4 opciones, siempre |
-| Progresión | Creciente entre niveles y dentro de cada nivel |
-| Nivel curricular | Year 6 británico, edad 10-11 |
+| Regla | v1 (hoy) | v2 (objetivo) |
+|---|---|---|
+| Idioma del juego | Inglés | Inglés |
+| Niveles | 5 | **7** |
+| Familias de preguntas por nivel | 16 mínimo | lo define el plan v2 |
+| Variantes por familia | 5 mínimo | 5 mínimo |
+| Formato | Opción múltiple, 4 opciones | Opción múltiple dentro de un Obby |
+| Progresión | Creciente entre y dentro de niveles | Igual |
+| Nivel curricular | Year 6 británico, 10-11 años | Igual |
 
-**Anti-repetición (requisito central):** una pregunta fallada nunca se vuelve a mostrar
-idéntica. El motor la devuelve al final de la cola y sirve otra variante de la misma
-familia, con números o datos distintos. Samuel tiene que razonar otra vez, no recordar
-qué botón pulsó.
+**Anti-repetición (requisito central, no negociable):** una pregunta fallada nunca se
+vuelve a mostrar idéntica. El motor la devuelve al final de la cola y sirve otra variante
+de la misma familia, con números o datos distintos. El niño tiene que razonar otra vez,
+no recordar qué botón pulsó.
 
 El motor da dos garantías, verificadas con tests: (1) agota **todas** las variantes de una
 familia antes de reutilizar ninguna; (2) al reiniciar el ciclo nunca sirve la última vista,
@@ -96,6 +114,52 @@ el terreno. No se introducen temas que el material no menciona.
 
 ---
 
+## [v2] Cada nivel es un Obby con un propósito de aprendizaje
+
+Los 7 niveles son recorridos de obstáculos. La regla que ordena todo el rediseño:
+
+> **Jugar, aprender y evaluarse. Ningún Obby existe solo porque sea divertido.**
+
+Cada nivel debe declarar por escrito, antes de construirse:
+
+1. **Qué habilidad entrena** — una sola, tomada del material del Cycle Test.
+2. **Por qué esa mecánica y no otra** — la forma de moverse debe encarnar la habilidad,
+   no decorarla. Saltar entre plataformas numeradas de 6 en 6 *es* contar en saltos;
+   una plataforma que se mueve mientras respondes es ruido.
+3. **Cómo se evalúa** — qué demuestra que el niño lo domina, y qué pasa si no.
+
+Un Obby cuya mecánica podría cambiarse por otra sin que cambie lo que el niño aprende
+está mal diseñado.
+
+**Los 7 niveles concretos los define el plan v2**, mapeados contra el material real del
+Cycle Test.
+
+**Punto abierto que el plan debe resolver:** con 5 niveles la cadencia era "un nivel por
+día, los 5 días antes del test". Con 7 no cierra. O el repaso empieza 7 días antes, o
+algunos días llevan dos niveles cortos. Hay que decidirlo, no dejarlo implícito.
+
+---
+
+## [v2] Puntuación
+
+**Decisión tomada: puntuación personal visible, sin ranking compartido.**
+
+Cada niño ve su puntaje, sus estrellas, su récord y su progreso. Nadie ve el de nadie más.
+
+Razón: un ranking entre compañeros exige un servidor con datos de menores que no son míos.
+Eso es tratamiento de datos personales de menores de edad bajo la Ley 1581 de 2012 y el
+Decreto 1377 de 2013 — requiere autorización de los padres de **cada** niño y me convierte
+en responsable de esos datos. No compensa para un juego de repaso semanal.
+
+Se puede revisar más adelante si los padres del curso lo autorizan por escrito. El plan v2
+puede incluir, como **anexo separado**, qué costaría añadirlo después sin rehacer el motor.
+
+Lo que sí debe hacer el esquema de puntuación: que el niño compita **contra sí mismo**.
+Récord personal, mejora respecto al intento anterior, rachas, medallas por dominio de una
+habilidad. Eso motiva sin necesidad de servidor.
+
+---
+
 ## Flujo semanal
 
 1. Llega el material de estudio (PDF, foto o texto).
@@ -103,12 +167,13 @@ el terreno. No se introducen temas que el material no menciona.
 3. Claude genera `tools/gen_<slug>.py`, `subjects/<slug>/data.js`, la línea de
    `subjects.js`, y ejecuta `tools/build.py`.
 4. Reviso la salida del generador y del test.
-5. Subo a GitHub **solo los `.html` de la raíz**: el `<slug>.html` nuevo y el `index.html`
-   actualizado. Arrastrar y soltar en *Add file → Upload files*.
-6. GitHub Pages publica en 1-2 minutos. Samuel usa el mismo link de siempre.
+5. **Doble clic en `publicar.bat`.** La carpeta local *es* el repositorio: el script hace
+   `add`, `commit` y `push` de todo lo que cambió, fuente incluida.
+6. GitHub Pages publica en 1-2 minutos. El link es siempre el mismo.
+   Si se ve igual, es caché: `Ctrl + F5`.
 
 Repo actual: <https://github.com/rafaeldeavilaf/Cycle_test>
-Link de Samuel: <https://rafaeldeavilaf.github.io/Cycle_test/>
+Link del juego: <https://rafaeldeavilaf.github.io/Cycle_test/>
 
 ---
 
@@ -122,21 +187,30 @@ que usa `fractions.Fraction` para aritmética exacta y que falla con `assert` si
 - una familia tiene menos de 4 variantes,
 - un nivel tiene menos de 15 familias.
 
-Motivo: escribir 240 preguntas a mano garantiza errores aritméticos, y una respuesta mal
-marcada le enseña a Samuel algo falso. Es el riesgo más caro del proyecto.
+Motivo: escribir cientos de preguntas a mano garantiza errores aritméticos, y una
+respuesta mal marcada le enseña algo falso al niño. Es el riesgo más caro del proyecto,
+y ahora que lo usan otros niños el error se multiplica.
+
+**El generador no basta: hay que auditar el contexto, no solo la aritmética.** En la
+auditoría del Cycle Test #1 aparecieron preguntas con números correctos pero situaciones
+imposibles —un submarino que subía hasta quedar sobre el nivel del mar, una planta que
+encogía cada mes—. El `assert` no las detecta. Antes de publicar, leer una muestra de las
+variantes como si fueras el niño.
 
 ---
 
 ## Progreso y datos
 
-- Se guarda en `localStorage` del navegador, clave `samuel-quest:<slug>`.
-- No hay backend, ni cuentas, ni datos personales en la nube. Costo de infraestructura: **USD 0**.
-- Si cambia de computador o borra la caché, empieza de cero. Aceptado a cambio de no
-  almacenar datos de un menor en un servidor (Ley 1581 de 2012 — tratamiento de datos de
-  menores; al no salir nada del equipo, no hay tratamiento que declarar).
-- Si algún día quiero ver su desempeño desde mi lado, eso sí requiere backend: Supabase
-  free tier, ~6 h de desarrollo, USD 0/mes hasta 500 MB, y sí implicaría autorización de
-  tratamiento de datos del menor. Decisión pendiente, no urgente.
+- Se guarda en `localStorage` del navegador de cada niño, clave `samuel-quest:<slug>`.
+- **La clave no se renombra aunque el juego cambie de nombre.** Renombrarla borra el
+  progreso de quien ya venía jugando. El nombre visible y la clave técnica son cosas
+  distintas.
+- No hay backend, ni cuentas, ni datos personales en la nube. Costo de infraestructura:
+  **USD 0**. Esto sigue siendo cierto en v2.
+- Cada niño juega en su propio navegador, así que los progresos no se pisan entre sí sin
+  necesidad de cuentas.
+- Si un niño cambia de computador o borra la caché, empieza de cero. Aceptado a cambio de
+  no almacenar datos de menores en un servidor.
 
 ---
 
@@ -144,24 +218,37 @@ marcada le enseña a Samuel algo falso. Es el riesgo más caro del proyecto.
 
 | Materia | Slug | Test | Niveles | Estado |
 |---|---|---|---|---|
-| Maths — Counting and Sequences | `y6-maths-counting-sequences` | Cycle Test #1 | 5 | Publicado |
+| Maths — Counting and Sequences | `y6-maths-counting-sequences` | Cycle Test #1 | 5 | Publicado — 80 familias, 400 variantes, auditado |
+
+**Duración real medida (v1):** con 70-90% de acierto, un nivel son 18-23 respuestas
+≈ 15-20 min con briefing incluido, no los 30 previstos. El plan v2 debe partir de este
+dato medido, no del supuesto.
 
 ---
 
 ## Decisiones tomadas (no volver a discutir)
 
+- **Nombre: "Samu: A Link to the Math".** El HTML publicado todavía dice "Samuel Quest";
+  se cambia al construir v2, junto con el `<title>` y el hub. La clave de `localStorage`
+  no cambia.
+- **7 niveles en v2**, cada uno un Obby con propósito de aprendizaje declarado.
+- **Puntuación personal, sin ranking compartido ni backend.** Motivo arriba.
 - **Motor + JSON en la fuente, HTML autocontenido en la publicación.** El motor sigue
   siendo uno solo (`assets/`), pero `tools/build.py` lo inlina en cada juego antes de
   publicar. Razón: en el primer despliegue el arrastrar-y-soltar de GitHub descartó las
   carpetas `assets/` y `subjects/` sin avisar; la página cargó sin estilos y el juego no
-  existía. Un archivo único no puede subirse a medias. Costo: el motor se duplica en cada
-  juego (~25 KB), irrelevante. Contrapartida real: un arreglo en el motor obliga a
-  reconstruir y volver a subir todos los juegos — un comando y un arrastre.
+  existía. Un archivo único no puede subirse a medias.
 - **Nunca entregar un HTML publicable que apunte a `assets/…`.** Es el modo de fallo
   conocido del proyecto.
-- **localStorage** frente a backend. Razón: burn rate cero y cero datos de menor en la nube.
 - **`data.js` en vez de `data.json`.** Razón: un `.js` funciona también abriendo el archivo
   con doble clic (`file://`); un `fetch` de JSON lo bloquearía CORS. Cero costo, más robusto.
-- **Sin build step, sin framework, sin dependencias.** HTML + CSS + JS plano. GitHub Pages
-  lo sirve tal cual. Nada que compilar, nada que actualizar, nada que se rompa en un año.
-- **Sonido generado con WebAudio**, sin archivos de audio. Cero peso, cero licencias.
+- **Sin build step en producción, sin framework, sin dependencias.** HTML + CSS + JS plano.
+  GitHub Pages lo sirve tal cual. Nada que compilar, nada que se rompa en un año.
+- **Sonido y música generados con WebAudio**, sin archivos de audio. Cero peso, cero
+  licencias. Interruptores separados para efectos y música, ambos guardados.
+- **Sprites en SVG inline dentro de `engine.js`**, nunca imágenes. Mismo motivo: el HTML
+  autocontenido no puede depender de archivos externos.
+- **Cambios en el motor se verifican corriendo el juego, no leyendo el código.** El método
+  del proyecto es una partida simulada completa (jsdom en Node) contra el `.html` ya
+  construido, con aciertos y errores. Fue lo que encontró la repetición de variantes y el
+  doble conteo al pulsar NEXT dos veces.
