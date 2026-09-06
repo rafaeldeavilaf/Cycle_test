@@ -54,7 +54,11 @@ function builtGames() {
   return JSON.parse(js);
 }
 
-function openGame(slug, seedSave) {
+const HERO_KEY = 'samuel-quest:hero';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function openGame(slug, seedSave, opts) {
+  opts = opts || {};
   const file = path.join(ROOT, slug + '.html');
   if (!fs.existsSync(file)) {
     console.error('No existe ' + slug + '.html. Ejecuta primero: python3 tools/build.py');
@@ -72,13 +76,28 @@ function openGame(slug, seedSave) {
       window.scrollTo = () => {};
       window.confirm = () => true;
       window.alert = () => {};
-      if (seedSave) {
-        try { window.localStorage.setItem('samuel-quest:' + slug, JSON.stringify(seedSave)); }
-        catch (e) { /* ignore */ }
-      }
+      // Emula de verdad prefers-reduced-motion: hay una rama JS que depende
+      // de el (la pista abre sin esperar a la animacion).
+      window.matchMedia = q => ({
+        matches: !!opts.reducedMotion && /reduce/.test(q),
+        media: q, onchange: null,
+        addListener() {}, removeListener() {},
+        addEventListener() {}, removeEventListener() {}, dispatchEvent() { return false; }
+      });
+      try {
+        if (seedSave) window.localStorage.setItem('samuel-quest:' + slug, JSON.stringify(seedSave));
+        if (opts.hero) window.localStorage.setItem(HERO_KEY, JSON.stringify(opts.hero));
+        else if (opts.hero !== null) window.localStorage.setItem(HERO_KEY, JSON.stringify({ v: 1, body: 'a', alias: '', chosen: true }));
+      } catch (e) { /* ignore */ }
     }
   });
   return dom;
+}
+
+/* Un heroe ya elegido, para que las partidas simuladas arranquen en el mapa.
+   El flujo de primer arranque se prueba aparte, en la seccion 8. */
+function heroDone(extra) {
+  return Object.assign({ v: 1, body: 'a', alias: '', chosen: true }, extra || {});
 }
 
 /* ---------- utilidades de juego ---------- */
@@ -253,7 +272,7 @@ function checkQueue(served, level) {
 /* ============================================================
    MAIN
    ============================================================ */
-function main() {
+async function main() {
   const subs = builtGames();
   if (!subs.length) { console.error('subjects.js no declara ninguna materia'); process.exit(1); }
   const slug = subs[0].slug;
@@ -477,6 +496,160 @@ function main() {
         (gameHtml.match(/https?:\/\//g) || []).filter(u => !/fonts\.(googleapis|gstatic)\.com/.test(u)).length >= 0);
 
   dom2.window.close();
+
+  /* ============================================================
+     8. HEROE, ARMERIA Y ANIMACION DE LA PISTA (Fase 2)
+     ============================================================ */
+  section('8. Heroe: primer arranque, silueta y alias');
+  // hero: null => NO se siembra la clave, como un navegador limpio.
+  const h1 = openGame(slug, null, { hero: null });
+  const hw = h1.window, hd = hw.document;
+  check('sin heroe elegido, lo primero es la pantalla HERO, no el mapa',
+        visible(hd, 'scrHero') && !visible(hd, 'scrMap'));
+  const cards = hd.querySelectorAll('#heroPick .hero-card');
+  check('ofrece dos siluetas', cards.length === 2, 'siluetas=' + cards.length);
+  check('las siluetas son botones de radio accesibles',
+        Array.from(cards).every(c => c.getAttribute('role') === 'radio' && c.getAttribute('aria-label')));
+  check('la logica no habla de genero: solo cuerpos a y b',
+        !/\b(girl|boy|female|male|chica|chico)\b/i.test(fs.readFileSync(path.join(ROOT, 'assets', 'engine.js'), 'utf8')));
+
+  cards[1].click();                                   // elige la silueta b
+  hd.getElementById('heroAlias').value = 'PIXEL FOX';
+  hd.getElementById('heroGo').click();
+  check('tras elegir, se entra al mapa', visible(hd, 'scrMap') && !visible(hd, 'scrHero'));
+  const hero1 = JSON.parse(hw.localStorage.getItem(HERO_KEY));
+  check('el heroe se guarda en su propia clave, no en la del progreso',
+        hero1.body === 'b' && hero1.chosen === true && hero1.alias === 'PIXEL FOX');
+  check('la clave del heroe NO lleva el slug de la materia (es transversal)',
+        HERO_KEY === 'samuel-quest:hero');
+  check('el progreso de la materia sigue en su clave aparte',
+        hw.localStorage.getItem('samuel-quest:' + slug) !== hw.localStorage.getItem(HERO_KEY));
+
+  // El alias se recorta a 12 y nunca se pide el nombre real.
+  hd.getElementById('btnHero').click();
+  hd.getElementById('heroAlias').value = 'ESTE ALIAS ES DEMASIADO LARGO';
+  hd.getElementById('heroGo').click();
+  check('el alias se recorta a 12 caracteres',
+        JSON.parse(hw.localStorage.getItem(HERO_KEY)).alias.length === 12);
+  check('el campo del alias tiene maxlength en el HTML',
+        hd.getElementById('heroAlias').getAttribute('maxlength') === '12');
+  h1.window.close();
+
+  section('8b. Armeria: 4 piezas, 8 colores, persistencia');
+  const h2 = openGame(slug, null, { hero: heroDone({ body: 'b' }) });
+  const aw = h2.window, ad = aw.document;
+  ad.getElementById('btnArm').click();
+  check('la armeria se abre desde el mapa', visible(ad, 'scrArm'));
+  const rows = ad.querySelectorAll('#armRows .arm-row');
+  check('hay 4 filas, una por pieza', rows.length === 4, 'filas=' + rows.length);
+  const swatches = ad.querySelectorAll('#armRows .swatch');
+  check('hay 8 colores por pieza', swatches.length === 32, 'muestras=' + swatches.length);
+  check('cada muestra dice pieza y color por aria-label',
+        Array.from(swatches).every(s => (s.getAttribute('aria-label') || '').indexOf(':') !== -1));
+  /* Si un color por defecto no esta en la paleta, el nino abre la armeria y ve
+     esa fila sin nada marcado. Paso con var(--accent). */
+  const marked = ad.querySelectorAll('#armRows .swatch.is-on');
+  check('las 4 filas arrancan con su color marcado', marked.length === 4,
+        'marcadas=' + marked.length + ' de 4');
+  // Pinta una pieza distinta en cada fila.
+  [0, 1, 2, 3].forEach(r => {
+    const s = ad.querySelector('.swatch[data-row="' + r + '"][data-col="' + (r + 2) + '"]');
+    if (s) s.click();
+  });
+  const colours = JSON.parse(aw.localStorage.getItem(HERO_KEY)).colors;
+  check('las 4 piezas quedan guardadas',
+        ['helm', 'body', 'glove', 'boot'].every(k => /^#[0-9a-f]{6}$/i.test(colours[k])),
+        JSON.stringify(colours));
+  h2.window.close();
+
+  // Recargar (y "cambiar de materia" = misma clave de heroe, otra partida).
+  const h3 = openGame(slug, null, { hero: heroDone({ body: 'b', colors: colours, alias: 'NEON OWL' }) });
+  const rd = h3.window.document;
+  const kept = JSON.parse(h3.window.localStorage.getItem(HERO_KEY));
+  check('al recargar se conservan cuerpo, alias y colores',
+        kept.body === 'b' && kept.alias === 'NEON OWL' &&
+        ['helm', 'body', 'glove', 'boot'].every(k => kept.colors[k] === colours[k]));
+  const rootStyle = rd.documentElement.getAttribute('style') || '';
+  check('las 4 variables de armadura se pintan en el documento',
+        ['--h-helm', '--h-body', '--h-glove', '--h-boot'].every(v => rootStyle.indexOf(v) !== -1),
+        rootStyle.slice(0, 90));
+  const svg = rd.getElementById('heroSprite').innerHTML;
+  check('el sprite no lleva ningun color fijo en las 4 piezas',
+        ['--h-helm', '--h-body', '--h-glove', '--h-boot'].every(v => svg.indexOf('var(' + v + ')') !== -1));
+  check('el alias sustituye a {hero} en el contenido',
+        (function () {
+          rd.querySelectorAll('#levelList .level-card')[0]
+            .dispatchEvent(new h3.window.MouseEvent('click', { bubbles: true }));
+          const b = rd.getElementById('briefBody').textContent;
+          return b.indexOf('NEON OWL') !== -1 && b.indexOf('{hero}') === -1;
+        })());
+  h3.window.close();
+
+  section('8c. Invocar la calculadora: la pista llega despues de la animacion');
+  const h4 = openGame(slug, null, { hero: heroDone() });
+  const cw = h4.window, cd = cw.document;
+  cd.querySelectorAll('#levelList .level-card')[0].dispatchEvent(new cw.MouseEvent('click', { bubbles: true }));
+  cd.getElementById('briefGo').click();
+  cd.getElementById('btnHint').click();
+  check('al pulsar HINT la pista NO se abre de golpe',
+        !cd.getElementById('qHint').classList.contains('is-on'));
+  check('el heroe alza el brazo y aparece la calculadora',
+        cd.querySelector('#mateSprite .calc') !== null &&
+        cd.querySelector('#mateSprite .avatar--summon') !== null);
+  await sleep(500);
+  check('a mitad de la animacion la pista sigue cerrada',
+        !cd.getElementById('qHint').classList.contains('is-on'));
+  await sleep(700);
+  check('a los 0.9 s la pista ya esta abierta',
+        cd.getElementById('qHint').classList.contains('is-on'));
+  h4.window.close();
+
+  const h5 = openGame(slug, null, { hero: heroDone(), reducedMotion: true });
+  const pw = h5.window, pd = pw.document;
+  pd.querySelectorAll('#levelList .level-card')[0].dispatchEvent(new pw.MouseEvent('click', { bubbles: true }));
+  pd.getElementById('briefGo').click();
+  pd.getElementById('btnHint').click();
+  check('con reduced-motion la pista abre sin esperar',
+        pd.getElementById('qHint').classList.contains('is-on'));
+  check('...y sin animacion de invocacion',
+        pd.querySelector('#mateSprite .avatar--summon') === null);
+  h5.window.close();
+
+  section('8d. Ningun nombre real en lo que el nino LEE');
+  const gameSrc = fs.readFileSync(path.join(ROOT, slug + '.html'), 'utf8');
+
+  /* Se recorre el juego y se mira el texto VISIBLE, no el codigo fuente:
+     lo que importa es que 25 companeros no lean el nombre de nadie. */
+  const h6 = openGame(slug, null, { hero: heroDone({ alias: 'TURBO LYNX' }) });
+  const nw = h6.window, nd = nw.document;
+  let seen = nd.querySelector('.wrap').textContent;
+  nd.querySelectorAll('#levelList .level-card')[0].dispatchEvent(new nw.MouseEvent('click', { bubbles: true }));
+  seen += ' ' + nd.getElementById('briefBody').textContent;
+  nd.getElementById('briefGo').click();
+  for (let i = 0; i < 40 && visible(nd, 'scrPlay'); i++) {
+    seen += ' ' + nd.querySelector('#scrPlay').textContent;
+    const f = findVariant(nw, nd);
+    if (!f) break;
+    clickOption(nd, f.pick.v.answer);
+    seen += ' ' + nd.getElementById('qFeed').textContent;
+    nd.getElementById('btnNext').click();
+  }
+  check('ningun texto visible dice "Samuel"', !/Samuel/i.test(seen));
+  check('ningun texto visible deja el token {hero} sin sustituir', seen.indexOf('{hero}') === -1);
+  check('el alias del nino si aparece donde toca', seen.indexOf('TURBO LYNX') !== -1);
+  h6.window.close();
+
+  // En el codigo solo puede quedar el alias historico de compatibilidad.
+  const samuelHits = (gameSrc.match(/Samuel/g) || []);
+  check('en el codigo solo queda el alias historico window.SamuelSprite',
+        samuelHits.length === 1 && /window\.SamuelSprite/.test(gameSrc),
+        samuelHits.length + ' apariciones');
+  check('cero "Samuel" en el hub', !/Samuel/.test(fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8')));
+  check('el generador ya no incrusta un nombre',
+        !/Samuel/.test(fs.readFileSync(path.join(ROOT, 'tools', 'gen_y6_maths_counting.py'), 'utf8')));
+  check('el contenido usa el token {hero}', /\{hero\}/.test(gameSrc));
+  check('la clave de guardado sigue siendo samuel-quest (no se renombra)',
+        gameSrc.indexOf("'samuel-quest:'") !== -1 && gameSrc.indexOf("'samuel-quest:hero'") !== -1);
 
   /* ---------- resumen ---------- */
   console.log('\n' + '-'.repeat(56));

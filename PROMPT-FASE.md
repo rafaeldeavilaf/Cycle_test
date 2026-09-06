@@ -13,8 +13,8 @@ knowledge del proyecto.
 | Fase | Estado |
 |---|---|
 | 0 — Limpieza, `ui.js`, migración v3, harness | **Hecha y publicada** |
-| 1 — Escena `doors` sobre los 5 niveles v1 | **Hecha** |
-| 2 — HERO + armería + animación de la calculadora | Pendiente |
+| 1 — Escena `doors` sobre los 5 niveles v1 | **Hecha y publicada** |
+| 2 — HERO + armería + animación de la calculadora | **Hecha** |
 | 3 — Puntuación v2 | Pendiente (los datos ya se guardan, ver abajo) |
 | 4 — Generador v2: 7 niveles, `mech`, jefes | Pendiente |
 | 5 — Escenas `bridge`/`ruler`/`planks`/`lift`/`rule`/`machine`/`smash` | Pendiente |
@@ -87,6 +87,26 @@ de un `role="group"` con nombre; la posición se anuncia por `aria-live`; con
 `prefers-reduced-motion` el héroe **aparece** en la casilla en vez de caminar
 (es CSS puro: `.scene__hero { transition: none }`).
 
+**7b. El héroe vive en `samuel-quest:hero`, aparte del progreso.** Clave nueva
+y **sin slug**: es transversal a materias, para que el niño no reconfigure su
+personaje en cada una. Guarda `{v, body:'a'|'b', alias, chosen, colors}`.
+
+- El motor **no sabe de género**: son cuerpos `a` y `b`; las etiquetas visibles
+  ("SHORT HAIR" / "LONG HAIR") están en `ui.js`.
+- **Nunca se pide ni se guarda el nombre real.** Solo un alias de 12 caracteres
+  elegido por el niño, con sugerencias generadas, que no sale del navegador.
+- Ningún texto de contenido puede llevar un nombre propio: se escribe `{hero}`
+  en `data.js` y el motor lo sustituye por el alias (`heroText()`). El harness
+  recorre el juego y falla si algún texto **visible** lleva un nombre real o
+  deja un `{hero}` sin sustituir.
+- El sprite se ensambla por partes (`BODIES`/`LIMBS`/`FACES`/`OVERLAYS`), nunca
+  un string por mood. Las 4 piezas de armadura se pintan con
+  `var(--h-helm|body|glove|boot)`; ningún `fill` fijo en esas piezas.
+- **Todo color de armadura elegible debe cumplir contraste ≥ 3:1 sobre
+  `--bg-1`**, y **todo color por defecto debe estar en la paleta** — si no, la
+  armería muestra esa fila sin nada marcado. Ambas cosas las comprueba el
+  harness. El `#1c2555` de las piernas de v1 da 1.16:1 y por eso no está.
+
 **8. DOM + CSS, nunca canvas.** Un héroe y ≤ 12 casillas no lo justifican, y
 canvas obliga a construir una capa de accesibilidad paralela.
 
@@ -108,9 +128,10 @@ node tools/harness.js
 ```
 
 `tools/harness.js` abre el `.html` **ya construido** en jsdom y juega niveles
-completos con aciertos y errores. Hoy son 65 comprobaciones. Encontró la
-repetición de variantes, el doble conteo al pulsar NEXT dos veces, y un texto
-con "daily" que se había colado en `ui.js`.
+completos con aciertos y errores. Hoy son 103 comprobaciones. Encontró la
+repetición de variantes, el doble conteo al pulsar NEXT dos veces, un texto con
+"daily" colado en `ui.js`, y tres filas de la armería que arrancaban sin ningún
+color marcado.
 
 Al añadir una pieza, **añade sus comprobaciones al harness**, y no borres las
 que ya están. Para una escena nueva, como mínimo: el nivel termina; solo con
@@ -129,9 +150,6 @@ publicado no usa npm ni build step).
   seguidas cuesta 1/16 y aún da 3 estrellas. Contradice el criterio del plan
   ("no domina = falla la misma familia 3 veces"). **Decisión de la Fase 3.**
   El harness fija el comportamiento actual para que el cambio se vea.
-- **Los briefings de `data.js` dicen "Welcome to the Quest, Samuel".** Otros
-  niños lo leen. Se resuelve con el alias de §5 (**Fase 2**) y exige regenerar
-  con `tools/gen_y6_maths_counting.py`.
 - **`README.md`, `PRIMEROS-PASOS.md`, `PROJECT_INSTRUCTIONS.md` y
   `DESIGN_SYSTEM.md` siguen describiendo v1** (nombre viejo, 5 niveles, sin
   escenas). **Fase 7.**

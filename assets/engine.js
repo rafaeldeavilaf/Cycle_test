@@ -106,6 +106,84 @@
   }
   var STATE = load();
 
+  /* ---------- HEROE (transversal a materias) ----------
+     Clave NUEVA y separada del progreso: si viviera dentro de
+     `samuel-quest:<slug>` el nino tendria que reconfigurar su personaje en
+     cada materia. Ninguna clave existente se renombra ni se toca.
+
+     Aqui NUNCA se guarda el nombre real: solo un alias elegido por el nino,
+     de 12 caracteres, que no sale del navegador. */
+  var HERO_KEY = 'samuel-quest:hero';
+  var ALIAS_MAX = 12;
+
+  function blankHero() {
+    return {
+      v: 1,
+      body: 'a',
+      alias: '',
+      chosen: false,
+      /* Valores concretos de la paleta, NO `var(--accent)`.
+         Dos razones:
+         1. Con `var(--accent)` la armeria mostraba tres filas sin ninguna
+            muestra marcada, porque el valor guardado no coincidia con ningun
+            hex de la paleta.
+         2. El heroe es del NINO y es transversal a materias: que cambiara de
+            color al pasar de Mates a Ciencias contradice justo eso.
+         Estos tres hex SON los acentos de Mates, asi que el aspecto de v1 se
+         conserva exacto. Las botas pasan de #1c2555 (1.16:1, invisible sobre
+         el fondo) a un azul que cumple contraste. */
+      colors: {
+        helm:  '#7ee8fa',   // CYAN   — era var(--accent) en Mates
+        body:  '#c77dff',   // PURPLE — era var(--accent-2)
+        glove: '#c77dff',   // PURPLE
+        boot:  '#5b8cff'    // SKY
+      }
+    };
+  }
+  function loadHero() {
+    var h = blankHero();
+    try {
+      var raw = localStorage.getItem(HERO_KEY);
+      if (!raw) return h;
+      var s = JSON.parse(raw);
+      if (!s || typeof s !== 'object') return h;
+      if (s.body === 'a' || s.body === 'b') h.body = s.body;
+      if (typeof s.alias === 'string') h.alias = s.alias.slice(0, ALIAS_MAX);
+      h.chosen = !!s.chosen;
+      if (s.colors && typeof s.colors === 'object') {
+        ['helm', 'body', 'glove', 'boot'].forEach(function (k) {
+          if (typeof s.colors[k] === 'string' && s.colors[k]) h.colors[k] = s.colors[k];
+        });
+      }
+    } catch (e) { /* private mode */ }
+    return h;
+  }
+  function saveHero() {
+    try { localStorage.setItem(HERO_KEY, JSON.stringify(HERO)); } catch (e) { /* private mode */ }
+  }
+  var HERO = loadHero();
+
+  /* Pinta las 4 variables de armadura sobre cualquier contenedor de sprites. */
+  function paintHero(node) {
+    if (!node || !node.style) return;
+    node.style.setProperty('--h-helm',  HERO.colors.helm);
+    node.style.setProperty('--h-body',  HERO.colors.body);
+    node.style.setProperty('--h-glove', HERO.colors.glove);
+    node.style.setProperty('--h-boot',  HERO.colors.boot);
+  }
+  function paintAllHeroes() {
+    paintHero(document.documentElement);
+  }
+
+  /* Sustituye {hero} por el alias en cualquier texto de contenido. Si el nino
+     no puso alias, se usa el generico de ui.js: nunca queda un hueco raro ni
+     el nombre de nadie. */
+  function heroText(s) {
+    if (s == null) return '';
+    var name = HERO.alias || UI.hero.defaultAlias;
+    return String(s).replace(/\{hero\}/g, name);
+  }
+
   /* ---------- AUDIO (no assets, pure WebAudio) ---------- */
   var actx = null;
   function beep(freq, dur, type, vol) {
@@ -127,7 +205,12 @@
     wrong:  function () { beep(200, .18, 'sawtooth', .05); },
     click:  function () { beep(440, .04, 'square', .03); },
     level:  function () { [523, 659, 784, 1047].forEach(function (f, i) { setTimeout(function () { beep(f, .16); }, i * 110); }); },
-    unlock: function () { [392, 523, 659].forEach(function (f, i) { setTimeout(function () { beep(f, .12); }, i * 90); }); }
+    unlock: function () { [392, 523, 659].forEach(function (f, i) { setTimeout(function () { beep(f, .12); }, i * 90); }); },
+    // Invocar la calculadora: arpegio ascendente de 3 notas + "ding".
+    summon: function () {
+      [523, 659, 784].forEach(function (f, i) { setTimeout(function () { beep(f, .10); }, i * 90); });
+      setTimeout(function () { beep(1319, .22, 'triangle', .05); }, 300);
+    }
   };
 
   /* ---------- MUSICA CHIPTUNE ----------
@@ -289,48 +372,90 @@
   }
 
   /* ---------- SPRITE (inline pixel-art hero) ----------
-     Moods: 'idle' | 'happy' (celebra) | 'sad' (derrotado)
-     Cada mood cambia ojos, boca y BRAZOS. Nada de archivos de imagen.
-  -------------------------------------------------------- */
-  function heroSVG(mood) {
-    var eyes, brow = '', mouth, arms, extra = '';
+     Ensamblado POR PARTES, no un string por mood. Con 3 moods x 2 cuerpos,
+     escribir el SVG entero cada vez son 6 strings casi identicos que se
+     desincronizan en cuanto se toca uno. (Deuda declarada en PLAN-V2 §6.)
 
-    if (mood === 'happy') {
-      // ojos cerrados en arco ^ ^
-      eyes  = 'M5 7h1v1H5z M6 6h1v1H6z M7 7h1v1H7z M9 7h1v1H9z M10 6h1v1h-1z M11 7h1v1h-1z';
-      mouth = 'M6 10h5v1H6z M5 9h1v1H5z M11 9h1v1h-1z M7 11h3v1H7z';
-      arms  = 'M3 8h2v5H3z M12 8h2v5h-2z';           // brazos ARRIBA
-      // chispas de celebracion
-      extra = '<path fill="var(--warn)" d="M1 6h1v1H1z M15 5h1v1h-1z M2 11h1v1H2z M14 10h1v1h-1z"/>';
-    } else if (mood === 'sad') {
-      eyes  = 'M6 8h1v1H6z M10 8h1v1h-1z';           // ojos pequenos y bajos
-      brow  = '<path fill="#141a33" d="M5 6h2v1H5z M10 6h2v1h-2z"/>';
-      mouth = 'M6 11h5v1H6z M5 10h1v1H5z M11 10h1v1h-1z';  // comisuras hacia abajo
-      arms  = 'M3 14h2v4H3z M12 14h2v4h-2z';         // brazos caidos
-      extra = '<path fill="#7ee8fa" d="M13 7h1v2h-1z M13 9h1v1h-1z"/>'; // gota de sudor
-    } else {
-      eyes  = 'M6 6h1v2H6z M10 6h1v2h-1z';
-      mouth = 'M7 10h3v1H7z';
-      arms  = 'M3 13h2v4H3z M12 13h2v4h-2z';
+     Moods: 'idle' | 'happy' | 'sad' | 'summon'
+     Cuerpos: 'a' | 'b'  — difieren en pelo, silueta del torso y botas.
+     La logica NO sabe de genero: son 'a' y 'b'; las etiquetas visibles
+     viven en ui.js.
+
+     Las 4 piezas de armadura se pintan con variables CSS
+     (--h-helm / --h-body / --h-glove / --h-boot) que pone el contenedor.
+     Asi un solo string sirve para todas las combinaciones y las animaciones
+     CSS no cambian.
+  -------------------------------------------------------- */
+  var BODIES = {
+    a: {
+      hair:  'M4 1h9v2H4z M3 2h1v4H3z M13 2h1v4h-1z M4 2h9v2H4z',
+      torso: 'M5 12h7v6H5z',
+      boots: 'M5 18h3v2H5z M9 18h3v2H9z'
+    },
+    b: {
+      hair:  'M4 1h9v2H4z M4 2h9v2H4z M3 2h1v9H3z M13 2h1v9h-1z M2 4h1v6H2z M14 4h1v6h-1z',
+      torso: 'M5 12h7v3H5z M6 15h5v3H6z',
+      boots: 'M6 18h2v2H6z M9 18h2v2H9z'
     }
+  };
+
+  /* Brazos y manos van separados: en v1 los brazos llevaban el color del
+     torso y no habia guantes que pintar. */
+  var LIMBS = {
+    idle:   { arms: 'M3 13h2v3H3z M12 13h2v3h-2z', hands: 'M3 16h2v1H3z M12 16h2v1h-2z' },
+    happy:  { arms: 'M3 9h2v4H3z M12 9h2v4h-2z',   hands: 'M3 8h2v1H3z M12 8h2v1h-2z'   },
+    sad:    { arms: 'M3 14h2v3H3z M12 14h2v3h-2z', hands: 'M3 17h2v1H3z M12 17h2v1h-2z' },
+    // summon: brazo derecho vertical, el izquierdo en reposo (PLAN-V2 §6.2).
+    summon: { arms: 'M3 13h2v3H3z M12 7h2v6h-2z',  hands: 'M3 16h2v1H3z M12 6h2v1h-2z'  }
+  };
+
+  var FACES = {
+    idle:   { eyes: 'M6 6h1v2H6z M10 6h1v2h-1z', mouth: 'M7 10h3v1H7z' },
+    happy:  { eyes: 'M5 7h1v1H5z M6 6h1v1H6z M7 7h1v1H7z M9 7h1v1H9z M10 6h1v1h-1z M11 7h1v1h-1z',
+              mouth: 'M6 10h5v1H6z M5 9h1v1H5z M11 9h1v1h-1z M7 11h3v1H7z' },
+    sad:    { eyes: 'M6 8h1v1H6z M10 8h1v1h-1z', mouth: 'M6 11h5v1H6z M5 10h1v1H5z M11 10h1v1h-1z',
+              brow: 'M5 6h2v1H5z M10 6h2v1h-2z' },
+    summon: { eyes: 'M6 6h1v2H6z M10 6h1v2h-1z', mouth: 'M7 10h2v2H7z' }   // boca abierta
+  };
+
+  var EXTRAS = {
+    happy: '<path fill="var(--warn)" d="M1 6h1v1H1z M15 5h1v1h-1z M2 11h1v1H2z M14 10h1v1h-1z"/>',
+    sad:   '<path fill="#7ee8fa" d="M13 7h1v2h-1z M13 9h1v1h-1z"/>'
+  };
+
+  /* Se dibuja DESPUES del cuerpo: el destello y la calculadora van delante
+     de la mano alzada. La animacion es CSS (ver .avatar .flash / .calc). */
+  var OVERLAYS = {
+    summon:
+      '<g class="flash">' +
+        '<path fill="var(--warn)" d="M10 4h1v1h-1z M16 4h1v1h-1z M13 0h1v1h-1z M13 8h1v1h-1z"/>' +
+      '</g>' +
+      '<g class="calc">' +
+        '<path fill="#0a0e24" d="M11 0h5v6h-5z"/>' +
+        '<path fill="var(--accent)" d="M12 1h3v2h-3z"/>' +
+        '<path fill="#eaf0ff" d="M12 4h1v1h-1z M14 4h1v1h-1z"/>' +
+      '</g>'
+  };
+
+  function heroSVG(mood, hero) {
+    hero = hero || HERO;
+    var B = BODIES[(hero && hero.body) === 'b' ? 'b' : 'a'];
+    var L = LIMBS[mood] || LIMBS.idle;
+    var F = FACES[mood] || FACES.idle;
 
     return '<svg class="avatar" viewBox="0 0 17 20" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">' +
-      extra +
-      // pelo
-      '<path fill="#2b1a12" d="M4 1h9v2H4z M3 2h1v4H3z M13 2h1v4h-1z M4 2h9v2H4z"/>' +
-      // cara
+      (EXTRAS[mood] || '') +
+      '<path fill="#2b1a12" d="' + B.hair + '"/>' +
       '<path fill="#e8b088" d="M4 4h9v8H4z"/>' +
-      brow +
-      '<path fill="#141a33" d="' + eyes + '"/>' +
-      '<path fill="#8c4a3a" d="' + mouth + '"/>' +
-      // diadema / visor con el color de la materia
-      '<path fill="var(--accent)" d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/>' +
-      // torso + brazos
-      '<path fill="var(--accent-2)" d="M5 12h7v6H5z ' + arms + '"/>' +
-      // emblema del pecho
+      (F.brow ? '<path fill="#141a33" d="' + F.brow + '"/>' : '') +
+      '<path fill="#141a33" d="' + F.eyes + '"/>' +
+      '<path fill="#8c4a3a" d="' + F.mouth + '"/>' +
+      '<path fill="var(--h-helm)"  d="M3 5h1v3H3z M13 5h1v3h-1z M3 4h11v1H3z"/>' +
+      '<path fill="var(--h-body)"  d="' + B.torso + ' ' + L.arms + '"/>' +
+      '<path fill="var(--h-glove)" d="' + L.hands + '"/>' +
       '<path fill="#fff" d="M8 14h1v3H8z M7 15h3v1H7z"/>' +
-      // piernas
-      '<path fill="#1c2555" d="M5 18h3v2H5z M9 18h3v2H9z"/>' +
+      '<path fill="var(--h-boot)"  d="' + B.boots + '"/>' +
+      (OVERLAYS[mood] || '') +
       '</svg>';
   }
   window.HeroSprite = heroSVG;
@@ -630,6 +755,8 @@
             '<span class="hud__stat">' + UI.map.statLevels + ' <b id="mapDone">0/0</b></span>' +
           '</div>' +
           '<div class="hud__group">' +
+            '<button class="btn btn--ghost" id="btnHero" type="button">' + UI.hero.btnHero + '</button>' +
+            '<button class="btn btn--ghost" id="btnArm" type="button">' + UI.hero.btnArmoury + '</button>' +
             '<button class="btn btn--ghost" id="btnMusic" type="button"></button>' +
             '<button class="btn btn--ghost" id="btnSound" type="button"></button>' +
             '<button class="btn btn--ghost" id="btnReset" type="button">' + UI.map.btnReset + '</button>' +
@@ -638,6 +765,45 @@
         '<p class="text-dim" style="font-size:15px">' + UI.map.intro + '</p>' +
         '<div class="levels" id="levelList"></div>' +
         '<div id="allDone"></div>' +
+      '</section>' +
+
+      /* HERO — primer arranque de cualquier materia */
+      '<section id="scrHero" class="screen">' +
+        '<div class="pixel-box brief">' +
+          '<h2>' + UI.hero.title + '</h2>' +
+          '<p class="text-dim" style="font-size:15px">' + UI.hero.intro + '</p>' +
+          '<div class="hero-pick" id="heroPick" role="radiogroup" aria-label="' + UI.hero.title + '"></div>' +
+          '<h3 class="mt-lg">' + UI.hero.aliasTitle + '</h3>' +
+          '<p class="text-dim" style="font-size:14px">' + UI.hero.aliasHelp + '</p>' +
+          '<div class="row mt">' +
+            '<label class="sr-only" for="heroAlias">' + UI.hero.aliasLabel + '</label>' +
+            '<input id="heroAlias" class="field" type="text" maxlength="' + ALIAS_MAX + '" ' +
+              'autocomplete="off" autocorrect="off" spellcheck="false">' +
+            '<button class="btn btn--ghost" id="heroDice" type="button">' + UI.hero.aliasDice + '</button>' +
+          '</div>' +
+          '<div class="row row--end mt-lg">' +
+            '<button class="btn btn--ghost" id="heroArm" type="button">' + UI.hero.btnArmoury + '</button>' +
+            '<button class="btn btn--primary" id="heroGo" type="button">' + UI.hero.btnStart + '</button>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+
+      /* ARMERIA */
+      '<section id="scrArm" class="screen">' +
+        '<div class="pixel-box brief">' +
+          '<h2>' + UI.armoury.title + '</h2>' +
+          '<p class="text-dim" style="font-size:15px">' + UI.armoury.intro + '</p>' +
+          '<div class="armoury">' +
+            '<div id="armRows"></div>' +
+            '<div class="armoury__preview">' +
+              '<span class="armoury__tag">' + UI.armoury.preview + '</span>' +
+              '<div id="armPreview"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="row row--end mt-lg">' +
+            '<button class="btn btn--primary" id="armDone" type="button">' + UI.armoury.btnDone + '</button>' +
+          '</div>' +
+        '</div>' +
       '</section>' +
 
       /* BRIEFING */
@@ -693,7 +859,10 @@
     '</div>' +
     '<div class="combo" id="comboPop"></div>';
 
-  var screens = { map: el('scrMap'), brief: el('scrBrief'), play: el('scrPlay'), win: el('scrWin') };
+  var screens = {
+    hero: el('scrHero'), arm: el('scrArm'), map: el('scrMap'),
+    brief: el('scrBrief'), play: el('scrPlay'), win: el('scrWin')
+  };
   function show(name) {
     Object.keys(screens).forEach(function (k) { screens[k].classList.toggle('is-on', k === name); });
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { /* jsdom / navegadores viejos */ }
@@ -746,6 +915,135 @@
       : '';
   }
 
+  /* ---------- HEROE Y ARMERIA ---------- */
+  var armFrom = 'map';        // a donde vuelve DONE
+
+  function refreshSprites() {
+    paintAllHeroes();
+    var h = el('heroSprite');
+    if (h) h.innerHTML = heroSVG('idle');
+  }
+
+  function renderHeroPick() {
+    var box = el('heroPick');
+    box.innerHTML = '';
+    [['a', UI.hero.bodyA], ['b', UI.hero.bodyB]].forEach(function (p) {
+      var on = HERO.body === p[0];
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'hero-card' + (on ? ' is-on' : '');
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+      b.setAttribute('aria-label', fmt(UI.hero.pickAria, { name: p[1] }));
+      b.innerHTML = '<span class="hero-card__art">' + heroSVG('idle', { body: p[0] }) + '</span>' +
+                    '<span class="hero-card__name">' + p[1] + '</span>';
+      b.addEventListener('click', function () {
+        HERO.body = p[0]; saveHero(); SFX.click();
+        renderHeroPick(); refreshSprites();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  var PIECES = [
+    { key: 'helm',  label: UI.armoury.pieceHelm },
+    { key: 'body',  label: UI.armoury.pieceBody },
+    { key: 'glove', label: UI.armoury.pieceGlove },
+    { key: 'boot',  label: UI.armoury.pieceBoot }
+  ];
+
+  function updateArmPreview() {
+    var p = el('armPreview');
+    if (p) p.innerHTML = heroSVG('idle').replace('class="avatar"', 'class="avatar avatar--lg avatar--bob"');
+  }
+
+  function renderArmoury(focusRow, focusCol) {
+    var rows = el('armRows');
+    rows.innerHTML = '';
+    PIECES.forEach(function (p, ri) {
+      var row = document.createElement('div');
+      row.className = 'arm-row';
+      var lab = document.createElement('span');
+      lab.className = 'arm-row__label';
+      lab.textContent = p.label;
+      var strip = document.createElement('div');
+      strip.className = 'arm-row__strip';
+      UI.armoury.colours.forEach(function (c, ci) {
+        var on = HERO.colors[p.key] === c.value;
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'swatch' + (on ? ' is-on' : '');
+        b.style.background = c.value;
+        b.setAttribute('data-piece', p.key);
+        b.setAttribute('data-row', String(ri));
+        b.setAttribute('data-col', String(ci));
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        b.setAttribute('aria-label', fmt(UI.armoury.swatchAria, { piece: p.label, colour: c.name }));
+        b.addEventListener('click', function () {
+          HERO.colors[p.key] = c.value; saveHero(); SFX.click();
+          renderArmoury(ri, ci); refreshSprites();
+        });
+        strip.appendChild(b);
+      });
+      row.appendChild(lab);
+      row.appendChild(strip);
+      rows.appendChild(row);
+    });
+    updateArmPreview();
+    if (focusRow != null) {
+      var again = rows.querySelector('.swatch[data-row="' + focusRow + '"][data-col="' + focusCol + '"]');
+      if (again) again.focus();
+    }
+  }
+
+  /* Flechas entre muestras; Enter/Espacio los aplica el propio <button>. */
+  el('armRows').addEventListener('keydown', function (e) {
+    var t = e.target;
+    if (!t || !t.classList || !t.classList.contains('swatch')) return;
+    var r = parseInt(t.getAttribute('data-row'), 10);
+    var c = parseInt(t.getAttribute('data-col'), 10);
+    var nr = r, nc = c, n = UI.armoury.colours.length;
+    if (e.key === 'ArrowRight')     nc = Math.min(n - 1, c + 1);
+    else if (e.key === 'ArrowLeft') nc = Math.max(0, c - 1);
+    else if (e.key === 'ArrowDown') nr = Math.min(PIECES.length - 1, r + 1);
+    else if (e.key === 'ArrowUp')   nr = Math.max(0, r - 1);
+    else return;
+    e.preventDefault();
+    var next = el('armRows').querySelector('.swatch[data-row="' + nr + '"][data-col="' + nc + '"]');
+    if (next) next.focus();
+  });
+
+  function openHero() {
+    el('heroAlias').value = HERO.alias || '';
+    renderHeroPick();
+    show('hero');
+  }
+  function openArmoury(from) {
+    armFrom = from;
+    renderArmoury();
+    show('arm');
+  }
+
+  el('heroDice').addEventListener('click', function () {
+    SFX.click();
+    el('heroAlias').value = (pick(UI.hero.aliasWordsA) + ' ' + pick(UI.hero.aliasWordsB)).slice(0, ALIAS_MAX);
+  });
+  el('heroGo').addEventListener('click', function () {
+    // Solo se guarda el alias que el nino escribio. Nunca sale del navegador.
+    HERO.alias = String(el('heroAlias').value || '').trim().slice(0, ALIAS_MAX);
+    HERO.chosen = true;
+    saveHero(); SFX.click();
+    refreshSprites(); renderMap(); show('map');
+  });
+  el('heroArm').addEventListener('click', function () { SFX.click(); openArmoury('hero'); });
+  el('armDone').addEventListener('click', function () {
+    SFX.click();
+    if (armFrom === 'hero') { renderHeroPick(); show('hero'); }
+    else { renderMap(); show('map'); }
+  });
+  el('btnHero').addEventListener('click', function () { SFX.click(); openHero(); });
+  el('btnArm').addEventListener('click', function () { SFX.click(); openArmoury('map'); });
+
   /* ---------- BRIEFING ---------- */
   var currentIdx = 0, run = null;
 
@@ -755,7 +1053,7 @@
     el('briefBody').innerHTML =
       '<div class="q-tag">' + fmt(UI.brief.tag, { n: lv.id }) + '</div>' +
       '<h2>' + esc(lv.name) + '</h2>' +
-      lv.briefing.join('');
+      heroText(lv.briefing.join(''));
     show('brief');
   }
 
@@ -801,8 +1099,8 @@
     locked = false;
 
     el('qTag').textContent = q.family.skill.toUpperCase().replace(/-/g, ' ');
-    el('qStem').innerHTML = q.v.stem;
-    el('qSub').innerHTML = q.v.sub || '';
+    el('qStem').innerHTML = heroText(q.v.stem);
+    el('qSub').innerHTML = heroText(q.v.sub || '');
     el('qSub').style.display = q.v.sub ? 'block' : 'none';
 
     // sequence tiles
@@ -821,16 +1119,44 @@
     mountScene(q.family.mech, q.v, order);
 
     // Andamiaje: si ya fallo esta familia antes, la pista aparece sola.
+    // Pero DESPUES de la animacion, para que el nino la vea (PLAN-V2 §6.2).
     var retry = q.tries > 1;
-    el('qHint').className = 'hint' + (retry ? ' is-on' : '');
+    el('qHint').className = 'hint';
     el('qHint').innerHTML = (retry ? UI.play.hintRetry : UI.play.hintLabel)
-      + (q.v.hint || UI.play.hintFallback);
+      + heroText(q.v.hint || UI.play.hintFallback);
     el('btnHint').style.display = retry ? 'none' : 'inline-block';
     el('qFeed').className = 'pixel-box feedback';
     el('btnNext').style.display = 'none';
     setMate('idle', run.combo >= 3 ? fmt(UI.mate.combo, { n: run.combo })
                                    : (retry ? UI.mate.retry : UI.mate.turn));
     updateHUD();
+    // El andamiaje automatico usa exactamente el mismo disparador que el boton.
+    if (retry) setTimeout(summonHint, 220);
+  }
+
+  /* Invocar la calculadora magica. Unico camino a la pista: lo llaman tanto
+     el boton HINT como el andamiaje del reintento. Con reduced-motion se salta
+     a la fase final y el panel abre ya. */
+  function summonHint() {
+    var panel = el('qHint');
+    if (!panel) return;
+    var box = el('mateSprite');
+    var reduced = false;
+    try {
+      reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) { /* navegador viejo */ }
+
+    if (!box || reduced) { panel.classList.add('is-on'); return; }
+
+    SFX.summon();
+    MUSIC.duck(1200);
+    box.innerHTML = heroSVG('summon');
+    var sprite = box.querySelector('.avatar');
+    if (sprite) sprite.classList.add('avatar--summon');
+    var m = el('mateMsg');
+    if (m) m.className = 'mate__msg';
+    // 0.9 s: alzar (0-0.3) + destello (0.3-0.5) + aparicion (0.5-0.9).
+    setTimeout(function () { panel.classList.add('is-on'); }, 900);
   }
 
   function updateHUD() {
@@ -867,7 +1193,7 @@
       if (run.combo >= 3) popCombo(fmt(UI.mate.comboPop, { n: run.combo }));
       fb.className = 'pixel-box feedback is-on feedback--good';
       fb.innerHTML = '<div class="feedback__title">' + UI.play.goodTitle + '</div>' +
-                     '<div class="feedback__body">' + q.v.explain + '</div>';
+                     '<div class="feedback__body">' + heroText(q.v.explain) + '</div>';
     } else {
       SFX.wrong();
       MUSIC.duck(900);
@@ -875,7 +1201,7 @@
       setMate('sad', pick(UI.mate.consoles), 'is-bad');
       fb.className = 'pixel-box feedback is-on feedback--bad';
       fb.innerHTML = '<div class="feedback__title">' + UI.play.badTitle + '</div>' +
-                     '<div class="feedback__body">' + q.v.explain +
+                     '<div class="feedback__body">' + heroText(q.v.explain) +
                      '<p style="margin-top:12px;color:var(--warn)">' + UI.play.badNote + '</p></div>';
     }
     el('btnHint').style.display = 'none';
@@ -886,7 +1212,7 @@
   }
 
   el('btnNext').addEventListener('click', function () { SFX.click(); nextQuestion(); });
-  el('btnHint').addEventListener('click', function () { SFX.click(); el('qHint').classList.add('is-on'); });
+  el('btnHint').addEventListener('click', function () { SFX.click(); summonHint(); });
   el('btnQuit').addEventListener('click', function () {
     if (window.confirm(UI.play.confirmQuit)) { renderMap(); show('map'); }
   });
@@ -1002,5 +1328,11 @@
     }
   });
 
+  /* ---------- ARRANQUE ----------
+     El heroe es transversal: si aun no se ha elegido en NINGUNA materia,
+     lo primero que se ve es la pantalla HERO. */
+  paintAllHeroes();
+  refreshSprites();
   renderMap();
+  if (!HERO.chosen) openHero(); else show('map');
 })();

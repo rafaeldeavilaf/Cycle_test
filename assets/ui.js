@@ -99,6 +99,56 @@ window.GAME_UI = {
     confirmQuit: 'Leave this level? Progress in this level is not saved.'
   },
 
+  /* ---------- HEROE Y ARMERIA ----------
+     El motor solo conoce cuerpos 'a' y 'b'. Como se llamen y como se
+     describan se decide aqui. Las etiquetas describen el PELO, no un genero:
+     es lo que de verdad cambia entre las dos siluetas. */
+  hero: {
+    title:        'CHOOSE YOUR HERO',
+    intro:        'Pick a look. You can change it any time, and it follows you into every game.',
+    bodyA:        'SHORT HAIR',
+    bodyB:        'LONG HAIR',
+    pickAria:     'Choose the {name} hero',
+    aliasTitle:   'HERO NAME',
+    aliasHelp:    'Optional. Up to 12 characters. Use a made-up name, not your real one &mdash; it stays in this browser and is never sent anywhere.',
+    aliasLabel:   'Your hero name',
+    aliasDice:    'SURPRISE ME',
+    defaultAlias: 'HERO',
+    btnStart:     'START &gt;',
+    btnArmoury:   'ARMOURY',
+    btnHero:      'HERO',
+    btnBack:      '&lt; MAP',
+    /* Sugerencias generadas: el nino elige de una lista, nunca escribe su
+       nombre real por inercia. Se combinan adjetivo + animal. */
+    aliasWordsA:  ['PIXEL', 'TURBO', 'NEON', 'IRON', 'STORM', 'LUCKY', 'SHADOW', 'COSMIC', 'RAPID', 'BRAVE'],
+    aliasWordsB:  ['FOX', 'OWL', 'WOLF', 'CROW', 'LYNX', 'HAWK', 'BEAR', 'MOTH', 'RAY', 'CUB']
+  },
+
+  armoury: {
+    title:      'ARMOURY',
+    intro:      'Paint your armour. Four pieces, eight colours.',
+    pieceHelm:  'HELMET',
+    pieceBody:  'BODY',
+    pieceGlove: 'GLOVES',
+    pieceBoot:  'BOOTS',
+    swatchAria: '{piece}: {colour}',
+    preview:    'PREVIEW',
+    btnDone:    'DONE &gt;',
+    /* Ocho colores fijos. Todos verificados con contraste >= 5:1 sobre
+       --bg-1; el navy de las piernas de v1 (#1c2555) daba 1.16:1 y por eso
+       no esta aqui. Si se cambia alguno, hay que volver a medir. */
+    colours: [
+      { name: 'CYAN',   value: '#7ee8fa' },
+      { name: 'SKY',    value: '#5b8cff' },
+      { name: 'PURPLE', value: '#c77dff' },
+      { name: 'ROSE',   value: '#ff4d6d' },
+      { name: 'ORANGE', value: '#ff9e64' },
+      { name: 'GOLD',   value: '#ffd93d' },
+      { name: 'LIME',   value: '#a0ff5c' },
+      { name: 'GREEN',  value: '#3ce88a' }
+    ]
+  },
+
   /* ---------- ESCENAS (v2: moverse es responder) ----------
      Textos de la capa de movimiento. `doors` es la escena canonica y
      el fallback de cualquier familia sin `mech`. */

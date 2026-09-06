@@ -336,7 +336,7 @@ LEVELS.append({
     "name": "WHOLE NUMBER WAY",
     "subtitle": "Counting on and back with whole numbers",
     "briefing": [
-        "<p>Welcome to the Quest, Samuel. Before anything else you need the basic move: <b>the step</b>.</p>",
+        "<p>Welcome, {hero}. Before anything else you need the basic move: <b>the step</b>.</p>",
         "<p>A sequence is just numbers that follow a rule. To find the rule, look at the jump between two numbers next to each other.</p>",
         "<div class='example'>4, 11, 18, 25<br>11 - 4 = 7<br>18 - 11 = 7<br>Rule: count on in steps of 7</div>",
         "<ul>"
@@ -479,7 +479,9 @@ for start, step, weeks in [(F(1250,100), F(-175,100), 3), (F(2,1), F(45,100), 4)
     end = start + weeks * step
     word = "spends" if step < 0 else "saves"
     v.append(mk(
-        f"Samuel has &pound;{f(start)} and {word} &pound;{f(abs(step))} each week. How much after {weeks} weeks?",
+        # {hero} lo sustituye el motor por el alias que eligio el nino. Nunca
+        # se escribe aqui el nombre de nadie: el juego lo usan 25 companeros.
+        f"{{hero}} has &pound;{f(start)} and {word} &pound;{f(abs(step))} each week. How much after {weeks} weeks?",
         "£" + f(end),
         ["£" + f(end + step), "£" + f(end - step), "£" + f(start + step)],
         f"That is {weeks} equal steps of {f(abs(step))}.",
@@ -1428,7 +1430,12 @@ for lv in DATA["levels"]:
             assert 0 <= var["answer"] < 4, q["id"]
 
 import os, sys
-out_dir = sys.argv[1] if len(sys.argv) > 1 else "."
+# Por defecto, la carpeta de ESTA materia. Antes el defecto era "." y ejecutarlo
+# sin argumentos dejaba un data.js suelto en la raiz del repo mientras el juego
+# seguia usando el viejo: parecia que el generador no habia hecho nada.
+_here = os.path.dirname(os.path.abspath(__file__))
+_default_out = os.path.join(os.path.dirname(_here), "subjects", "y6-maths-counting-sequences")
+out_dir = sys.argv[1] if len(sys.argv) > 1 else _default_out
 os.makedirs(out_dir, exist_ok=True)
 path = os.path.join(out_dir, "data.js")
 with open(path, "w", encoding="utf-8") as fh:

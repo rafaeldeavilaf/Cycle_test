@@ -14,7 +14,7 @@ window.QUIZ_DATA = {
    "name": "WHOLE NUMBER WAY",
    "subtitle": "Counting on and back with whole numbers",
    "briefing": [
-    "<p>Welcome to the Quest, Samuel. Before anything else you need the basic move: <b>the step</b>.</p>",
+    "<p>Welcome, {hero}. Before anything else you need the basic move: <b>the step</b>.</p>",
     "<p>A sequence is just numbers that follow a rule. To find the rule, look at the jump between two numbers next to each other.</p>",
     "<div class='example'>4, 11, 18, 25<br>11 - 4 = 7<br>18 - 11 = 7<br>Rule: count on in steps of 7</div>",
     "<ul><li><b>Count on</b> = numbers get bigger. Add the step.</li><li><b>Count back</b> = numbers get smaller. Subtract the step.</li><li>Always check <i>two</i> jumps, not one, so you don't guess.</li></ul>",
@@ -2422,7 +2422,7 @@ window.QUIZ_DATA = {
      "skill": "decimal word problem",
      "variants": [
       {
-       "stem": "Samuel has &pound;12.5 and spends &pound;1.75 each week. How much after 3 weeks?",
+       "stem": "{hero} has &pound;12.5 and spends &pound;1.75 each week. How much after 3 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -2436,7 +2436,7 @@ window.QUIZ_DATA = {
        "explain": "<code>3 x 1.75 = 5.25</code>, so the answer is <code>7.25</code>."
       },
       {
-       "stem": "Samuel has &pound;2 and saves &pound;0.45 each week. How much after 4 weeks?",
+       "stem": "{hero} has &pound;2 and saves &pound;0.45 each week. How much after 4 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -2450,7 +2450,7 @@ window.QUIZ_DATA = {
        "explain": "<code>4 x 0.45 = 1.8</code>, so the answer is <code>3.8</code>."
       },
       {
-       "stem": "Samuel has &pound;30 and spends &pound;2.5 each week. How much after 5 weeks?",
+       "stem": "{hero} has &pound;30 and spends &pound;2.5 each week. How much after 5 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -2464,7 +2464,7 @@ window.QUIZ_DATA = {
        "explain": "<code>5 x 2.5 = 12.5</code>, so the answer is <code>17.5</code>."
       },
       {
-       "stem": "Samuel has &pound;20.5 and spends &pound;2.5 each week. How much after 4 weeks?",
+       "stem": "{hero} has &pound;20.5 and spends &pound;2.5 each week. How much after 4 weeks?",
        "sub": null,
        "seq": null,
        "options": [
@@ -2478,7 +2478,7 @@ window.QUIZ_DATA = {
        "explain": "<code>4 x 2.5 = 10</code>, so the answer is <code>10.5</code>."
       },
       {
-       "stem": "Samuel has &pound;5 and saves &pound;1.25 each week. How much after 3 weeks?",
+       "stem": "{hero} has &pound;5 and saves &pound;1.25 each week. How much after 3 weeks?",
        "sub": null,
        "seq": null,
        "options": [
