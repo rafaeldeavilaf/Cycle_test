@@ -1,10 +1,19 @@
-# NIVELES Y JEFES — Samu: A Link to the Math (v2)
+# NIVELES Y JEFES — borrador interno (v2)
 
-**Propuesta base para el plan v2.** No es una decisión cerrada: el equipo de expertos debe
-validarla, corregirla o sustituirla con argumentos. Existe para que el plan discuta algo
-concreto en vez de empezar de cero.
+> **Esto no es una especificación y no se manda al equipo de expertos.**
+>
+> Quién diseña los 7 niveles y los 7 jefes es el equipo del plan v2, desde cero. Este
+> documento es un borrador de trabajo: existe para **contrastar después**, cuando ellos ya
+> hayan entregado su propuesta, y ver qué se les escapó o qué resolvieron mejor.
+>
+> Si se adjunta al primer mensaje, el equipo lo validará en vez de diseñar. El efecto ancla
+> es real: cuesta más criticar un diseño que ya está escrito que inventar uno propio.
+>
+> Lo único de aquí que **sí** es decisión tomada, y está recogido en
+> `PROJECT_INSTRUCTIONS.md`, son las restricciones: sin destreza, sin reloj, perder no
+> cuesta progreso, y los nombres viven en datos y no en el motor.
 
-Todo aquí está mapeado contra el material real del **Cycle Test #1 — Counting and
+Todo lo que sigue está mapeado contra el material real del **Cycle Test #1 — Counting and
 Sequences**, que es el único contenido que existe hoy (80 familias, 400 variantes).
 
 ---
@@ -91,6 +100,9 @@ justamente lo que falla en un examen real donde las preguntas no vienen ordenada
 
 ### Los siete jefes
 
+Los nombres son de trabajo y se cambian cuando se quiera: viven en el archivo de datos de
+la materia, no en el motor. Renombrar uno es editar una línea y reconstruir.
+
 **1 · THE STEPKEEPER** — *Whole Number Way*
 Guardián de piedra que sostiene el puente de entrada.
 Durante el mundo te daban la secuencia y pedían el siguiente número. El Stepkeeper hace lo
@@ -143,7 +155,7 @@ antes del Cycle Test real.
 
 ## 4. Qué queda por decidir
 
-Esto es propuesta; el plan v2 debe resolver, con argumentos:
+Todo lo anterior es borrador. El equipo del plan v2 decide, con argumentos:
 
 - Si los mundos 5 y 7 son los correctos, o si el material del Cycle Test pide otro corte.
 - Cuántas familias por mundo, ahora que la carga se reparte entre 7 y no 5. En v1 un nivel

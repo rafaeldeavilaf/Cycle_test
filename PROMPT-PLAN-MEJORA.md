@@ -1,9 +1,14 @@
 # Prompt para el chat del plan de mejora — v2
 
 > Copia todo lo que sigue en un chat nuevo con Claude (modelo Fable). Antes de enviarlo,
-> adjunta: `PROJECT_INSTRUCTIONS.md`, `NIVELES-Y-JEFES.md`, `DESIGN_SYSTEM.md`,
-> `README.md`, `PROMPT.md`, `assets/engine.js`, `assets/engine.css`, el material de
-> estudio del Cycle Test y el archivo publicable `y6-maths-counting-sequences.html`.
+> adjunta: `PROJECT_INSTRUCTIONS.md`, `DESIGN_SYSTEM.md`, `README.md`, `PROMPT.md`,
+> `assets/engine.js`, `assets/engine.css`, el material de estudio del Cycle Test y el
+> archivo publicable `y6-maths-counting-sequences.html`.
+>
+> **No adjuntes `NIVELES-Y-JEFES.md` en el primer mensaje.** Ese documento es un borrador
+> interno: si lo mandas de entrada, el equipo lo validará en vez de diseñar, y perderás
+> justo lo que fuiste a buscar. Guárdalo y compáralo **después** de que entreguen su
+> propuesta, para ver qué se les escapó.
 
 ---
 
@@ -39,19 +44,18 @@ explícitamente como una decisión de rediseño, con su justificación.
 
 Producir un **plan de mejora** (documento, no código) para v2, con estas siete piezas.
 
-### 1. Validar y cerrar los 7 niveles
+### 1. Diseñar los 7 niveles
 
-v2 pasa de 5 a **7 niveles**. En `NIVELES-Y-JEFES.md` adjunto hay una **propuesta base**:
-siete mundos mapeados contra el material real del Cycle Test #1, con la habilidad que
-entrena cada uno y la mecánica que le corresponde.
+v2 pasa de 5 a **7 niveles**, y **vosotros decidís cuáles son**. No hay una lista previa
+que respetar: partid del material de estudio adjunto y del contenido que ya existe
+(5 mundos: enteros, decimales, fracciones, negativos, reglas posición-término) y decidid
+cómo se reparte en siete, qué falta, qué se divide y en qué orden.
 
-Vuestro trabajo no es aceptarla: es **auditarla y cerrarla**. Decid qué mundo sobra, cuál
-falta, si el corte del material es el correcto, y entregad la lista definitiva con nombre,
-habilidad, qué debe saber hacer el niño al terminarlo, y cuántas familias de preguntas
-lleva. Tened en cuenta el dato medido: en v1, un nivel de 16 familias dura 15-20 minutos.
+Entregad la lista definitiva. Para cada nivel: nombre, habilidad que entrena, qué debe
+saber hacer el niño al terminarlo, y cuántas familias de preguntas lleva. Señalad qué
+contenido **no existe todavía** y hay que generar, con su costo.
 
-Dos mundos de la propuesta **no tienen contenido generado todavía**. Decid qué preguntas
-hacen falta y cuánto cuesta generarlas.
+Dato para calibrar: en v1, un nivel de 16 familias dura 15-20 minutos reales.
 
 **El progreso se mide en niveles, nunca en días.** No propongáis calendarios de estudio ni
 cadencias diarias: es un juego, y cada niño avanza a su ritmo.
@@ -79,14 +83,15 @@ que domina la matemática se atascara en un salto y que el juego midiera reflejo
 razonamiento. No lo reabráis.
 
 La mecánica es **opción múltiple interactiva**: el personaje se mueve con el teclado y su
-desplazamiento es la respuesta. Cuatro puertas rotuladas y cruza la correcta; un puente de
-losas donde solo pisa las que continúan la secuencia; un ascensor vertical que es una recta
-numérica con el cero marcado. **Sin reloj, sin saltos con temporización, sin caídas.**
-Elegir mal devuelve al inicio del tramo y la pregunta vuelve luego con otra variante.
+desplazamiento es la respuesta. La forma canónica son cuatro puertas rotuladas al fondo de
+un pasillo: caminas hacia la correcta y la cruzas. **Sin reloj, sin saltos con
+temporización, sin caídas.** Elegir mal devuelve al inicio del tramo y la pregunta vuelve
+luego con otra variante.
 
-En `NIVELES-Y-JEFES.md` hay seis formas de moverse propuestas. Auditadlas: añadid las que
-falten, descartad las que sean decorado, y proponed variantes más imaginativas si las
-tenéis — el único filtro es que la mecánica encarne la habilidad.
+Eso es el suelo, no el techo. **Inventad las variantes**: cuantas formas de moverse hagan
+falta para que cada habilidad tenga la suya, y que sean imaginativas. El único filtro es
+el de arriba —la mecánica debe encarnar la habilidad, no decorarla— y que ninguna exija
+destreza.
 
 Definid cómo se implementa en 2D —canvas o DOM+CSS, sin motor de físicas pesado—
 manteniendo compatible el modelo de datos actual (familias/variantes) y sin romper el
@@ -126,22 +131,32 @@ Al entrar, el jugador elige si su personaje es femenino o masculino. Debe persis
 
 ### 7. Jefes de nivel
 
-Cada uno de los 7 niveles termina con un jefe. En `NIVELES-Y-JEFES.md` hay siete jefes
-propuestos con sus fases y el sistema de combate: la vida del jefe son preguntas, acertar
-a la primera hace daño crítico, sin reloj nunca, tres corazones, y perder reinicia solo el
-combate —nunca el mundo—.
+Cada uno de los 7 niveles termina con un jefe, y **vosotros los diseñáis**: nombre,
+identidad, mecánica de combate, fases y cómo escala del nivel 1 al 7. No hay jefes
+preasignados.
 
-Auditad esa propuesta y cerradla. El filtro duro, aplicado uno por uno:
+Diseñad primero el **sistema de combate** —cómo se hace daño, qué pasa al fallar, qué
+pasa al perder— y después los siete jefes concretos dentro de ese sistema.
+
+El filtro duro, aplicado a cada uno por separado:
 
 > **¿Qué evalúa este jefe que no evalúen ya las preguntas de su nivel?**
 
-Casi siempre la respuesta debe ser la habilidad **invertida** o dos habilidades a la vez.
 Un jefe que es "más preguntas con música épica" no justifica lo que cuesta construirlo:
-decidlo y proponed otro.
+descartadlo y proponed otro.
+
+Dos restricciones pedagógicas que no son negociables: **nunca un reloj** —castigar la
+lentitud rompe el propósito del juego— y **perder no puede devolver al principio del
+mundo**; equivocarse cuesta tiempo, nunca progreso.
 
 Resolved además: si el jefe sustituye a las últimas preguntas del nivel o se suma a ellas
 (sumarlo alarga, sustituirlo reduce cobertura), y cómo se anima un ataque de jefe sin
 archivos de imagen, solo con SVG inline, CSS y WebAudio.
+
+**Requisito técnico:** los nombres de jefes y mundos —y cualquier otro texto que el
+jugador lea— viven en el archivo de datos de la materia, nunca dentro del motor.
+Renombrar un jefe debe costar editar una línea y reconstruir. Decid en el plan dónde queda
+cada texto.
 
 ## Restricciones que el plan debe respetar
 
@@ -153,6 +168,9 @@ archivos de imagen, solo con SVG inline, CSS y WebAudio.
   debe mantener esa compatibilidad, o el plan declara explícitamente la migración y su costo.
 - **La clave de `localStorage` no se renombra** aunque el juego cambie de nombre:
   renombrarla borra el progreso de quien ya venía jugando.
+- **Ningún texto visible se escribe dentro del motor.** Nombres de mundos y de jefes,
+  títulos de fase, mensajes de victoria y derrota: todo en el archivo de datos de la
+  materia. Si un nombre de jefe aparece en `engine.js`, está mal.
 - **Debe seguir publicándose con doble clic.** Nada del flujo (`publicar.bat`, `build.py`)
   puede exigir pasos técnicos nuevos al fundador.
 - **Lo van a usar otros niños.** Autoexplicativo desde el primer clic, sin un adulto al

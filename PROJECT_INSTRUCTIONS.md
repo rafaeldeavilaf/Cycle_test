@@ -50,6 +50,24 @@ genéricos o dirigidos al alias que cada niño elija.
 La única excepción permitida en `engine.css` es añadir una línea `[data-accent="..."]`
 con dos variables de color para una materia nueva.
 
+### Ningún texto visible se escribe dentro del motor
+
+**Todo lo que el jugador lee vive en datos, nunca en `engine.js`.** Nombres de mundos,
+nombres de jefes, títulos de fase, mensajes del compañero, textos de victoria y derrota:
+todo va en `subjects/<slug>/data.js` (o en el generador que lo produce).
+
+Cambiar el nombre de un jefe tiene que costar **editar una línea y reconstruir**, sin
+abrir el motor, sin buscar strings sueltos y sin riesgo de romper nada. Lo mismo para
+renombrar un mundo o reescribir un mensaje.
+
+Motivo: los nombres se van a cambiar. Siempre pasa —suena mejor otro, un niño se queja,
+cambia la materia—. Un nombre incrustado en el motor convierte un capricho de dos minutos
+en una edición de código con su reconstrucción y su riesgo. Es la clase de deuda técnica
+que no duele el primer día y estorba cada semana.
+
+Regla práctica para revisar cualquier entrega: si buscas un nombre de jefe con `grep` y
+aparece en `engine.js`, está mal.
+
 ---
 
 ## Estructura
@@ -72,7 +90,7 @@ samu-link-to-the-math/
 │   └── build.py          inlina motor+datos en los .html de la raíz
 ├── PROMPT.md             prompt maestro para materias nuevas
 ├── PROMPT-PLAN-MEJORA.md prompt para el plan de rediseño v2
-├── NIVELES-Y-JEFES.md    propuesta de los 7 mundos y los 7 jefes (v2)
+├── NIVELES-Y-JEFES.md    borrador interno de mundos y jefes — NO se manda al plan v2
 ├── DESIGN_SYSTEM.md      reglas visuales inviolables
 └── PROJECT_INSTRUCTIONS.md
 ```
@@ -144,9 +162,9 @@ sola), por qué esa mecánica y no otra, y cómo se evalúa que el niño la domi
 **Cada nivel termina con un jefe** que evalúa algo que las preguntas del nivel no evalúan
 —normalmente la habilidad invertida, o dos habilidades a la vez—.
 
-El detalle está en [`NIVELES-Y-JEFES.md`](NIVELES-Y-JEFES.md): las seis formas de moverse,
-los 7 mundos mapeados al material real y los 7 jefes con sus fases. Es una **propuesta
-base** que el plan v2 debe validar o corregir con argumentos.
+**Cuáles son los 7 niveles y cómo es cada jefe lo decide el equipo de expertos del plan
+v2**, no está decidido aquí. [`NIVELES-Y-JEFES.md`](NIVELES-Y-JEFES.md) es un borrador
+interno mío para tener algo con que contrastar; no es la especificación.
 
 ---
 

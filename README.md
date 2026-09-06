@@ -12,9 +12,10 @@ Cada test es un juego de varios niveles. Cada niño avanza a su ritmo.
 > dice "Samuel Quest" por dentro. La v2 —7 niveles donde el personaje se mueve con el
 > teclado para responder, un jefe por nivel, personaje configurable, puntuación visible y
 > el nombre nuevo— está en fase de plan, sin construir.
-> Ver [`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md),
-> [`NIVELES-Y-JEFES.md`](NIVELES-Y-JEFES.md) y
-> [`PROMPT-PLAN-MEJORA.md`](PROMPT-PLAN-MEJORA.md).
+> Ver [`PROJECT_INSTRUCTIONS.md`](PROJECT_INSTRUCTIONS.md) y
+> [`PROMPT-PLAN-MEJORA.md`](PROMPT-PLAN-MEJORA.md). Los niveles y los jefes concretos los
+> define el equipo del plan v2; [`NIVELES-Y-JEFES.md`](NIVELES-Y-JEFES.md) es solo un
+> borrador interno para contrastar después.
 
 ---
 
