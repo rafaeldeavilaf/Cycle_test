@@ -360,7 +360,15 @@
     var corridor = null, startPad = null, heroEl = null;
     var slots = [];            // [{ node, orig }]
     var cursor = -1;           // -1 = casilla de inicio; 0..n-1 = puertas
-    var ctx = null, dead = false, onResize = null;
+    var ctx = null, dead = false, onResize = null, stacked = false;
+
+    /* Una opcion puede ser "24" o "Each term is 10 more than the one before it."
+       Cuatro frases en columnas estrechas son ilegibles, en movil y fuera de el.
+       Por encima de este umbral el corredor se pone VERTICAL: cada puerta es una
+       banda a lo ancho y el heroe baja por el carril izquierdo. Es el mismo
+       modelo de movimiento (las flechas siguen valiendo), no una mecanica nueva. */
+    var STACK_OVER = 12;
+    function plain(s) { return String(s).replace(/<[^>]*>/g, ''); }
 
     function nodeAt(i) { return i < 0 ? startPad : slots[i].node; }
 
@@ -370,8 +378,14 @@
       if (!heroEl || !corridor) return;
       var t = nodeAt(cursor);
       if (!t) return;
-      var x = t.offsetLeft + (t.offsetWidth / 2);
-      heroEl.style.left = x + 'px';
+      if (stacked) {
+        // Corredor vertical: el heroe baja por el carril izquierdo.
+        heroEl.style.left = (startPad.offsetLeft + (startPad.offsetWidth / 2)) + 'px';
+        heroEl.style.top  = (t.offsetTop + (t.offsetHeight / 2)) + 'px';
+      } else {
+        heroEl.style.left = (t.offsetLeft + (t.offsetWidth / 2)) + 'px';
+        heroEl.style.top  = '';
+      }
       slots.forEach(function (s, i) { s.node.classList.toggle('is-here', i === cursor); });
       if (startPad) startPad.classList.toggle('is-here', cursor === -1);
     }
@@ -392,8 +406,10 @@
         cursor = -1;
 
         var v = ctx.variant;
+        stacked = ctx.order.some(function (o) { return plain(v.options[o]).length > STACK_OVER; });
+
         var html =
-          '<div class="scene scene--doors">' +
+          '<div class="scene scene--doors' + (stacked ? ' scene--stacked' : '') + '">' +
             '<div class="scene__corridor">' +
               '<div class="scene__row">' +
                 '<div class="scene__start" aria-hidden="true">' +
@@ -415,7 +431,7 @@
               // offsetParent con las puertas y basta un offsetLeft para situarlo.
               '<div class="scene__hero">' + heroSVG('idle') + '</div>' +
             '</div>' +
-            '<p class="scene__help">' + UI.scene.help + '</p>' +
+            '<p class="scene__help">' + (stacked ? UI.scene.helpStacked : UI.scene.help) + '</p>' +
           '</div>';
         container.innerHTML = html;
 

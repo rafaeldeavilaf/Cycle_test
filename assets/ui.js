@@ -104,7 +104,10 @@ window.GAME_UI = {
      el fallback de cualquier familia sin `mech`. */
   scene: {
     groupLabel:  'Walk to your answer',
-    help:        '<b>&larr; &rarr;</b> move &nbsp;·&nbsp; <b>Enter</b> go through the door &nbsp;·&nbsp; or press <b>A B C D</b>',
+    /* Las flechas van en <kbd>, no en <b>: la fuente de pixel no tiene glifo de
+       flecha y caia a una fuente de respaldo que se veia apagada y mas pequena. */
+    help:        '<kbd>&larr; &rarr;</kbd> move &nbsp;·&nbsp; <b>Enter</b> go through the door &nbsp;·&nbsp; or press <b>A B C D</b>',
+    helpStacked: '<kbd>&uarr; &darr;</kbd> move &nbsp;·&nbsp; <b>Enter</b> go through the door &nbsp;·&nbsp; or press <b>A B C D</b>',
     helpTouch:   'Tap a door to walk through it.',
     startLabel:  'START',
     startAria:   'Start of the corridor',

@@ -165,6 +165,7 @@ function playFullLevel(slug, levelIdx, plan) {
   let victim = null;          // modo 'focus': la familia que se machaca
   let walkOk = true;          // la puerta pisada coincide con la elegida
   let heroReturned = true;    // tras fallar, el heroe vuelve al inicio
+  const layout = { stacked: 0, row: 0, wrong: [] };
 
   while (visible(doc, 'scrPlay') && steps < 2000) {
     steps++;
@@ -175,6 +176,17 @@ function playFullLevel(slug, levelIdx, plan) {
     const fi = found.pick.fi, vi = found.pick.vi;
     (served[fi] = served[fi] || []).push(vi);
     if (victim === null) victim = fi;
+
+    // Invariante de maquetacion: el corredor se pone vertical si y solo si
+    // alguna opcion pasa de 12 caracteres.
+    const longest = found.pick.v.options
+      .map(o => String(o).replace(/<[^>]*>/g, '').length)
+      .reduce((a, b) => Math.max(a, b), 0);
+    const isStacked = !!doc.querySelector('.scene--stacked');
+    if (isStacked) layout.stacked++; else layout.row++;
+    if (isStacked !== (longest > 12)) {
+      layout.wrong.push('opcion de ' + longest + ' car. -> ' + (isStacked ? 'vertical' : 'horizontal'));
+    }
 
     const answer = found.pick.v.answer;
     fails[fi] = fails[fi] || 0;
@@ -213,7 +225,7 @@ function playFullLevel(slug, levelIdx, plan) {
   }
 
   return { dom, win, doc, served, problems, steps, rightHighlightOk, ambiguousSeen,
-           wrongsDone, victim, walkOk, heroReturned };
+           wrongsDone, victim, walkOk, heroReturned, layout };
 }
 
 /* Comprueba las dos garantias sobre la secuencia de variantes servidas
@@ -312,6 +324,29 @@ function main() {
   const cssPub = fs.readFileSync(path.join(ROOT, slug + '.html'), 'utf8');
   check('con prefers-reduced-motion el heroe no camina, aparece',
         /prefers-reduced-motion[\s\S]{0,400}\.scene__hero\s*\{\s*transition:\s*none/.test(cssPub));
+
+  /* REGRESION: una opcion puede ser una secuencia entera ("70, 62, 54, 46"),
+     no solo un numero. Con altura fija el texto se corta. Paso mucho. */
+  const frameRule = (cssPub.match(/\.door__frame\s*\{[^}]*\}/) || [''])[0];
+  check('las puertas crecen con el texto (min-height, nunca height fijo)',
+        /min-height/.test(frameRule) && !/[^-]height\s*:/.test(frameRule), frameRule.replace(/\s+/g, ' ').slice(0, 120));
+  const longest = r.win.QUIZ_DATA.levels
+    .flatMap(l => l.questions)
+    .flatMap(f => f.variants)
+    .flatMap(v => v.options.map(o => String(o).replace(/<[^>]*>/g, '')))
+    .reduce((a, b) => (b.length > a.length ? b : a), '');
+  console.log('       (opcion mas larga del juego: ' + longest.length + ' caracteres — "' + longest + '")');
+  check('hay opciones largas de verdad en el contenido (la regla sirve para algo)',
+        longest.length > 12, longest.length + ' caracteres');
+
+  /* El corredor vertical existe porque cuatro frases en columnas de 80px son
+     ilegibles. Invariante: vertical si y solo si alguna opcion pasa de 12 car. */
+  const lay = { stacked: r.layout.stacked + rk.layout.stacked, row: r.layout.row + rk.layout.row,
+                wrong: r.layout.wrong.concat(rk.layout.wrong) };
+  check('el corredor se pone vertical exactamente cuando toca',
+        lay.wrong.length === 0, lay.wrong.slice(0, 4).join(' | '));
+  check('se vieron las dos maquetaciones en la misma partida',
+        lay.stacked > 0 && lay.row > 0, 'vertical=' + lay.stacked + ' horizontal=' + lay.row);
 
   /* ---------- 2. Anti-repeticion ---------- */
   section('2. Anti-repeticion de variantes');
