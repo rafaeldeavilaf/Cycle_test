@@ -247,14 +247,13 @@ h3 { font-size: 12px; }
   .avatar .calc   { opacity: 1; animation: none; }
 }
 
-/* Compañero en la pantalla de juego */
+/* Mensaje del companero. El sprite vive en la escena, no aqui: un solo
+   personaje en movimiento se sigue mejor que tres repartidos. */
 .mate {
   display: flex; align-items: center; gap: 12px;
   flex: none;
-  min-width: 190px;
+  min-width: 150px;
 }
-.mate__sprite { width: 56px; height: 56px; display: grid; place-items: center; flex: none; }
-.mate__sprite .avatar { width: 56px; height: 56px; }
 .mate__msg {
   font-family: var(--font-ui);
   font-size: 11px;
@@ -9215,7 +9214,21 @@ window.QUIZ_DATA = {
 
         onResize = function () { place(); };
         window.addEventListener('resize', onResize);
+        this.setMood('idle');
         place();
+      },
+
+      /* El heroe de la escena es el unico animado del juego: respira en reposo,
+         celebra al acertar, se hunde al fallar e invoca la calculadora. */
+      setMood: function (m) {
+        if (!heroEl) return;
+        heroEl.innerHTML = heroSVG(m || 'idle');
+        var a = heroEl.querySelector('.avatar');
+        if (!a) return;
+        if (m === 'happy')       a.classList.add('avatar--cheer');
+        else if (m === 'sad')    a.classList.add('avatar--down');
+        else if (m === 'summon') a.classList.add('avatar--summon');
+        else                     a.classList.add('avatar--bob');
       },
 
       move: function (delta) {
@@ -9254,12 +9267,9 @@ window.QUIZ_DATA = {
         var correct = (answerOrig === chosenOrig);
         if (!correct) {
           slots.forEach(function (s) { if (s.orig === chosenOrig) s.node.classList.add('is-wrong', 'shake'); });
-          // El heroe vuelve al inicio del tramo.
+          // El heroe vuelve al inicio del tramo. La cara la pone setMate().
           cursor = -1;
           place();
-          if (heroEl) { var a = heroEl.querySelector('.avatar'); if (a) a.classList.add('avatar--down'); }
-        } else {
-          if (heroEl) { var b = heroEl.querySelector('.avatar'); if (b) b.classList.add('avatar--cheer'); }
         }
         ctx.say(correct ? UI.scene.sayRight : UI.scene.sayWrong);
       },
@@ -9272,17 +9282,12 @@ window.QUIZ_DATA = {
     };
   };
 
-  /* Cambia la cara del companero en la pantalla de juego. */
+  /* El mensaje va al HUD; la REACCION va al heroe de la escena, que es el que
+     el nino esta mirando porque es el que mueve. */
   function setMate(mood, msg, cls) {
-    var box = el('mateSprite');
-    if (!box) return;
-    box.innerHTML = heroSVG(mood);
-    var sprite = box.querySelector('.avatar');
-    if (mood === 'happy') sprite.classList.add('avatar--cheer');
-    else if (mood === 'sad') sprite.classList.add('avatar--down');
-    else sprite.classList.add('avatar--bob');
     var m = el('mateMsg');
     if (m) { m.textContent = msg || ''; m.className = 'mate__msg' + (cls ? ' ' + cls : ''); }
+    if (scene && scene.setMood) scene.setMood(mood);
   }
 
   /* ---------- QUESTION QUEUE ----------
@@ -9482,10 +9487,10 @@ window.QUIZ_DATA = {
       /* PLAY */
       '<section id="scrPlay" class="screen">' +
         '<div class="pixel-box hud">' +
-          '<div class="mate">' +
-            '<div class="mate__sprite" id="mateSprite"></div>' +
-            '<div class="mate__msg" id="mateMsg"></div>' +
-          '</div>' +
+          // Sin sprite aqui: el heroe de la escena es el unico que se anima.
+          // Tener tres copias del personaje en pantalla repartia la atencion y
+          // dejaba estatico justo al que toma la decision.
+          '<div class="mate"><div class="mate__msg" id="mateMsg"></div></div>' +
           '<div class="hud__group" style="flex:1">' +
             '<span class="hud__stat" id="hudLvl"></span>' +
             '<div class="bar"><div class="bar__fill" id="hudBar"></div></div>' +
@@ -9882,21 +9887,16 @@ window.QUIZ_DATA = {
   function summonHint() {
     var panel = el('qHint');
     if (!panel) return;
-    var box = el('mateSprite');
     var reduced = false;
     try {
       reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     } catch (e) { /* navegador viejo */ }
 
-    if (!box || reduced) { panel.classList.add('is-on'); return; }
+    if (!scene || !scene.setMood || reduced) { panel.classList.add('is-on'); return; }
 
     SFX.summon();
     MUSIC.duck(1200);
-    box.innerHTML = heroSVG('summon');
-    var sprite = box.querySelector('.avatar');
-    if (sprite) sprite.classList.add('avatar--summon');
-    var m = el('mateMsg');
-    if (m) m.className = 'mate__msg';
+    scene.setMood('summon');
     // 0.9 s: alzar (0-0.3) + destello (0.3-0.5) + aparicion (0.5-0.9).
     setTimeout(function () { panel.classList.add('is-on'); }, 900);
   }

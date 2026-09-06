@@ -598,12 +598,19 @@ async function main() {
   const cw = h4.window, cd = cw.document;
   cd.querySelectorAll('#levelList .level-card')[0].dispatchEvent(new cw.MouseEvent('click', { bubbles: true }));
   cd.getElementById('briefGo').click();
+  /* Un solo heroe en movimiento, no tres repartidos por la pantalla. */
+  check('en la pantalla de juego solo hay UN heroe, el de la escena',
+        cd.querySelectorAll('#scrPlay .avatar').length === 1,
+        'sprites en la pantalla de juego=' + cd.querySelectorAll('#scrPlay .avatar').length);
+  check('ese heroe esta en el corredor', !!cd.querySelector('#qScene .scene__hero .avatar'));
+  check('el heroe respira en reposo', !!cd.querySelector('#qScene .scene__hero .avatar--bob'));
+
   cd.getElementById('btnHint').click();
   check('al pulsar HINT la pista NO se abre de golpe',
         !cd.getElementById('qHint').classList.contains('is-on'));
-  check('el heroe alza el brazo y aparece la calculadora',
-        cd.querySelector('#mateSprite .calc') !== null &&
-        cd.querySelector('#mateSprite .avatar--summon') !== null);
+  check('el heroe de la escena alza el brazo y aparece la calculadora',
+        cd.querySelector('#qScene .scene__hero .calc') !== null &&
+        cd.querySelector('#qScene .scene__hero .avatar--summon') !== null);
   await sleep(500);
   check('a mitad de la animacion la pista sigue cerrada',
         !cd.getElementById('qHint').classList.contains('is-on'));
@@ -620,7 +627,7 @@ async function main() {
   check('con reduced-motion la pista abre sin esperar',
         pd.getElementById('qHint').classList.contains('is-on'));
   check('...y sin animacion de invocacion',
-        pd.querySelector('#mateSprite .avatar--summon') === null);
+        pd.querySelector('#qScene .avatar--summon') === null);
   h5.window.close();
 
   section('8d. Ningun nombre real en lo que el nino LEE');

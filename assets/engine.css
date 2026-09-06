@@ -236,14 +236,13 @@ h3 { font-size: 12px; }
   .avatar .calc   { opacity: 1; animation: none; }
 }
 
-/* Compañero en la pantalla de juego */
+/* Mensaje del companero. El sprite vive en la escena, no aqui: un solo
+   personaje en movimiento se sigue mejor que tres repartidos. */
 .mate {
   display: flex; align-items: center; gap: 12px;
   flex: none;
-  min-width: 190px;
+  min-width: 150px;
 }
-.mate__sprite { width: 56px; height: 56px; display: grid; place-items: center; flex: none; }
-.mate__sprite .avatar { width: 56px; height: 56px; }
 .mate__msg {
   font-family: var(--font-ui);
   font-size: 11px;
