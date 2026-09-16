@@ -745,6 +745,128 @@
     };
   };
 
+  /* ---------- SCENES.forge — construccion por piezas ----------
+     Anadida como motor generico (no como parche de una materia): sirve para
+     cualquier reto de "arma tu respuesta con piezas", no solo para espanol.
+
+     Contrato de la familia en data.js (ademas de lo comun a toda variante):
+       pieces: [{ text, cat }, ...]   — el banco, ya mezclado al vuelo aqui
+       rule:   { need: [{cat,min}], forbid: [cat, ...] }
+       options y answer se mantienen SOLO para respetar el contrato generico
+       del motor (answer(chosen) compara por indice); esta escena decide cual
+       de los dos indices corresponde llamando ctx.pick(...), la regla vive en
+       datos, nunca en este archivo.
+
+     No es espacial: `move`/`jump` no hacen nada (no hay flechas que caminar).
+     Confirmar es la unica forma de responder, igual que cruzar una puerta. */
+  SCENES.forge = function () {
+    var hostEl = null, previewEl = null, confirmBtn = null, paletteEls = {};
+    var ctx = null, dead = false, chosen = [];
+
+    function pieces() { return (ctx && ctx.variant && ctx.variant.pieces) || []; }
+    function rule() { return (ctx && ctx.variant && ctx.variant.rule) || {}; }
+
+    function setPieceEnabled(pi, enabled) {
+      var b = paletteEls[pi];
+      if (b) { b.disabled = !enabled; b.classList.toggle('is-used', !enabled); }
+    }
+
+    function renderPreview() {
+      if (!previewEl) return;
+      var P = pieces();
+      if (!chosen.length) {
+        previewEl.innerHTML = '<span class="forge__placeholder">&hellip;</span>';
+        return;
+      }
+      previewEl.innerHTML = chosen.map(function (pi, slot) {
+        return '<button type="button" class="forge__piece is-chosen" data-slot="' + slot + '"' +
+          (dead ? ' disabled' : '') + '>' + esc(P[pi].text) + '</button>';
+      }).join('');
+      if (dead) return;
+      Array.prototype.forEach.call(previewEl.querySelectorAll('.forge__piece'), function (btn) {
+        btn.addEventListener('click', function () {
+          if (dead) return;
+          var slot = parseInt(btn.getAttribute('data-slot'), 10);
+          var pi = chosen[slot];
+          chosen.splice(slot, 1);
+          setPieceEnabled(pi, true);
+          renderPreview();
+          ctx.say(fmt(UI.scene.sayForgeRemove, { value: P[pi].text }));
+        });
+      });
+    }
+
+    return {
+      mount: function (container, context) {
+        ctx = context; dead = false; chosen = []; paletteEls = {};
+        hostEl = container;
+        var P = pieces();
+        var order = shuffle(P.map(function (_, i) { return i; }));
+        var html =
+          '<div class="scene scene--forge">' +
+            '<div class="forge__preview" id="forgePreview" role="list" aria-label="' + esc(UI.scene.forgePreview) + '"></div>' +
+            '<div class="forge__palette" role="group" aria-label="' + esc(UI.scene.forgePaletteAria) + '">' +
+            order.map(function (pi) {
+              return '<button type="button" class="forge__piece" data-pi="' + pi + '">' + esc(P[pi].text) + '</button>';
+            }).join('') +
+            '</div>' +
+            '<div class="row mt"><button type="button" class="btn btn--primary" id="forgeConfirmBtn">' + esc(UI.scene.forgeConfirm) + '</button></div>' +
+          '</div>';
+        container.innerHTML = html;
+        if (ctx.help) ctx.help(UI.scene.forgeHelp, false);
+
+        previewEl = container.querySelector('#forgePreview');
+        confirmBtn = container.querySelector('#forgeConfirmBtn');
+        var self = this;
+        Array.prototype.forEach.call(container.querySelectorAll('.forge__palette .forge__piece'), function (btn) {
+          var pi = parseInt(btn.getAttribute('data-pi'), 10);
+          paletteEls[pi] = btn;
+          btn.addEventListener('click', function () {
+            if (dead || btn.disabled) return;
+            chosen.push(pi);
+            setPieceEnabled(pi, false);
+            renderPreview();
+            ctx.say(fmt(UI.scene.sayForgeAdd, { value: P[pi].text }));
+          });
+        });
+        confirmBtn.addEventListener('click', function () { self.confirm(); });
+        renderPreview();
+      },
+
+      setMood: function () { /* no hay heroe animado en esta escena */ },
+      move: function () { /* no es espacial: nada que caminar */ },
+      jump: function () { /* idem */ },
+
+      confirm: function () {
+        if (dead) return null;
+        if (!chosen.length) { if (ctx) ctx.say(UI.scene.sayForgeEmpty); return null; }
+        var P = pieces(), R = rule(), counts = {};
+        chosen.forEach(function (pi) { var c = P[pi].cat; counts[c] = (counts[c] || 0) + 1; });
+        var ok = true;
+        (R.need || []).forEach(function (n) { if ((counts[n.cat] || 0) < n.min) ok = false; });
+        (R.forbid || []).forEach(function (c) { if (counts[c]) ok = false; });
+        dead = true;
+        Object.keys(paletteEls).forEach(function (pi) { paletteEls[pi].disabled = true; });
+        if (confirmBtn) confirmBtn.disabled = true;
+        var answer = ctx.variant.answer;
+        var orig = ok ? answer : (answer === 1 ? 0 : 1);
+        ctx.pick(orig);
+        return orig;
+      },
+
+      markResult: function (answerOrig, chosenOrig) {
+        renderPreview();
+        if (previewEl) previewEl.classList.add(chosenOrig === answerOrig ? 'is-good' : 'is-bad');
+        ctx.say(chosenOrig === answerOrig ? UI.scene.sayForgeGood : UI.scene.sayForgeBad);
+      },
+
+      destroy: function () {
+        dead = true;
+        hostEl = previewEl = confirmBtn = null; paletteEls = {}; chosen = []; ctx = null;
+      }
+    };
+  };
+
   /* El mensaje va al HUD; la REACCION va al heroe de la escena, que es el que
      el nino esta mirando porque es el que mueve. */
   function setMate(mood, msg, cls) {

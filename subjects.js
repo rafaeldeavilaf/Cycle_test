@@ -5,6 +5,16 @@
    ============================================================ */
 window.SUBJECTS = [
   {
+    slug:    "espanol-heliodoro-laberinto",
+    subject: "Español",
+    topic:   "Elementos de la narración y producción escrita",
+    test:    "Cycle Test — Plan lector: Heliodoro y el laberinto secreto",
+    accent:  "spanish",
+    added:   "2026-09-16",
+    blurb:   "Narrador, personajes, tiempo y espacio, estructura, y producción escrita (descripción y diálogo), sobre un mundo propio — El Archivo del Laberinto.",
+    levels:  7
+  },
+  {
     slug:    "y6-maths-counting-sequences",
     subject: "Maths",
     topic:   "Counting and Sequences",

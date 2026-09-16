@@ -4,15 +4,13 @@ Memoria del proyecto. Pega este archivo en las *instrucciones del proyecto* de C
 (o súbelo al knowledge del proyecto) para que cualquier conversación futura arranque
 con el contexto completo.
 
-**Este documento describe dos cosas y no hay que confundirlas:**
-
-- **v1 — lo que está publicado y funcionando hoy.** 5 niveles, preguntas de opción
-  múltiple en pantalla estática. Se llama todavía "Samuel Quest" dentro del HTML.
-- **v2 — el rediseño aprobado, todavía sin construir.** 7 niveles donde el personaje se
-  mueve con el teclado para responder, un jefe por nivel, personaje configurable,
-  puntuación visible, nombre "Samu: A Link to the Math".
-
-Las secciones marcadas **[v2]** son objetivo, no realidad. No las describas como hechas.
+**Corrección del 16 de septiembre de 2026:** este documento decía que v2 (7 niveles,
+movimiento como respuesta, jefe por nivel, puntuación visible) estaba "aprobada, todavía
+sin construir". Eso ya no es cierto — `subjects/y6-maths-counting-sequences/data.js` y
+`assets/engine.js` YA tienen v2 completa (7 niveles, 112 familias, jefes con datos
+verificados). Las secciones marcadas **[v2]** de abajo describen lo que hoy YA ESTÁ
+construido para Maths, no una aspiración. Si algo de lo marcado [v2] no coincide con lo
+que ves al jugar, avisa — es señal de que este documento volvió a quedarse atrás.
 
 ---
 
@@ -26,8 +24,16 @@ compañeros de curso**: cada niño abre el mismo link y juega en su propio naveg
 quiera de una sentada. En ningún documento ni pantalla se habla de "un nivel por día" ni
 de calendarios de estudio: es un juego, no un plan de deberes.
 
-Todo el contenido del juego está **en inglés**. La documentación y la conversación
-conmigo, en español.
+**El idioma del contenido sigue al de la materia evaluada, no es siempre inglés.**
+Maths y las demás materias del currículo británico van en inglés, porque así se evalúan.
+La materia de español (`espanol-heliodoro-laberinto`) va en español, porque evalúa la
+clase de español — poner sus enunciados en inglés le enseñaría algo falso. Esto se
+resuelve por materia con `DATA.ui` (cada `data.js` puede pisar el texto de la interfaz que
+necesite; ver "Principio arquitectónico" abajo) sin tocar `assets/ui.js`. Lo que SÍ se
+mantiene igual en todas las materias, por ahora, es el texto genérico del motor (botones
+como NEXT, HINT, CONFIRM): traducirlo por completo para español queda pendiente, declarado
+como alcance recortado a propósito por el plazo del Cycle Test del 21 de septiembre. La
+documentación y la conversación conmigo, en español, siempre.
 
 **Consecuencia de que lo usen otros niños [v2]:** el juego ya no puede hablarle a Samuel
 por su nombre ni asumir que un adulto está al lado explicando. Tiene que ser
@@ -49,6 +55,16 @@ genéricos o dirigidos al alias que cada niño elija.
 
 La única excepción permitida en `engine.css` es añadir una línea `[data-accent="..."]`
 con dos variables de color para una materia nueva.
+
+**Segunda excepción, distinta de la anterior: una mecánica nueva de juego SÍ puede
+tocar `engine.js`/`engine.css`, pero solo si es genérica** (sirve para cualquier materia
+futura, no solo la que la motivó) y **aditiva** (no cambia ni una línea de lo que ya
+existe — `doors`, el `Runner`, `answer()`). Así se añadió `doors` en su momento, y así se
+añadió `forge` el 16 de septiembre de 2026 (construcción por piezas: un banco de piezas
+categorizadas + una regla declarativa en datos, `{need, forbid}`; el motor no sabe qué
+significa cada categoría, solo cuenta cuántas hay). La prueba de que sigue siendo aditivo:
+`tools/harness.js` completo, corrido contra Maths, en verde después del cambio. Cualquier
+mecánica nueva se verifica así antes de darse por buena — nunca leyendo el código a ojo.
 
 ### Ningún texto visible se escribe dentro del motor
 
@@ -87,7 +103,9 @@ samu-link-to-the-math/
 ├── subjects/<slug>/data.js   contenido (autogenerado)
 ├── tools/
 │   ├── gen_<slug>.py     generador de data.js con validación
-│   └── build.py          inlina motor+datos en los .html de la raíz
+│   ├── build.py          inlina motor+datos en los .html de la raíz
+│   ├── harness.js        regresión completa (jsdom) — piensa en Maths, exige jsdom
+│   └── verify_<slug>.js  verificación propia de una materia (ver el de español como ejemplo)
 ├── PROMPT.md             prompt maestro para materias nuevas
 ├── PROMPT-PLAN-MEJORA.md prompt para el plan de rediseño v2
 ├── NIVELES-Y-JEFES.md    borrador interno de mundos y jefes — NO se manda al plan v2
@@ -108,7 +126,7 @@ siempre soy yo quien ejecuta el script.
 
 | Regla | v1 (hoy) | v2 (objetivo) |
 |---|---|---|
-| Idioma del juego | Inglés | Inglés |
+| Idioma del juego | Inglés (currículo británico) o español (materias de la clase de español) | Igual — sigue a la materia evaluada, no es fijo |
 | Niveles | 5 | **7** |
 | Familias de preguntas por nivel | 16 mínimo | lo define el plan v2 |
 | Variantes por familia | 5 mínimo | 5 mínimo |
@@ -219,6 +237,15 @@ Motivo: escribir cientos de preguntas a mano garantiza errores aritméticos, y u
 respuesta mal marcada le enseña algo falso al niño. Es el riesgo más caro del proyecto,
 y ahora que lo usan otros niños el error se multiplica.
 
+**Excepción declarada para lenguaje/literatura (ej. `gen_espanol_heliodoro.py`):** un
+tema de comprensión narrativa no se genera por fórmula como una secuencia numérica. Cada
+familia trae UNA sola variante, escrita a mano, en vez de 4-5 variantes generadas. El
+generador sigue validando con `assert` (una respuesta correcta, sin opciones duplicadas,
+ningún enunciado repetido entre ítems), pero no puede exigir el mínimo de variantes por
+familia que sí tiene sentido en Maths. Consecuencia aceptada: si un niño falla un ítem de
+estas materias, vuelve a ver el mismo enunciado — pierde la garantía anti-repetición de
+Maths. Es deuda técnica declarada, no un descuido.
+
 **El generador no basta: hay que auditar el contexto, no solo la aritmética.** En la
 auditoría del Cycle Test #1 aparecieron preguntas con números correctos pero situaciones
 imposibles —un submarino que subía hasta quedar sobre el nivel del mar, una planta que
@@ -246,7 +273,8 @@ variantes como si fueras el niño.
 
 | Materia | Slug | Test | Niveles | Estado |
 |---|---|---|---|---|
-| Maths — Counting and Sequences | `y6-maths-counting-sequences` | Cycle Test #1 | 5 | Publicado — 80 familias, 400 variantes, auditado |
+| Español — El Archivo del Laberinto | `espanol-heliodoro-laberinto` | Cycle Test de español, lunes 21 sep. 2026 (plan lector *Heliodoro y el laberinto secreto*) | 7 | Construido y verificado el 16 de sep. — 80 ítems (58 doors + 22 forge), `tools/verify_espanol_heliodoro.js` en verde. Falta: doble clic en `publicar.bat` |
+| Maths — Counting and Sequences | `y6-maths-counting-sequences` | Cycle Test #1 | 7 | Publicado — v2 completa, 112 familias, 560 variantes, `tools/harness.js` en verde |
 
 **Duración real medida (v1):** con 70-90% de acierto, un nivel son 18-23 respuestas
 ≈ 15-20 minutos con briefing incluido. El plan v2 debe partir de este dato medido al

@@ -635,6 +635,38 @@ h3 { font-size: 12px; }
   .scene--stacked .scene__hero { transition: none; }
 }
 
+/* ---------- FORGE (mech: "forge") ----------
+   Construction scene: a preview strip of chosen pieces + a palette to pick
+   from. Generic, subject-agnostic — same rules as `.scene--doors` above. */
+.scene--forge { padding: 4px 0; }
+.forge__preview {
+  min-height: 52px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  padding: 10px 12px;
+  border: var(--px) solid var(--line);
+  background: var(--bg-2);
+  margin-bottom: 14px;
+}
+.forge__preview.is-good { border-color: var(--good); }
+.forge__preview.is-bad  { border-color: var(--bad); }
+.forge__placeholder { color: var(--ink-dim); font-size: 14px; }
+.forge__palette { display: flex; flex-wrap: wrap; gap: 8px; }
+.forge__piece {
+  font-family: var(--font-read);
+  font-size: 15px;
+  padding: 8px 12px;
+  border: var(--px) solid var(--accent);
+  background: var(--bg-1);
+  color: var(--ink);
+  cursor: pointer;
+}
+.forge__piece:hover:not(:disabled) { background: var(--bg-2); }
+.forge__piece:disabled { opacity: .35; cursor: default; }
+.forge__preview .forge__piece.is-chosen {
+  border-color: var(--accent-2);
+  background: var(--bg-3);
+}
+
 .scene__help {
   margin-top: 12px;
   font-size: 13px;

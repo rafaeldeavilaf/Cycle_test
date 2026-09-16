@@ -196,7 +196,20 @@ window.GAME_UI = {
     sayOn:       'Standing at door {key}. It says {value}.',
     sayNeedMove: 'Step onto a door first: use the left and right arrows.',
     sayRight:    'Correct. The door opens.',
-    sayWrong:    'Wrong door. Back to the start.'
+    sayWrong:    'Wrong door. Back to the start.',
+
+    /* ---------- FORGE (mech: "forge") ----------
+       Construction mechanic: tap pieces from a palette to build an answer,
+       then confirm. Generic chrome only — no subject content here. */
+    forgeHelp:      'Tap pieces to add them. Tap an added piece to remove it. Press <b>Confirm</b> when ready.',
+    forgeConfirm:   'CONFIRM',
+    forgePreview:   'Your answer so far',
+    forgePaletteAria: 'Available pieces',
+    sayForgeAdd:    'Added: {value}.',
+    sayForgeRemove: 'Removed: {value}.',
+    sayForgeEmpty:  'Add at least one piece before confirming.',
+    sayForgeGood:   'That satisfies the rule.',
+    sayForgeBad:    'Not yet — check the rule and try again.'
   },
 
   /* ---------- COMPANERO DE PANTALLA ----------
