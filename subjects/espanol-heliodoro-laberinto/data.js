@@ -1855,8 +1855,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"Necesito pasar\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", dijo",
@@ -1891,11 +1891,11 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas"
+         "texto-comillas"
         ]
        },
        "hint": "En español el diálogo se marca con raya, no con comillas.",
-       "explain": "La raya (—) marca el diálogo en español; las comillas no se usan para esto."
+       "explain": "La raya (—) marca el diálogo en español; la versión entre comillas es el estilo inglés, no el español."
       }
      ]
     },
@@ -1919,8 +1919,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"Todavía no\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", respondió",
@@ -1955,11 +1955,11 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas"
+         "texto-comillas"
         ]
        },
        "hint": "Recuerda: raya al inicio, nunca comillas.",
-       "explain": "La raya marca dónde empieza el diálogo; el verbo dicendi dice quién y cómo lo dijo."
+       "explain": "La raya marca dónde empieza el diálogo; la versión entre comillas no es el estilo correcto en español."
       }
      ]
     },
@@ -1983,8 +1983,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"¿Qué buscas aquí?\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", preguntó",
@@ -2019,7 +2019,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas"
+         "texto-comillas"
         ]
        },
        "hint": "Una pregunta necesita un verbo dicendi de pregunta, no de sorpresa.",
@@ -2047,8 +2047,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"Hay algo detrás de la puerta\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", susurró",
@@ -2083,7 +2083,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas",
+         "texto-comillas",
          "verbo-voz-alta"
         ]
        },
@@ -2112,8 +2112,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"¡Otra vez tú!\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", exclamó",
@@ -2148,7 +2148,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas",
+         "texto-comillas",
          "verbo-pregunta"
         ]
        },
@@ -2181,8 +2181,8 @@ window.QUIZ_DATA = {
          "cat": "raya-2"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"¿Me dejas pasar?\"",
+         "cat": "texto-1-comillas"
         },
         {
          "text": ", preguntó",
@@ -2233,7 +2233,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas"
+         "texto-1-comillas"
         ]
        },
        "hint": "Cada intervención necesita su propia raya y su propio verbo dicendi.",
@@ -2261,8 +2261,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"Ve a la Torre antes del anochecer\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", ordenó",
@@ -2297,7 +2297,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas",
+         "texto-comillas",
          "verbo-pregunta"
         ]
        },
@@ -2326,8 +2326,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"Por favor\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", insistió",
@@ -2370,7 +2370,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas"
+         "texto-comillas"
         ]
        },
        "hint": "Puedes usar cualquiera de los verbos de insistencia, no hace falta repetir el mismo.",
@@ -2398,8 +2398,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"Entonces será mejor que corras\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", dijo",
@@ -2438,7 +2438,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas"
+         "texto-comillas"
         ]
        },
        "hint": "\"Concedió\" o \"aceptó\" muestran mejor que el Guardián cambió de opinión.",
@@ -2466,8 +2466,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas-a-quitar"
+         "text": "\"Necesito la Bóveda\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", dijo",
@@ -2494,7 +2494,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas-a-quitar"
+         "texto-comillas"
         ]
        },
        "hint": "El original usa comillas: hay que reemplazarlas por la raya.",
@@ -2816,8 +2816,8 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "“comillas”",
-         "cat": "comillas"
+         "text": "\"Vete antes de que cambie de opinión\"",
+         "cat": "texto-comillas"
         },
         {
          "text": ", advirtió",
@@ -2848,7 +2848,7 @@ window.QUIZ_DATA = {
          }
         ],
         "forbid": [
-         "comillas",
+         "texto-comillas",
          "verbo-repetido"
         ]
        },
