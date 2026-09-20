@@ -1855,7 +1855,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -1919,7 +1919,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -1983,7 +1983,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -2047,7 +2047,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -2112,7 +2112,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -2181,7 +2181,7 @@ window.QUIZ_DATA = {
          "cat": "raya-2"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -2261,7 +2261,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -2326,7 +2326,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -2398,7 +2398,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
@@ -2466,7 +2466,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas-a-quitar"
         },
         {
@@ -2816,7 +2816,7 @@ window.QUIZ_DATA = {
          "cat": "raya"
         },
         {
-         "text": "\" \"",
+         "text": "“comillas”",
          "cat": "comillas"
         },
         {
